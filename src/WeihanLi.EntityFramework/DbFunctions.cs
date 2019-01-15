@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace WeihanLi.EntityFramework
 {
-    public static class CustomDbFunctions
+    public static class DbFunctions
     {
         [DbFunction("JSON_VALUE", "")]
         public static string JsonValue(string column, [NotParameterized] string path)

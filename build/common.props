@@ -3,19 +3,20 @@
   <Import Project="version.props" />
   <PropertyGroup>        
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Title>WeihanLi.EntityFramework.Extensions</Title>
-    <PackageId>WeihanLi.EntityFramework.Extensions</PackageId>
+    <Title>WeihanLi.EntityFramework</Title>
+    <PackageId>WeihanLi.EntityFramework</PackageId>
     <Authors>WeihanLi</Authors>
     <Company>WeihanLi</Company>
-    <Product>WeihanLi.EntityFramework.Extensions</Product>
+    <Product>WeihanLi.EntityFramework</Product>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework.Extensions</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework.Extensions</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ef efcore entityframework entityframeworkcore</PackageTags>
     <Description>EntityFramework Extensions</Description>
     <PackageReleaseNotes>
+        Init
     </PackageReleaseNotes>
     <Copyright>Copyright 2018 WeihanLi</Copyright>
     <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">True</GeneratePackageOnBuild>
