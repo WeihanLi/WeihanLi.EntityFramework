@@ -23,6 +23,8 @@ namespace WeihanLi.EntityFramework.Samples
 
             var names = db.TestEntities.AsNoTracking().Select(t => DbFunctions.JsonValue(t.Extra, "$.Name")).ToArray();
 
+            var repo = new EFRepository<TestDbContext, TestEntity>(db);
+            var list = repo.Select(t => t.Id > 0).ToArray();
             //
             Console.ReadLine();
         }
