@@ -4,100 +4,80 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using WeihanLi.Common.Data;
 using WeihanLi.Common.Models;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
-    public class EFRepository<TDbContext, TEntity> : IRepository<TEntity>
+    public class EFRepository<TDbContext, TEntity> :
+        IEFRepository<TEntity>
         where TDbContext : DbContext
         where TEntity : class
     {
-        private readonly TDbContext _dbContext;
+        protected readonly TDbContext DbContext;
 
         public EFRepository(TDbContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
         }
 
-        public virtual long Count(Expression<Func<TEntity, bool>> whereExpression) => _dbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
+        public virtual long Count(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
 
         public virtual Task<long> CountAsync(Expression<Func<TEntity, bool>> whereExpression)
-        => _dbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
+        => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
 
         public virtual int Delete(Expression<Func<TEntity, bool>> whereExpression)
         {
-            _dbContext.Set<TEntity>().RemoveRange(_dbContext.Set<TEntity>().Where(whereExpression));
-            return _dbContext.SaveChanges();
+            DbContext.Set<TEntity>().RemoveRange(DbContext.Set<TEntity>().Where(whereExpression));
+            return DbContext.SaveChanges();
         }
 
         public virtual Task<int> DeleteAsync(Expression<Func<TEntity, bool>> whereExpression)
         {
-            _dbContext.Set<TEntity>().RemoveRange(_dbContext.Set<TEntity>().Where(whereExpression));
-            return _dbContext.SaveChangesAsync();
+            DbContext.Set<TEntity>().RemoveRange(DbContext.Set<TEntity>().Where(whereExpression));
+            return DbContext.SaveChangesAsync();
         }
 
-        public virtual int Execute(string sqlStr, object param = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<int> ExecuteAsync(string sqlStr, object param = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual TResult ExecuteScalar<TResult>(string sqlStr, object param = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<TResult> ExecuteScalarAsync<TResult>(string sqlStr, object param = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool Exist(Expression<Func<TEntity, bool>> whereExpression) => _dbContext.Set<TEntity>().AsNoTracking()
+        public virtual bool Exist(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
                 .Any(whereExpression);
 
-        public virtual Task<bool> ExistAsync(Expression<Func<TEntity, bool>> whereExpression) => _dbContext.Set<TEntity>().AsNoTracking()
+        public virtual Task<bool> ExistAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
                 .AnyAsync(whereExpression);
 
         public virtual TEntity Fetch(Expression<Func<TEntity, bool>> whereExpression)
-        => _dbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
+        => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
 
         public virtual Task<TEntity> FetchAsync(Expression<Func<TEntity, bool>> whereExpression)
 
-        => _dbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression);
+        => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression);
 
         public virtual int Insert(TEntity entity)
         {
-            _dbContext.Set<TEntity>().Add(entity);
-            return _dbContext.SaveChanges();
+            DbContext.Set<TEntity>().Add(entity);
+            return DbContext.SaveChanges();
         }
 
         public virtual int Insert(IEnumerable<TEntity> entities)
         {
-            _dbContext.Set<TEntity>().AddRange(entities);
-            return _dbContext.SaveChanges();
+            DbContext.Set<TEntity>().AddRange(entities);
+            return DbContext.SaveChanges();
         }
 
         public virtual Task<int> InsertAsync(TEntity entity)
         {
-            _dbContext.Set<TEntity>().Add(entity);
-            return _dbContext.SaveChangesAsync();
+            DbContext.Set<TEntity>().Add(entity);
+            return DbContext.SaveChangesAsync();
         }
 
         public virtual Task<int> InsertAsync(IEnumerable<TEntity> entities)
         {
-            _dbContext.Set<TEntity>().AddRange(entities);
-            return _dbContext.SaveChangesAsync();
+            DbContext.Set<TEntity>().AddRange(entities);
+            return DbContext.SaveChangesAsync();
         }
 
         public virtual PagedListModel<TEntity> Paged<TProperty>(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
         {
-            var total = _dbContext.Set<TEntity>().AsNoTracking()
+            var total = DbContext.Set<TEntity>().AsNoTracking()
                 .Count(whereExpression);
             if (total == 0)
             {
@@ -111,7 +91,7 @@ namespace WeihanLi.EntityFramework
             {
                 pageSize = 10;
             }
-            var query = _dbContext.Set<TEntity>().AsNoTracking()
+            var query = DbContext.Set<TEntity>().AsNoTracking()
                 .Where(whereExpression);
             if (isAsc)
             {
@@ -135,7 +115,7 @@ namespace WeihanLi.EntityFramework
 
         public virtual async Task<PagedListModel<TEntity>> PagedAsync<TProperty>(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
         {
-            var total = await _dbContext.Set<TEntity>().AsNoTracking()
+            var total = await DbContext.Set<TEntity>().AsNoTracking()
                 .CountAsync(whereExpression);
             if (total == 0)
             {
@@ -149,7 +129,7 @@ namespace WeihanLi.EntityFramework
             {
                 pageSize = 10;
             }
-            var query = _dbContext.Set<TEntity>().AsNoTracking()
+            var query = DbContext.Set<TEntity>().AsNoTracking()
                 .Where(whereExpression);
             if (isAsc)
             {
@@ -171,27 +151,52 @@ namespace WeihanLi.EntityFramework
             };
         }
 
-        public virtual IEnumerable<TEntity> Select(Expression<Func<TEntity, bool>> whereExpression) => _dbContext.Set<TEntity>().AsNoTracking()
-                .Where(whereExpression).AsEnumerable();
+        public virtual List<TEntity> Select(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
+                .Where(whereExpression).ToList();
 
-        public virtual Task<IEnumerable<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public List<TEntity> Select<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
         {
-            return Task.FromResult(_dbContext.Set<TEntity>().AsNoTracking().Where(whereExpression).AsEnumerable());
+            var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
+            if (isAsc)
+            {
+                query = query.OrderBy(orderByExpression);
+            }
+            else
+            {
+                query = query.OrderByDescending(orderByExpression);
+            }
+            return query.Take(count).ToList();
+        }
+
+        public virtual Task<List<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression).ToListAsync();
+
+        public Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
+        {
+            var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
+            if (isAsc)
+            {
+                query = query.OrderBy(orderByExpression);
+            }
+            else
+            {
+                query = query.OrderByDescending(orderByExpression);
+            }
+            return query.Take(count).ToListAsync();
         }
 
         public virtual int Update<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value)
         {
-            foreach (var entity in _dbContext.Set<TEntity>().Where(whereExpression))
+            foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
             }
 
-            return _dbContext.SaveChanges();
+            return DbContext.SaveChanges();
         }
 
         public virtual int Update(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues)
         {
-            foreach (var entity in _dbContext.Set<TEntity>().Where(whereExpression))
+            foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 foreach (var propertyValue in propertyValues)
                 {
@@ -199,22 +204,39 @@ namespace WeihanLi.EntityFramework
                 }
             }
 
-            return _dbContext.SaveChanges();
+            return DbContext.SaveChanges();
+        }
+
+        public int Update(TEntity entity)
+        {
+            DbContext.Update(entity);
+            return DbContext.SaveChanges();
+        }
+
+        public int Update(TEntity entity, string[] parameters)
+        {
+            var entry = DbContext.Entry(entity);
+            entry.State = EntityState.Unchanged;
+            foreach (var param in parameters)
+            {
+                entry.Property(param).IsModified = true;
+            }
+            return DbContext.SaveChanges();
         }
 
         public virtual async Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value)
         {
-            foreach (var entity in _dbContext.Set<TEntity>().Where(whereExpression))
+            foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
             }
 
-            return await _dbContext.SaveChangesAsync();
+            return await DbContext.SaveChangesAsync();
         }
 
         public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues)
         {
-            foreach (var entity in _dbContext.Set<TEntity>().Where(whereExpression))
+            foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 foreach (var propertyValue in propertyValues)
                 {
@@ -222,7 +244,24 @@ namespace WeihanLi.EntityFramework
                 }
             }
 
-            return await _dbContext.SaveChangesAsync();
+            return await DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync(TEntity entity)
+        {
+            DbContext.Set<TEntity>().Update(entity);
+            return DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync(TEntity entity, string[] parameters)
+        {
+            var entry = DbContext.Entry(entity);
+            entry.State = EntityState.Unchanged;
+            foreach (var param in parameters)
+            {
+                entry.Property(param).IsModified = true;
+            }
+            return DbContext.SaveChangesAsync();
         }
     }
 }
