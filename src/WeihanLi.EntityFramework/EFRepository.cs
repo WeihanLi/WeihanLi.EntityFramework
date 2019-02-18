@@ -215,7 +215,7 @@ namespace WeihanLi.EntityFramework
 
         public int Update(TEntity entity, string[] parameters)
         {
-            var entry = DbContext.Entry(entity);
+            var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
             foreach (var param in parameters)
             {
@@ -224,14 +224,22 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual async Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value)
+        public int Update<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression).IsModified = true;
+            return DbContext.SaveChanges();
+        }
+
+        public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value)
         {
             foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
             }
 
-            return await DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync();
         }
 
         public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues)
@@ -255,12 +263,20 @@ namespace WeihanLi.EntityFramework
 
         public Task<int> UpdateAsync(TEntity entity, string[] parameters)
         {
-            var entry = DbContext.Entry(entity);
+            var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
             foreach (var param in parameters)
             {
                 entry.Property(param).IsModified = true;
             }
+            return DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression).IsModified = true;
             return DbContext.SaveChangesAsync();
         }
     }
