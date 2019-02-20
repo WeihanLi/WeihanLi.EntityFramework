@@ -283,5 +283,128 @@ namespace WeihanLi.EntityFramework
             entry.Property(propertyExpression).IsModified = true;
             return DbContext.SaveChangesAsync();
         }
+
+        public int Update<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            return DbContext.SaveChanges();
+        }
+
+        public int Update<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            return DbContext.SaveChanges();
+        }
+
+        public int Update<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            entry.Property(propertyExpression4).IsModified = true;
+            return DbContext.SaveChanges();
+        }
+
+        public int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity,
+            Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            entry.Property(propertyExpression4).IsModified = true;
+            entry.Property(propertyExpression5).IsModified = true;
+            return DbContext.SaveChanges();
+        }
+
+        public int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity,
+            Expression<Func<TEntity, TProperty1>> propertyExpression1,
+            Expression<Func<TEntity, TProperty2>> propertyExpression2,
+            Expression<Func<TEntity, TProperty3>> propertyExpression3,
+            Expression<Func<TEntity, TProperty4>> propertyExpression4,
+            Expression<Func<TEntity, TProperty5>> propertyExpression5,
+            Expression<Func<TEntity, TProperty6>> propertyExpression6)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            entry.Property(propertyExpression4).IsModified = true;
+            entry.Property(propertyExpression5).IsModified = true;
+            entry.Property(propertyExpression6).IsModified = true;
+            return DbContext.SaveChanges();
+        }
+
+        public Task<int> UpdateAsync<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            return DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1,
+            Expression<Func<TEntity, TProperty2>> propertyExpression2,
+            Expression<Func<TEntity, TProperty3>> propertyExpression3)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            return DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity,
+            Expression<Func<TEntity, TProperty1>> propertyExpression1,
+            Expression<Func<TEntity, TProperty2>> propertyExpression2,
+            Expression<Func<TEntity, TProperty3>> propertyExpression3,
+            Expression<Func<TEntity, TProperty4>> propertyExpression4)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            entry.Property(propertyExpression4).IsModified = true;
+            return DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            entry.Property(propertyExpression4).IsModified = true;
+            entry.Property(propertyExpression5).IsModified = true;
+            return DbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5, Expression<Func<TEntity, TProperty6>> propertyExpression6)
+        {
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Unchanged;
+            entry.Property(propertyExpression1).IsModified = true;
+            entry.Property(propertyExpression2).IsModified = true;
+            entry.Property(propertyExpression3).IsModified = true;
+            entry.Property(propertyExpression4).IsModified = true;
+            entry.Property(propertyExpression5).IsModified = true;
+            entry.Property(propertyExpression6).IsModified = true;
+            return DbContext.SaveChangesAsync();
+        }
     }
 }
