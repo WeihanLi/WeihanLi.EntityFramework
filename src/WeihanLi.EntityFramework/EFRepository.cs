@@ -21,10 +21,14 @@ namespace WeihanLi.EntityFramework
             DbContext = dbContext;
         }
 
-        public virtual long Count(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
+        public virtual int Count(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().Count(whereExpression);
 
-        public virtual Task<long> CountAsync(Expression<Func<TEntity, bool>> whereExpression)
-        => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
+        public virtual Task<int> CountAsync(Expression<Func<TEntity, bool>> whereExpression)
+        => DbContext.Set<TEntity>().AsNoTracking().CountAsync(whereExpression);
+
+        public long LongCount(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
+
+        public Task<long> LongCountAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
 
         public virtual int Delete(Expression<Func<TEntity, bool>> whereExpression)
         {
@@ -81,7 +85,7 @@ namespace WeihanLi.EntityFramework
                 .Count(whereExpression);
             if (total == 0)
             {
-                return new PagedListModel<TEntity>() { PageIndex = 1, PageSize = pageSize, TotalCount = 0 };
+                return new PagedListModel<TEntity>() { PageSize = pageSize };
             }
             if (pageIndex <= 0)
             {
@@ -119,7 +123,7 @@ namespace WeihanLi.EntityFramework
                 .CountAsync(whereExpression);
             if (total == 0)
             {
-                return new PagedListModel<TEntity>() { PageIndex = 1, PageSize = pageSize, TotalCount = 0 };
+                return new PagedListModel<TEntity>() { PageSize = pageSize };
             }
             if (pageIndex <= 0)
             {

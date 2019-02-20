@@ -21,6 +21,8 @@ namespace WeihanLi.EntityFramework.Samples
 
             var abc = db.TestEntities.AsNoTracking().ToArray();
 
+            var exists = db.TestEntities.Any(_ => _.Id > 2000);
+
             var names = db.TestEntities.AsNoTracking().Select(t => DbFunctions.JsonValue(t.Extra, "$.Name")).ToArray();
 
             var repo = new EFRepository<TestDbContext, TestEntity>(db);
