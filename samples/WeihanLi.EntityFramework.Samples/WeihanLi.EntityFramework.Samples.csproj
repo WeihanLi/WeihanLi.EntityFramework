@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
-    <PackageReference Include="WeihanLi.Common.Logging.Log4Net" Version="1.0.12-preview-20190219-194445" />
+    <PackageReference Include="WeihanLi.Common.Logging.Log4Net" Version="1.0.12" />
   </ItemGroup>
 
   <ItemGroup>

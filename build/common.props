@@ -18,7 +18,7 @@
     <PackageReleaseNotes>
         Init
     </PackageReleaseNotes>
-    <Copyright>Copyright 2018 WeihanLi</Copyright>
+    <Copyright>Copyright 2019 WeihanLi</Copyright>
     <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">True</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>
