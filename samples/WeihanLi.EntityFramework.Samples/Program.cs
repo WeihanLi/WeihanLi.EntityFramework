@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using WeihanLi.Common;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Samples
@@ -12,43 +14,53 @@ namespace WeihanLi.EntityFramework.Samples
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddLog4Net();
-
-            var optionsBuilder = new DbContextOptionsBuilder<TestDbContext>()
-                .UseLoggerFactory(loggerFactory)
-                .EnableDetailedErrors()
-                .EnableSensitiveDataLogging()
-                .UseSqlServer("server=.;database=Test;Integrated Security=True");
-
-            var db = new TestDbContext(optionsBuilder.Options);
-
-            var abc = db.TestEntities.AsNoTracking().ToArray();
-
-            var exists = db.TestEntities.Any(_ => _.Id > 2000);
-
-            var names = db.TestEntities.AsNoTracking().Select(t => DbFunctions.JsonValue(t.Extra, "$.Name")).ToArray();
-
-            var repo = new EFRepository<TestDbContext, TestEntity>(db);
-            repo.Insert(new[] {
-                new TestEntity
+            var services = new ServiceCollection();
+            services.AddDbContext<TestDbContext>(options =>
             {
-                Extra = new { Name="Abcdes" }.ToJson(),
-                CreatedAt = DateTime.Now
-            },
-            new TestEntity
+                options
+                    .UseLoggerFactory(loggerFactory)
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging()
+                    .UseSqlServer("server=.;database=Test;Integrated Security=True");
+            });
+            services.AddEFRepository();
+            DependencyResolver.SetDependencyResolver(services);
+            DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
-                Extra = new { Name = "Abcdes" }.ToJson(),
-                CreatedAt = DateTime.Now
-            }
+                var abc = db.TestEntities.AsNoTracking().ToArray();
+                Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
+                var names = db.TestEntities.AsNoTracking().Select(t => DbFunctions.JsonValue(t.Extra, "$.Name"))
+                    .ToArray();
+                Console.WriteLine($"Names: {names.StringJoin(",")}");
             });
 
-            repo.Update(new TestEntity
+            DependencyResolver.Current.TryInvokeService<IEFRepository<TestDbContext, TestEntity>>(repo =>
             {
-                CreatedAt = DateTime.UtcNow,
-                Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
-                Id = 3
-            }, t => t.CreatedAt, t => t.Extra);
-            repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
-            var list = repo.Select(t => t.Id > 0).ToArray();
+                repo.Update(new TestEntity
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
+                    Id = 3
+                }, t => t.CreatedAt, t => t.Extra);
+                repo.Insert(new[]
+                {
+                    new TestEntity
+                    {
+                        Extra = new {Name = "Abcdes"}.ToJson(),
+                        CreatedAt = DateTime.Now
+                    },
+                    new TestEntity
+                    {
+                        Extra = new {Name = "Abcdes"}.ToJson(),
+                        CreatedAt = DateTime.Now
+                    }
+                });
+                var list = repo.Select(t => t.Id > 0).Select(_ => _.Id).ToArray();
+                Console.WriteLine($"Ids: {list.StringJoin(",")}");
+                repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
+                Console.WriteLine($"Count: {repo.Count(c => true)}");
+            });
+
             //
             Console.ReadLine();
         }

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using WeihanLi.Common.Data;
 
 namespace WeihanLi.EntityFramework
 {
-    public interface IEFRepository<TEntity> : IRepository<TEntity> where TEntity : class
+    public interface IEFRepository<TDbContext, TEntity> : IRepository<TEntity>
+        where TDbContext : DbContext
+        where TEntity : class
     {
         //
         int Update(TEntity entity);

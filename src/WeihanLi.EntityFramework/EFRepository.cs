@@ -10,7 +10,7 @@ using WeihanLi.Extensions;
 namespace WeihanLi.EntityFramework
 {
     public class EFRepository<TDbContext, TEntity> :
-        IEFRepository<TEntity>
+        IEFRepository<TDbContext, TEntity>
         where TDbContext : DbContext
         where TEntity : class
     {
