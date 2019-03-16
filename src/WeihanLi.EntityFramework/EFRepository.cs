@@ -211,19 +211,20 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update(TEntity entity)
+        public int Update(TEntity entity, params string[] parameters)
         {
-            DbContext.Update(entity);
-            return DbContext.SaveChanges();
-        }
-
-        public int Update(TEntity entity, string[] parameters)
-        {
-            var entry = DbContext.Set<TEntity>().Attach(entity);
-            entry.State = EntityState.Unchanged;
-            foreach (var param in parameters)
+            if (parameters == null || parameters.Length == 0)
             {
-                entry.Property(param).IsModified = true;
+                DbContext.Set<TEntity>().Update(entity);
+            }
+            else
+            {
+                var entry = DbContext.Set<TEntity>().Attach(entity);
+                entry.State = EntityState.Unchanged;
+                foreach (var param in parameters)
+                {
+                    entry.Property(param).IsModified = true;
+                }
             }
             return DbContext.SaveChanges();
         }
@@ -259,19 +260,20 @@ namespace WeihanLi.EntityFramework
             return await DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync(TEntity entity)
+        public Task<int> UpdateAsync(TEntity entity, params string[] parameters)
         {
-            DbContext.Set<TEntity>().Update(entity);
-            return DbContext.SaveChangesAsync();
-        }
-
-        public Task<int> UpdateAsync(TEntity entity, string[] parameters)
-        {
-            var entry = DbContext.Set<TEntity>().Attach(entity);
-            entry.State = EntityState.Unchanged;
-            foreach (var param in parameters)
+            if (parameters == null || parameters.Length == 0)
             {
-                entry.Property(param).IsModified = true;
+                DbContext.Set<TEntity>().Update(entity);
+            }
+            else
+            {
+                var entry = DbContext.Set<TEntity>().Attach(entity);
+                entry.State = EntityState.Unchanged;
+                foreach (var param in parameters)
+                {
+                    entry.Property(param).IsModified = true;
+                }
             }
             return DbContext.SaveChangesAsync();
         }

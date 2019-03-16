@@ -10,11 +10,6 @@ namespace WeihanLi.EntityFramework
         where TDbContext : DbContext
         where TEntity : class
     {
-        //
-        int Update(TEntity entity);
-
-        int Update(TEntity entity, string[] parameters);
-
         int Update<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression);
 
         int Update<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2);
@@ -47,8 +42,6 @@ namespace WeihanLi.EntityFramework
             Expression<Func<TEntity, TProperty5>> propertyExpression5,
             Expression<Func<TEntity, TProperty6>> propertyExpression6
             );
-
-        Task<int> UpdateAsync(TEntity entity);
 
         Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression);
 
@@ -83,6 +76,8 @@ namespace WeihanLi.EntityFramework
             Expression<Func<TEntity, TProperty6>> propertyExpression6
             );
 
-        Task<int> UpdateAsync(TEntity entity, string[] parameters);
+        int Update(TEntity entity, params string[] parameters);
+
+        Task<int> UpdateAsync(TEntity entity, params string[] parameters);
     }
 }
