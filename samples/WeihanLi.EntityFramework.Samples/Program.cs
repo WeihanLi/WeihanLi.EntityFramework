@@ -14,6 +14,9 @@ namespace WeihanLi.EntityFramework.Samples
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddLog4Net();
+
+            EFRepositoryGenerator.GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
+
             var services = new ServiceCollection();
             services.AddDbContext<TestDbContext>(options =>
             {

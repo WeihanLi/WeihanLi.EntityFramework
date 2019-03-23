@@ -55,6 +55,22 @@ namespace WeihanLi.EntityFramework
 
         => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression);
 
+        public virtual TEntity Fetch<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        {
+            return ascending
+                ? DbContext.Set<TEntity>().AsNoTracking().OrderBy(orderByExpression).FirstOrDefault(whereExpression)
+                : DbContext.Set<TEntity>().AsNoTracking().OrderByDescending(orderByExpression).FirstOrDefault(whereExpression)
+                ;
+        }
+
+        public virtual Task<TEntity> FetchAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        {
+            return ascending
+                ? DbContext.Set<TEntity>().AsNoTracking().OrderBy(orderByExpression).FirstOrDefaultAsync(whereExpression)
+                : DbContext.Set<TEntity>().AsNoTracking().OrderByDescending(orderByExpression).FirstOrDefaultAsync(whereExpression)
+                ;
+        }
+
         public virtual int Insert(TEntity entity)
         {
             DbContext.Set<TEntity>().Add(entity);
@@ -79,7 +95,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public virtual PagedListModel<TEntity> Paged<TProperty>(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
+        public virtual PagedListModel<TEntity> Paged<TProperty>(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
             var total = DbContext.Set<TEntity>().AsNoTracking()
                 .Count(whereExpression);
@@ -97,7 +113,7 @@ namespace WeihanLi.EntityFramework
             }
             var query = DbContext.Set<TEntity>().AsNoTracking()
                 .Where(whereExpression);
-            if (isAsc)
+            if (ascending)
             {
                 query = query.OrderBy(orderByExpression);
             }
@@ -117,7 +133,7 @@ namespace WeihanLi.EntityFramework
             };
         }
 
-        public virtual async Task<PagedListModel<TEntity>> PagedAsync<TProperty>(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
+        public virtual async Task<PagedListModel<TEntity>> PagedAsync<TProperty>(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
             var total = await DbContext.Set<TEntity>().AsNoTracking()
                 .CountAsync(whereExpression);
@@ -135,7 +151,7 @@ namespace WeihanLi.EntityFramework
             }
             var query = DbContext.Set<TEntity>().AsNoTracking()
                 .Where(whereExpression);
-            if (isAsc)
+            if (ascending)
             {
                 query = query.OrderBy(orderByExpression);
             }
@@ -158,10 +174,10 @@ namespace WeihanLi.EntityFramework
         public virtual List<TEntity> Select(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
                 .Where(whereExpression).ToList();
 
-        public List<TEntity> Select<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
+        public List<TEntity> Select<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
             var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
-            if (isAsc)
+            if (ascending)
             {
                 query = query.OrderBy(orderByExpression);
             }
@@ -174,10 +190,10 @@ namespace WeihanLi.EntityFramework
 
         public virtual Task<List<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression).ToListAsync();
 
-        public Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool isAsc = false)
+        public Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
             var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
-            if (isAsc)
+            if (ascending)
             {
                 query = query.OrderBy(orderByExpression);
             }
