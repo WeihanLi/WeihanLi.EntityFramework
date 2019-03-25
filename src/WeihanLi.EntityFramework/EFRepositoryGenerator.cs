@@ -33,7 +33,7 @@ namespace WeihanLi.EntityFramework
                 .ToArray()
                 ;
 
-            var modelNamespaces = entities.Select(p => p.PropertyType.Namespace).Distinct().ToList();
+            var modelNamespaces = entities.Select(p => p.PropertyType.GetGenericArguments()[0].Namespace).Distinct().ToList();
             modelNamespaces.AddIfNotContains(dbContextType.Namespace);
             var entityNames = entities.Select(p => p.PropertyType.GetGenericArguments()[0].Name).ToArray();
             //

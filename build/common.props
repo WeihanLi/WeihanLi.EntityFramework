@@ -16,7 +16,7 @@
     <PackageTags>ef efcore entityframework entityframeworkcore</PackageTags>
     <Description>EntityFramework Extensions</Description>
     <PackageReleaseNotes>
-        Init
+        Add EFRepositoryGenerator
     </PackageReleaseNotes>
     <Copyright>Copyright 2019 WeihanLi</Copyright>
     <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">True</GeneratePackageOnBuild>
