@@ -19,6 +19,5 @@
         Add EFRepositoryGenerator
     </PackageReleaseNotes>
     <Copyright>Copyright 2019 WeihanLi</Copyright>
-    <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">True</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>
