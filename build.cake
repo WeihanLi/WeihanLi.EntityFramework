@@ -5,8 +5,9 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
-var solutionPath = "./WeihanLi.Common.sln";
-var srcProjects  = GetFiles("./src/**/*.csproj");
+
+var solutionPath = "./WeihanLi.EntityFramework.sln";
+var srcProjects  = GetFiles("./src/WeihanLi.EntityFramework/*.csproj");
 
 var artifacts = "./artifacts/packages";
 var isWindowsAgent = (EnvironmentVariable("Agent_OS") ?? "Windows_NT") == "Windows_NT";
@@ -58,10 +59,7 @@ Task("restore")
     .Description("Restore")
     .Does(() => 
     {
-      foreach(var project in srcProjects)
-      {
-         DotNetCoreRestore(project.FullPath);
-      }
+      DotNetCoreRestore(solutionPath);
     });
 
 Task("build")    
@@ -74,10 +72,7 @@ Task("build")
          NoRestore = true,
          Configuration = configuration
       };
-      foreach(var project in srcProjects)
-      {
-         DotNetCoreBuild(project.FullPath, buildSetting);
-      }
+      DotNetCoreBuild(solutionPath, buildSetting);
     });
 
 Task("pack")
