@@ -7,7 +7,8 @@ var configuration = Argument("configuration", "Release");
 
 
 var solutionPath = "./WeihanLi.EntityFramework.sln";
-var srcProjects  = GetFiles("./src/WeihanLi.EntityFramework/*.csproj");
+var srcProjects  = GetFiles("./src/**/*.csproj");
+var packProjects = GetFiles("./src/WeihanLi.EntityFramework/*.csproj");
 
 var artifacts = "./artifacts/packages";
 var isWindowsAgent = (EnvironmentVariable("Agent_OS") ?? "Windows_NT") == "Windows_NT";
@@ -91,7 +92,7 @@ Task("pack")
       if(branchName != "master"){
          settings.VersionSuffix = $"preview-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
       }
-      foreach (var project in srcProjects)
+      foreach (var project in packProjects)
       {
          DotNetCorePack(project.FullPath, settings);
       }
