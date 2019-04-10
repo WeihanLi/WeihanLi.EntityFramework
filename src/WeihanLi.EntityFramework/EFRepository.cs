@@ -26,9 +26,9 @@ namespace WeihanLi.EntityFramework
         public virtual Task<int> CountAsync(Expression<Func<TEntity, bool>> whereExpression)
         => DbContext.Set<TEntity>().AsNoTracking().CountAsync(whereExpression);
 
-        public long LongCount(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
+        public virtual long LongCount(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
 
-        public Task<long> LongCountAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
+        public virtual Task<long> LongCountAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
 
         public virtual int Delete(Expression<Func<TEntity, bool>> whereExpression)
         {
@@ -174,7 +174,7 @@ namespace WeihanLi.EntityFramework
         public virtual List<TEntity> Select(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
                 .Where(whereExpression).ToList();
 
-        public List<TEntity> Select<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        public virtual List<TEntity> Select<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
             var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
             if (ascending)
@@ -190,7 +190,7 @@ namespace WeihanLi.EntityFramework
 
         public virtual Task<List<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression).ToListAsync();
 
-        public Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        public virtual Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
             var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
             if (ascending)
@@ -227,7 +227,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update(TEntity entity, params string[] parameters)
+        public virtual int Update(TEntity entity, params string[] parameters)
         {
             if (parameters == null || parameters.Length == 0)
             {
@@ -245,7 +245,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
+        public virtual int Update<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -276,7 +276,7 @@ namespace WeihanLi.EntityFramework
             return await DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync(TEntity entity, params string[] parameters)
+        public virtual Task<int> UpdateAsync(TEntity entity, params string[] parameters)
         {
             if (parameters == null || parameters.Length == 0)
             {
@@ -294,7 +294,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
+        public virtual Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -302,7 +302,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public int Update<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
+        public virtual int Update<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -311,7 +311,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3)
+        public virtual int Update<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -321,7 +321,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4)
+        public virtual int Update<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -332,7 +332,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity,
+        public virtual int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity,
             Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
@@ -345,7 +345,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity,
+        public virtual int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity,
             Expression<Func<TEntity, TProperty1>> propertyExpression1,
             Expression<Func<TEntity, TProperty2>> propertyExpression2,
             Expression<Func<TEntity, TProperty3>> propertyExpression3,
@@ -364,7 +364,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public Task<int> UpdateAsync<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -373,7 +373,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1,
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1,
             Expression<Func<TEntity, TProperty2>> propertyExpression2,
             Expression<Func<TEntity, TProperty3>> propertyExpression3)
         {
@@ -385,7 +385,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity,
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity,
             Expression<Func<TEntity, TProperty1>> propertyExpression1,
             Expression<Func<TEntity, TProperty2>> propertyExpression2,
             Expression<Func<TEntity, TProperty3>> propertyExpression3,
@@ -400,7 +400,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5)
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -412,7 +412,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync();
         }
 
-        public Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5, Expression<Func<TEntity, TProperty6>> propertyExpression6)
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5, Expression<Func<TEntity, TProperty6>> propertyExpression6)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
