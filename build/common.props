@@ -1,4 +1,5 @@
 <Project>  
+  <Import Project="analyzer.props" />
   <Import Project="sign.props" />
   <Import Project="version.props" />
   <PropertyGroup>        
@@ -19,5 +20,6 @@
         Add EFRepositoryGenerator
     </PackageReleaseNotes>
     <Copyright>Copyright 2019 WeihanLi</Copyright>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 </Project>

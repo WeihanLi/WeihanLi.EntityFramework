@@ -58,8 +58,10 @@ namespace WeihanLi.EntityFramework.Samples
                         CreatedAt = DateTime.Now
                     }
                 });
-                var list = repo.Select(t => t.Id > 0).Select(_ => _.Id).ToArray();
+                var list = repo.Select(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
+                repo.Select(_ => _.Id, orderBy: q => q.OrderBy(_ => _.CreatedAt));
+
                 repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
                 Console.WriteLine($"Count: {repo.Count(c => true)}");
             });
