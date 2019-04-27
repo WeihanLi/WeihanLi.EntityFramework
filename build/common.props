@@ -17,7 +17,7 @@
     <PackageTags>ef efcore entityframework entityframeworkcore</PackageTags>
     <Description>EntityFramework Extensions</Description>
     <PackageReleaseNotes>
-        Add EFRepositoryGenerator
+        Add more EFRepository support
     </PackageReleaseNotes>
     <Copyright>Copyright 2019 WeihanLi</Copyright>
     <LangVersion>latest</LangVersion>

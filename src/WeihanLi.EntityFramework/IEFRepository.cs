@@ -25,7 +25,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        List<TEntity> Select(Expression<Func<TEntity, bool>> predicate = null,
+        List<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                          bool disableTracking = true);
@@ -40,7 +40,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
+        List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                          bool disableTracking = true);
@@ -55,7 +55,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<List<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> predicate = null,
+        Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                          bool disableTracking = true,
@@ -72,7 +72,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
+        Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                          bool disableTracking = true,
