@@ -27,12 +27,12 @@ namespace WeihanLi.EntityFramework
 
         public virtual int Count(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().Count(whereExpression);
 
-        public virtual Task<int> CountAsync(Expression<Func<TEntity, bool>> whereExpression)
-        => DbContext.Set<TEntity>().AsNoTracking().CountAsync(whereExpression);
+        public virtual Task<int> CountAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
+        => DbContext.Set<TEntity>().AsNoTracking().CountAsync(whereExpression, cancellationToken);
 
         public virtual long LongCount(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCount(whereExpression);
 
-        public virtual Task<long> LongCountAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression);
+        public virtual Task<long> LongCountAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default) => DbContext.Set<TEntity>().AsNoTracking().LongCountAsync(whereExpression, cancellationToken);
 
         public virtual int Delete(Expression<Func<TEntity, bool>> whereExpression)
         {
@@ -40,24 +40,24 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<int> DeleteAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual Task<int> DeleteAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
         {
             DbContext.Set<TEntity>().RemoveRange(DbContext.Set<TEntity>().Where(whereExpression));
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public virtual bool Exist(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
                 .Any(whereExpression);
 
-        public virtual Task<bool> ExistAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking()
-                .AnyAsync(whereExpression);
+        public virtual Task<bool> ExistAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default) => DbContext.Set<TEntity>().AsNoTracking()
+                .AnyAsync(whereExpression, cancellationToken);
 
         public virtual TEntity Fetch(Expression<Func<TEntity, bool>> whereExpression)
         => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
 
-        public virtual Task<TEntity> FetchAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual Task<TEntity> FetchAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
 
-        => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression);
+        => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression, cancellationToken);
 
         public virtual TEntity Fetch<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
@@ -67,11 +67,11 @@ namespace WeihanLi.EntityFramework
                 ;
         }
 
-        public virtual Task<TEntity> FetchAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        public virtual Task<TEntity> FetchAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false, CancellationToken cancellationToken = default)
         {
             return ascending
-                ? DbContext.Set<TEntity>().AsNoTracking().OrderBy(orderByExpression).FirstOrDefaultAsync(whereExpression)
-                : DbContext.Set<TEntity>().AsNoTracking().OrderByDescending(orderByExpression).FirstOrDefaultAsync(whereExpression)
+                ? DbContext.Set<TEntity>().AsNoTracking().OrderBy(orderByExpression).FirstOrDefaultAsync(whereExpression, cancellationToken)
+                : DbContext.Set<TEntity>().AsNoTracking().OrderByDescending(orderByExpression).FirstOrDefaultAsync(whereExpression, cancellationToken)
                 ;
         }
 
@@ -87,16 +87,16 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<int> InsertAsync(TEntity entity)
+        public virtual Task<int> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             DbContext.Set<TEntity>().Add(entity);
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> InsertAsync(IEnumerable<TEntity> entities)
+        public virtual Task<int> InsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             DbContext.Set<TEntity>().AddRange(entities);
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public virtual PagedListModel<TEntity> Paged<TProperty>(int pageNumber, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
@@ -137,7 +137,7 @@ namespace WeihanLi.EntityFramework
             };
         }
 
-        public virtual async Task<PagedListModel<TEntity>> PagedAsync<TProperty>(int pageNumber, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        public virtual async Task<PagedListModel<TEntity>> PagedAsync<TProperty>(int pageNumber, int pageSize, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false, CancellationToken cancellationToken = default)
         {
             var total = await DbContext.Set<TEntity>().AsNoTracking()
                 .CountAsync(whereExpression);
@@ -192,9 +192,9 @@ namespace WeihanLi.EntityFramework
             return query.Take(count).ToList();
         }
 
-        public virtual Task<List<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression).ToListAsync();
+        public virtual Task<List<TEntity>> SelectAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default) => DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression).ToListAsync(cancellationToken);
 
-        public virtual Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
+        public virtual Task<List<TEntity>> SelectAsync<TProperty>(int count, Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false, CancellationToken cancellationToken = default)
         {
             var query = DbContext.Set<TEntity>().AsNoTracking().Where(whereExpression);
             if (ascending)
@@ -205,7 +205,7 @@ namespace WeihanLi.EntityFramework
             {
                 query = query.OrderByDescending(orderByExpression);
             }
-            return query.Take(count).ToListAsync();
+            return query.Take(count).ToListAsync(cancellationToken);
         }
 
         public virtual int Update<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value)
@@ -257,17 +257,17 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value)
+        public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value, CancellationToken cancellationToken = default)
         {
             foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
             }
 
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues)
+        public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues, CancellationToken cancellationToken = default)
         {
             foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
@@ -277,10 +277,10 @@ namespace WeihanLi.EntityFramework
                 }
             }
 
-            return await DbContext.SaveChangesAsync();
+            return await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> UpdateAsync(TEntity entity, params string[] parameters)
+        public virtual Task<int> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default, params string[] parameters)
         {
             if (parameters == null || parameters.Length == 0)
             {
@@ -295,15 +295,15 @@ namespace WeihanLi.EntityFramework
                     entry.Property(param).IsModified = true;
                 }
             }
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression)
+        public virtual Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression, CancellationToken cancellationToken = default)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
             entry.Property(propertyExpression).IsModified = true;
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public virtual int Update<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
@@ -368,32 +368,32 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<int> UpdateAsync<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2)
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, CancellationToken cancellationToken = default)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
             entry.Property(propertyExpression1).IsModified = true;
             entry.Property(propertyExpression2).IsModified = true;
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1,
             Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3)
+            Expression<Func<TEntity, TProperty3>> propertyExpression3, CancellationToken cancellationToken = default)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
             entry.Property(propertyExpression1).IsModified = true;
             entry.Property(propertyExpression2).IsModified = true;
             entry.Property(propertyExpression3).IsModified = true;
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity,
             Expression<Func<TEntity, TProperty1>> propertyExpression1,
             Expression<Func<TEntity, TProperty2>> propertyExpression2,
             Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4)
+            Expression<Func<TEntity, TProperty4>> propertyExpression4, CancellationToken cancellationToken = default)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -401,10 +401,10 @@ namespace WeihanLi.EntityFramework
             entry.Property(propertyExpression2).IsModified = true;
             entry.Property(propertyExpression3).IsModified = true;
             entry.Property(propertyExpression4).IsModified = true;
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5)
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5, CancellationToken cancellationToken = default)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -413,10 +413,10 @@ namespace WeihanLi.EntityFramework
             entry.Property(propertyExpression3).IsModified = true;
             entry.Property(propertyExpression4).IsModified = true;
             entry.Property(propertyExpression5).IsModified = true;
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5, Expression<Func<TEntity, TProperty6>> propertyExpression6)
+        public virtual Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, Expression<Func<TEntity, TProperty3>> propertyExpression3, Expression<Func<TEntity, TProperty4>> propertyExpression4, Expression<Func<TEntity, TProperty5>> propertyExpression5, Expression<Func<TEntity, TProperty6>> propertyExpression6, CancellationToken cancellationToken = default)
         {
             var entry = DbContext.Set<TEntity>().Attach(entity);
             entry.State = EntityState.Unchanged;
@@ -426,7 +426,7 @@ namespace WeihanLi.EntityFramework
             entry.Property(propertyExpression4).IsModified = true;
             entry.Property(propertyExpression5).IsModified = true;
             entry.Property(propertyExpression6).IsModified = true;
-            return DbContext.SaveChangesAsync();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public IPagedListModel<TEntity> Paged(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 0, int pageSize = 20, bool disableTracking = true)
@@ -477,11 +477,11 @@ namespace WeihanLi.EntityFramework
 
             if (orderBy != null)
             {
-                return orderBy(query).ToPagedListAsync(pageNumber, pageSize);
+                return orderBy(query).ToPagedListAsync(pageNumber, pageSize, cancellationToken);
             }
             else
             {
-                return query.ToPagedListAsync(pageNumber, pageSize);
+                return query.ToPagedListAsync(pageNumber, pageSize, cancellationToken);
             }
         }
 
