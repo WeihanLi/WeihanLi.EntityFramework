@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -8,24 +7,9 @@ using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
-    public static class EFRepositoryGenerator
+    internal class EFRepositoryGenerator : IEFRepositoryGenerator
     {
-        public static void GenerateRepositoryCodeFor<TDbContext>(string repositoryNamespace,
-            string outputPath = null) where TDbContext : DbContext
-        {
-            var repositoryText = GenerateRepositoryCodeTextFor<TDbContext>(repositoryNamespace);
-            if (string.IsNullOrEmpty(outputPath))
-            {
-                outputPath = $"{typeof(TDbContext).Name.Replace("DbContext", "").Replace("Context", "")}Repository";
-            }
-            if (!outputPath.EndsWith(".cs"))
-            {
-                outputPath += ".generated.cs";
-            }
-            File.WriteAllText(outputPath, repositoryText);
-        }
-
-        public static string GenerateRepositoryCodeTextFor<TDbContext>(string repositoryNamespace) where TDbContext : DbContext
+        public string GenerateRepositoryCodeTextFor<TDbContext>(string repositoryNamespace) where TDbContext : DbContext
         {
             var dbContextType = typeof(TDbContext);
             var entities = dbContextType.GetProperties()

@@ -14,6 +14,7 @@ namespace WeihanLi.EntityFramework
             }
 
             services.TryAddScoped(typeof(IEFRepository<,>), typeof(EFRepository<,>));
+            services.TryAddSingleton<IEFRepositoryGenerator, EFRepositoryGenerator>();
             return services;
         }
     }
