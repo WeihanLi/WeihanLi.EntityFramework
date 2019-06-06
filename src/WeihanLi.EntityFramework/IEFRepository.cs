@@ -72,13 +72,35 @@ namespace WeihanLi.EntityFramework
                                          bool disableTracking = true,
                                          CancellationToken cancellationToken = default);
 
+        List<TEntity> Top(int count, Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            bool disableTracking = true);
+
+        List<TResult> Top<TResult>(int count, Expression<Func<TEntity, TResult>> selector,
+            Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            bool disableTracking = true);
+
+        Task<List<TEntity>> TopAsync(int count, Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            bool disableTracking = true, CancellationToken cancellationToken = default);
+
+        Task<List<TResult>> TopAsync<TResult>(int count, Expression<Func<TEntity, TResult>> selector,
+            Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            bool disableTracking = true, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
+        /// <param name="pageNumber">The pageNumber of page.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
@@ -86,7 +108,7 @@ namespace WeihanLi.EntityFramework
         IPagedListModel<TEntity> Paged(Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         int pageIndex = 0,
+                                         int pageNumber = 1,
                                          int pageSize = 20,
                                          bool disableTracking = true);
 
@@ -96,7 +118,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
+        /// <param name="pageNumber">The number of page.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <param name="cancellationToken">
@@ -107,7 +129,7 @@ namespace WeihanLi.EntityFramework
         Task<IPagedListModel<TEntity>> PagedAsync(Expression<Func<TEntity, bool>> predicate = null,
                                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                    int pageIndex = 0,
+                                                    int pageNumber = 1,
                                                     int pageSize = 20,
                                                     bool disableTracking = true,
                                                     CancellationToken cancellationToken = default);
@@ -119,7 +141,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
+        /// <param name="pageNumber">pageNumber</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <returns>An <see cref="IPagedListModel{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
@@ -128,7 +150,7 @@ namespace WeihanLi.EntityFramework
                                                   Expression<Func<TEntity, bool>> predicate = null,
                                                   Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                                   Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                  int pageIndex = 0,
+                                                  int pageNumber = 1,
                                                   int pageSize = 20,
                                                   bool disableTracking = true) where TResult : class;
 
@@ -139,7 +161,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
+        /// <param name="pageNumber">The pageNumber of page.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <param name="cancellationToken">
@@ -151,7 +173,7 @@ namespace WeihanLi.EntityFramework
                                                              Expression<Func<TEntity, bool>> predicate = null,
                                                              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                                              Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                             int pageIndex = 0,
+                                                             int pageNumber = 1,
                                                              int pageSize = 20,
                                                              bool disableTracking = true,
                                                              CancellationToken cancellationToken = default) where TResult : class;
