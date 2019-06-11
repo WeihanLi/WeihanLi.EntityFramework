@@ -22,11 +22,13 @@ namespace WeihanLi.EntityFramework
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <remarks>This method default no-tracking query.</remarks>
         List<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true);
+                                         bool disableTracking = true,
+                                         bool ignoreQueryFilter = false);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -36,11 +38,13 @@ namespace WeihanLi.EntityFramework
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <remarks>This method default no-tracking query.</remarks>
         List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true);
+                                         bool disableTracking = true,
+                                         bool ignoreQueryFilter = false);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -49,12 +53,15 @@ namespace WeihanLi.EntityFramework
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <remarks>This method default no-tracking query.</remarks>
         Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true, CancellationToken cancellationToken = default);
+                                         bool disableTracking = true,
+                                         bool ignoreQueryFilter = false,
+                                         CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="List{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -64,35 +71,39 @@ namespace WeihanLi.EntityFramework
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="include">A function to include navigation properties</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <param name="cancellationToken"></param>
         /// <remarks>This method default no-tracking query.</remarks>
         Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                          bool disableTracking = true,
+                                         bool ignoreQueryFilter = false,
                                          CancellationToken cancellationToken = default);
 
         List<TEntity> Top(int count, Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true);
+            bool disableTracking = true,
+            bool ignoreQueryFilter = false);
 
         List<TResult> Top<TResult>(int count, Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true);
+            bool disableTracking = true,
+            bool ignoreQueryFilter = false);
 
         Task<List<TEntity>> TopAsync(int count, Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true, CancellationToken cancellationToken = default);
+            bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default);
 
         Task<List<TResult>> TopAsync<TResult>(int count, Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true, CancellationToken cancellationToken = default);
+            bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -103,6 +114,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber">The pageNumber of page.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
         IPagedListModel<TEntity> Paged(Expression<Func<TEntity, bool>> predicate = null,
@@ -110,7 +122,8 @@ namespace WeihanLi.EntityFramework
                                          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                          int pageNumber = 1,
                                          int pageSize = 20,
-                                         bool disableTracking = true);
+                                         bool disableTracking = true,
+                                         bool ignoreQueryFilter = false);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -121,6 +134,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber">The number of page.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <param name="cancellationToken">
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
@@ -132,6 +146,7 @@ namespace WeihanLi.EntityFramework
                                                     int pageNumber = 1,
                                                     int pageSize = 20,
                                                     bool disableTracking = true,
+                                                    bool ignoreQueryFilter = false,
                                                     CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -144,6 +159,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber">pageNumber</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <returns>An <see cref="IPagedListModel{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
         IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector,
@@ -152,7 +168,8 @@ namespace WeihanLi.EntityFramework
                                                   Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
                                                   int pageNumber = 1,
                                                   int pageSize = 20,
-                                                  bool disableTracking = true) where TResult : class;
+                                                  bool disableTracking = true,
+                                                  bool ignoreQueryFilter = false) where TResult : class;
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -164,6 +181,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber">The pageNumber of page.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilter"></param>
         /// <param name="cancellationToken">
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
@@ -176,6 +194,7 @@ namespace WeihanLi.EntityFramework
                                                              int pageNumber = 1,
                                                              int pageSize = 20,
                                                              bool disableTracking = true,
+                                                             bool ignoreQueryFilter = false,
                                                              CancellationToken cancellationToken = default) where TResult : class;
 
         /// <summary>
