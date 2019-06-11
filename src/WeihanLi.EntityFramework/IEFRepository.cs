@@ -19,7 +19,7 @@ namespace WeihanLi.EntityFramework
         /// </summary>
         /// <param name="queryBuilderAction">queryBuilderAction</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        List<TEntity> Get(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null);
+        List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate
@@ -27,7 +27,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="selector"></param>
         /// <param name="queryBuilderAction">queryBuilderAction</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null);
+        List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate
@@ -35,7 +35,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="queryBuilderAction">queryBuilder</param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<List<TEntity>> GetAsync(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
+        Task<List<TEntity>> GetAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="List{TResult}"/> based on a predicate
@@ -44,7 +44,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="queryBuilderAction">queryBuilder</param>
         /// <param name="cancellationToken"></param>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
+        Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -54,7 +54,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">The size of the page.</param>
         /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListModel<TEntity> Paged(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20);
+        IPagedListModel<TEntity> Paged(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -67,7 +67,7 @@ namespace WeihanLi.EntityFramework
         /// </param>
         /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListModel<TEntity>> PagedAsync(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
+        Task<IPagedListModel<TEntity>> PagedAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -78,7 +78,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">pageSize</param>
         /// <returns>An <see cref="IPagedListModel{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListModel<TResult> Paged<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null,
+        IPagedListModel<TResult> Paged<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
                                                   int pageNumber = 1, int pageSize = 20) where TResult : class;
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber"></param>
         /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListModel<TResult>> PagedAsync<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null,
+        Task<IPagedListModel<TResult>> PagedAsync<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
                                                              int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default) where TResult : class;
 
         /// <summary>

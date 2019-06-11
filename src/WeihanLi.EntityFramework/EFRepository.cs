@@ -434,72 +434,72 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public List<TEntity> Get(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null)
+        public List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery().ToList();
+            return queryBuilder.Build().ToList();
         }
 
-        public List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null)
+        public List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery(selector).ToList();
+            return queryBuilder.Build(selector).ToList();
         }
 
-        public Task<List<TEntity>> GetAsync(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public Task<List<TEntity>> GetAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery().ToListAsync(cancellationToken);
+            return queryBuilder.Build().ToListAsync(cancellationToken);
         }
 
-        public Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null,
+        public Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
             CancellationToken cancellationToken = default)
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery(selector).ToListAsync(cancellationToken);
+            return queryBuilder.Build(selector).ToListAsync(cancellationToken);
         }
 
-        public IPagedListModel<TEntity> Paged(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
+        public IPagedListModel<TEntity> Paged(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery().ToPagedList(pageNumber, pageSize);
+            return queryBuilder.Build().ToPagedList(pageNumber, pageSize);
         }
 
-        public Task<IPagedListModel<TEntity>> PagedAsync(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
+        public Task<IPagedListModel<TEntity>> PagedAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery().ToPagedListAsync(pageNumber, pageSize, cancellationToken);
+            return queryBuilder.Build().ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
 
-        public IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+        public IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20) where TResult : class
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery(selector).ToPagedList(pageNumber, pageSize);
+            return queryBuilder.Build(selector).ToPagedList(pageNumber, pageSize);
         }
 
-        public Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+        public Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20, CancellationToken cancellationToken = default) where TResult : class
         {
-            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.BuildQuery(selector).ToPagedListAsync(pageNumber, pageSize, cancellationToken);
+            return queryBuilder.Build(selector).ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
 
         public TEntity Find(params object[] keyValues)
