@@ -435,7 +435,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public IPagedListModel<TEntity> Paged(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true)
+        public IPagedListModel<TEntity> Paged(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true, bool ignoreQueryFilter = false)
         {
             IQueryable<TEntity> query = DbContext.Set<TEntity>();
             if (disableTracking)
@@ -463,7 +463,7 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public Task<IPagedListModel<TEntity>> PagedAsync(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true, CancellationToken cancellationToken = default)
+        public Task<IPagedListModel<TEntity>> PagedAsync(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
         {
             IQueryable<TEntity> query = DbContext.Set<TEntity>();
             if (disableTracking)
@@ -491,7 +491,7 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true) where TResult : class
+        public IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true, bool ignoreQueryFilter = false) where TResult : class
         {
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
@@ -519,7 +519,7 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true, CancellationToken cancellationToken = default) where TResult : class
+        public Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageNumber = 1, int pageSize = 20, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default) where TResult : class
         {
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
@@ -562,12 +562,17 @@ namespace WeihanLi.EntityFramework
             return DbContext.Set<TEntity>().FindAsync(keyValues, cancellationToken);
         }
 
-        public List<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true)
+        public List<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
         {
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
             {
                 query = query.AsNoTracking();
+            }
+
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
             }
 
             if (include != null)
@@ -590,12 +595,16 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true)
+        public List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
         {
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
             {
                 query = query.AsNoTracking();
+            }
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
             }
             if (include != null)
             {
@@ -615,14 +624,17 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, CancellationToken cancellationToken = default)
+        public Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
         {
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
             {
                 query = query.AsNoTracking();
             }
-
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
+            }
             if (include != null)
             {
                 query = include(query);
@@ -643,14 +655,17 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, CancellationToken cancellationToken = default)
+        public Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
         {
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
             {
                 query = query.AsNoTracking();
             }
-
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
+            }
             if (include != null)
             {
                 query = include(query);
@@ -671,7 +686,7 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public List<TEntity> Top(int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true)
+        public List<TEntity> Top(int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
         {
             if (count <= 0) count = 10;
             IQueryable<TEntity> query = _dbSet;
@@ -679,7 +694,10 @@ namespace WeihanLi.EntityFramework
             {
                 query = query.AsNoTracking();
             }
-
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
+            }
             if (include != null)
             {
                 query = include(query);
@@ -700,13 +718,17 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public List<TResult> Top<TResult>(int count, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true)
+        public List<TResult> Top<TResult>(int count, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
         {
             if (count <= 0) count = 10;
             IQueryable<TEntity> query = _dbSet;
             if (disableTracking)
             {
                 query = query.AsNoTracking();
+            }
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
             }
             if (include != null)
             {
@@ -726,7 +748,7 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public Task<List<TEntity>> TopAsync(int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, CancellationToken cancellationToken = default)
+        public Task<List<TEntity>> TopAsync(int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
         {
             if (count <= 0) count = 10;
             IQueryable<TEntity> query = _dbSet;
@@ -734,7 +756,10 @@ namespace WeihanLi.EntityFramework
             {
                 query = query.AsNoTracking();
             }
-
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
+            }
             if (include != null)
             {
                 query = include(query);
@@ -755,7 +780,7 @@ namespace WeihanLi.EntityFramework
             }
         }
 
-        public Task<List<TResult>> TopAsync<TResult>(int count, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, CancellationToken cancellationToken = default)
+        public Task<List<TResult>> TopAsync<TResult>(int count, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
         {
             if (count <= 0) count = 10;
             IQueryable<TEntity> query = _dbSet;
@@ -763,7 +788,10 @@ namespace WeihanLi.EntityFramework
             {
                 query = query.AsNoTracking();
             }
-
+            if (ignoreQueryFilter)
+            {
+                query = query.IgnoreQueryFilters();
+            }
             if (include != null)
             {
                 query = include(query);
