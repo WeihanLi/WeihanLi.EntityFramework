@@ -10,18 +10,12 @@ namespace WeihanLi.EntityFramework
 {
     public class EFRepoQueryBuilder<TEntity> where TEntity : class
     {
-        private DbSet<TEntity> _dbSet;
+        private readonly DbSet<TEntity> _dbSet;
 
-        internal EFRepoQueryBuilder<TEntity> WithDbSet(DbSet<TEntity> dbSet)
+        public EFRepoQueryBuilder(DbSet<TEntity> dbSet)
         {
-            if (_dbSet == null)
-            {
-                _dbSet = dbSet;
-            }
-            return this;
+            _dbSet = dbSet;
         }
-
-        public static EFRepoQueryBuilder<TEntity> New() => new EFRepoQueryBuilder<TEntity>();
 
         private Expression<Func<TEntity, bool>> _whereExpression = t => true;
 
@@ -107,31 +101,8 @@ namespace WeihanLi.EntityFramework
             {
                 throw new ArgumentNullException(nameof(selector));
             }
-            IQueryable<TEntity> query = _dbSet;
-            if (_disableTracking)
-            {
-                query = _dbSet.AsNoTracking();
-            }
-            if (_ignoreQueryFilters)
-            {
-                query = query.IgnoreQueryFilters();
-            }
-            query = query.Where(_whereExpression);
-            if (_orderByExpression != null)
-            {
-                query = _orderByExpression(query);
-            }
 
-            if (_count > 0)
-            {
-                query = query.Take(_count);
-            }
-
-            foreach (var include in _includeExpressions)
-            {
-                query = include(query);
-            }
-
+            var query = BuildQuery();
             return query.Select(selector);
         }
     }

@@ -434,61 +434,70 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public List<TEntity> Get(EFRepoQueryBuilder<TEntity> queryBuilder = null)
+        public List<TEntity> Get(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null)
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery().ToList();
         }
 
-        public List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null)
+        public List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null)
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
             return queryBuilder.BuildQuery(selector).ToList();
         }
 
-        public Task<List<TEntity>> GetAsync(EFRepoQueryBuilder<TEntity> queryBuilder = null, CancellationToken cancellationToken = default)
+        public Task<List<TEntity>> GetAsync(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery().ToListAsync(cancellationToken);
         }
 
-        public Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null,
+        public Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null,
             CancellationToken cancellationToken = default)
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery(selector).ToListAsync(cancellationToken);
         }
 
-        public IPagedListModel<TEntity> Paged(EFRepoQueryBuilder<TEntity> queryBuilder = null, int pageNumber = 1, int pageSize = 20)
+        public IPagedListModel<TEntity> Paged(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery().ToPagedList(pageNumber, pageSize);
         }
 
-        public Task<IPagedListModel<TEntity>> PagedAsync(EFRepoQueryBuilder<TEntity> queryBuilder = null, int pageNumber = 1, int pageSize = 20,
+        public Task<IPagedListModel<TEntity>> PagedAsync(Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery().ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
 
-        public IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null, int pageNumber = 1,
+        public IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20) where TResult : class
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery(selector).ToPagedList(pageNumber, pageSize);
         }
 
-        public Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null, int pageNumber = 1,
+        public Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepoQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20, CancellationToken cancellationToken = default) where TResult : class
         {
-            queryBuilder = (queryBuilder ?? new EFRepoQueryBuilder<TEntity>()).WithDbSet(_dbSet);
+            var queryBuilder = new EFRepoQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.BuildQuery(selector).ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
@@ -741,132 +750,6 @@ namespace WeihanLi.EntityFramework
         //    else
         //    {
         //        return query.Select(selector).ToListAsync(cancellationToken);
-        //    }
-        //}
-
-        //public List<TEntity> Top(int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
-        //{
-        //    if (count <= 0) count = 10;
-        //    IQueryable<TEntity> query = _dbSet;
-        //    if (disableTracking)
-        //    {
-        //        query = query.AsNoTracking();
-        //    }
-        //    if (ignoreQueryFilter)
-        //    {
-        //        query = query.IgnoreQueryFilters();
-        //    }
-        //    if (include != null)
-        //    {
-        //        query = include(query);
-        //    }
-
-        //    if (predicate != null)
-        //    {
-        //        query = query.Where(predicate);
-        //    }
-
-        //    if (orderBy != null)
-        //    {
-        //        return orderBy(query).Take(count).ToList();
-        //    }
-        //    else
-        //    {
-        //        return query.Take(count).ToList();
-        //    }
-        //}
-
-        //public List<TResult> Top<TResult>(int count, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
-        //{
-        //    if (count <= 0) count = 10;
-        //    IQueryable<TEntity> query = _dbSet;
-        //    if (disableTracking)
-        //    {
-        //        query = query.AsNoTracking();
-        //    }
-        //    if (ignoreQueryFilter)
-        //    {
-        //        query = query.IgnoreQueryFilters();
-        //    }
-        //    if (include != null)
-        //    {
-        //        query = include(query);
-        //    }
-        //    if (predicate != null)
-        //    {
-        //        query = query.Where(predicate);
-        //    }
-        //    if (orderBy != null)
-        //    {
-        //        return orderBy(query).Take(count).Select(selector).ToList();
-        //    }
-        //    else
-        //    {
-        //        return query.Take(count).Select(selector).ToList();
-        //    }
-        //}
-
-        //public Task<List<TEntity>> TopAsync(int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
-        //{
-        //    if (count <= 0) count = 10;
-        //    IQueryable<TEntity> query = _dbSet;
-        //    if (disableTracking)
-        //    {
-        //        query = query.AsNoTracking();
-        //    }
-        //    if (ignoreQueryFilter)
-        //    {
-        //        query = query.IgnoreQueryFilters();
-        //    }
-        //    if (include != null)
-        //    {
-        //        query = include(query);
-        //    }
-
-        //    if (predicate != null)
-        //    {
-        //        query = query.Where(predicate);
-        //    }
-
-        //    if (orderBy != null)
-        //    {
-        //        return orderBy(query).Take(count).ToListAsync(cancellationToken);
-        //    }
-        //    else
-        //    {
-        //        return query.Take(count).ToListAsync(cancellationToken);
-        //    }
-        //}
-
-        //public Task<List<TResult>> TopAsync<TResult>(int count, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
-        //{
-        //    if (count <= 0) count = 10;
-        //    IQueryable<TEntity> query = _dbSet;
-        //    if (disableTracking)
-        //    {
-        //        query = query.AsNoTracking();
-        //    }
-        //    if (ignoreQueryFilter)
-        //    {
-        //        query = query.IgnoreQueryFilters();
-        //    }
-        //    if (include != null)
-        //    {
-        //        query = include(query);
-        //    }
-
-        //    if (predicate != null)
-        //    {
-        //        query = query.Where(predicate);
-        //    }
-
-        //    if (orderBy != null)
-        //    {
-        //        return orderBy(query).Select(selector).Take(count).ToListAsync(cancellationToken);
-        //    }
-        //    else
-        //    {
-        //        return query.Select(selector).Take(count).ToListAsync(cancellationToken);
         //    }
         //}
     }
