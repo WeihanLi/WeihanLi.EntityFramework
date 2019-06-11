@@ -63,10 +63,10 @@ namespace WeihanLi.EntityFramework.Samples
                 var list = repo.GetAll().Select(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
 
-                repo.Get(_ => _.Id, EFRepoQueryBuilder<TestEntity>.New()
+                repo.Get(_ => _.Id, queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
-                var list1 = repo.Get(x => true, EFRepoQueryBuilder<TestEntity>.New()
+                var list1 = repo.Get(x => true, queryBuilder => queryBuilder
                     .WithOrderBy(query => query.OrderByDescending(q => q.Id))
                 );
 
