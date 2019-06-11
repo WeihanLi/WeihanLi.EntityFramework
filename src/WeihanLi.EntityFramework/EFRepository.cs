@@ -692,11 +692,11 @@ namespace WeihanLi.EntityFramework
 
             if (orderBy != null)
             {
-                return orderBy(query).ToList();
+                return orderBy(query).Take(count).ToList();
             }
             else
             {
-                return query.ToList();
+                return query.Take(count).ToList();
             }
         }
 
