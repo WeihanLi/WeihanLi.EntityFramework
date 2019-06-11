@@ -28,7 +28,8 @@ namespace WeihanLi.EntityFramework.Samples
             services.AddEFRepository();
             DependencyResolver.SetDependencyResolver(services);
 
-            // DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>().GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
+            DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>()
+                .GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
 
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
@@ -66,12 +67,12 @@ namespace WeihanLi.EntityFramework.Samples
                 repo.Get(_ => _.Id, queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
-                var list1 = repo.Get(x => true, queryBuilder => queryBuilder
+                var list1 = repo.Get(x => x.Id, queryBuilder => queryBuilder
                     .WithOrderBy(query => query.OrderByDescending(q => q.Id))
                 );
 
                 repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
-                Console.WriteLine($"Count: {repo.Count(c => true)}");
+                Console.WriteLine($"Count: {repo.Count()}");
             });
 
             //

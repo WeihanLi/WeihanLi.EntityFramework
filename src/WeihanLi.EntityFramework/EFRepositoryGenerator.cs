@@ -1,19 +1,25 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Options;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
     internal class EFRepositoryGenerator : IEFRepositoryGenerator
     {
+        private readonly EFRepositoryGeneratorOptions _generatorOptions;
+
+        public EFRepositoryGenerator(IOptions<EFRepositoryGeneratorOptions> options)
+        {
+            _generatorOptions = options.Value;
+        }
+
         public string GenerateRepositoryCodeTextFor<TDbContext>(string repositoryNamespace) where TDbContext : DbContext
         {
             var dbContextType = typeof(TDbContext);
             var entities = dbContextType.GetProperties()
-                .Where(p => typeof(IQueryable).IsAssignableFrom(p.PropertyType) && typeof(IInfrastructure<IServiceProvider>).IsAssignableFrom(p.PropertyType))
+                .Where(p => p.PropertyType.IsGenericType && typeof(DbSet<>) == p.PropertyType.GetGenericTypeDefinition())
                 .ToArray()
                 ;
 
@@ -39,14 +45,26 @@ namespace WeihanLi.EntityFramework
             return builder.ToString();
         }
 
-        private static string GenerateRepository(string dbContextName, string entityName)
+        private string GenerateRepository(string dbContextName, string entityName)
         {
-            return $@"
-    public partial interface I{entityName}Repository : IEFRepository<{dbContextName}, {entityName}> {{ }}
-    public partial class {entityName}Repository : EFRepository<{dbContextName}, {entityName}>, I{entityName}Repository
+            var repositoryName = _generatorOptions.RepositoryNameResolver(entityName);
+            if (_generatorOptions.GenerateInterface)
+            {
+                return $@"
+    public partial interface I{repositoryName} : IEFRepository<{dbContextName}, {entityName}> {{ }}
+    public partial class {repositoryName} : EFRepository<{dbContextName}, {entityName}>, I{repositoryName}
     {{
-        public {entityName}Repository({dbContextName} dbContext) : base(dbContext) {{ }}
+        public {repositoryName}({dbContextName} dbContext) : base(dbContext) {{ }}
     }}";
+            }
+            else
+            {
+                return $@"
+    public partial class {repositoryName} : EFRepository<{dbContextName}, {entityName}>
+    {{
+        public {repositoryName}({dbContextName} dbContext) : base(dbContext) {{ }}
+    }}";
+            }
         }
     }
 }
