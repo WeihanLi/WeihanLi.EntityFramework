@@ -63,9 +63,12 @@ namespace WeihanLi.EntityFramework.Samples
                 var list = repo.GetAll().Select(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
 
-                repo.Get(_ => _.Id, orderBy: q => q.OrderBy(_ => _.CreatedAt));
+                repo.Get(_ => _.Id, EFRepoQueryBuilder<TestEntity>.New()
+                    .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
-                var list1 = repo.Get(x => true, query => query.OrderByDescending(q => q.Id));
+                var list1 = repo.Get(x => true, EFRepoQueryBuilder<TestEntity>.New()
+                    .WithOrderBy(query => query.OrderByDescending(q => q.Id))
+                );
 
                 repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
                 Console.WriteLine($"Count: {repo.Count(c => true)}");

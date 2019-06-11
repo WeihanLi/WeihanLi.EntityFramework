@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Models;
 
@@ -16,186 +15,86 @@ namespace WeihanLi.EntityFramework
         where TEntity : class
     {
         /// <summary>
-        /// Gets the <see cref="List{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
         /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
+        /// <param name="queryBuilder">queryBuilder</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        List<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null,
-                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true,
-                                         bool ignoreQueryFilter = false);
+        List<TEntity> Get(EFRepoQueryBuilder<TEntity> queryBuilder = null);
 
         /// <summary>
-        /// Gets the <see cref="List{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
         /// </summary>
         /// <param name="selector"></param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
+        /// <param name="queryBuilder">queryBuilder</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
-                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true,
-                                         bool ignoreQueryFilter = false);
+        List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null);
 
         /// <summary>
-        /// Gets the <see cref="List{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
         /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
+        /// <param name="queryBuilder">queryBuilder</param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate = null,
-                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true,
-                                         bool ignoreQueryFilter = false,
-                                         CancellationToken cancellationToken = default);
+        Task<List<TEntity>> GetAsync(EFRepoQueryBuilder<TEntity> queryBuilder = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets the <see cref="List{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="List{TResult}"/> based on a predicate
         /// </summary>
         /// <param name="selector">selector</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
+        /// <param name="queryBuilder">queryBuilder</param>
         /// <param name="cancellationToken"></param>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null,
-                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true,
-                                         bool ignoreQueryFilter = false,
-                                         CancellationToken cancellationToken = default);
-
-        List<TEntity> Top(int count, Expression<Func<TEntity, bool>> predicate = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true,
-            bool ignoreQueryFilter = false);
-
-        List<TResult> Top<TResult>(int count, Expression<Func<TEntity, TResult>> selector,
-            Expression<Func<TEntity, bool>> predicate = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true,
-            bool ignoreQueryFilter = false);
-
-        Task<List<TEntity>> TopAsync(int count, Expression<Func<TEntity, bool>> predicate = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default);
-
-        Task<List<TResult>> TopAsync<TResult>(int count, Expression<Func<TEntity, TResult>> selector,
-            Expression<Func<TEntity, bool>> predicate = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default);
+        Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
+        /// <param name="queryBuilder">queryBuilder</param>
         /// <param name="pageNumber">The pageNumber of page.</param>
         /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
-        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilder"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListModel<TEntity> Paged(Expression<Func<TEntity, bool>> predicate = null,
-                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         int pageNumber = 1,
-                                         int pageSize = 20,
-                                         bool disableTracking = true,
-                                         bool ignoreQueryFilter = false);
+        IPagedListModel<TEntity> Paged(EFRepoQueryBuilder<TEntity> queryBuilder = null, int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
+        /// <param name="queryBuilder">A function to test each element for a condition.</param>
         /// <param name="pageNumber">The number of page.</param>
         /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
         /// <param name="cancellationToken">
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
-        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilder"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListModel<TEntity>> PagedAsync(Expression<Func<TEntity, bool>> predicate = null,
-                                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                    int pageNumber = 1,
-                                                    int pageSize = 20,
-                                                    bool disableTracking = true,
-                                                    bool ignoreQueryFilter = false,
-                                                    CancellationToken cancellationToken = default);
+        Task<IPagedListModel<TEntity>> PagedAsync(EFRepoQueryBuilder<TEntity> queryBuilder = null, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="selector">The selector for projection.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
+        /// <param name="queryBuilder">A function to test each element for a condition.</param>
         /// <param name="pageNumber">pageNumber</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
-        /// <returns>An <see cref="IPagedListModel{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+        /// <param name="pageSize">pageSize</param>
+        /// <returns>An <see cref="IPagedListModel{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilder"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector,
-                                                  Expression<Func<TEntity, bool>> predicate = null,
-                                                  Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                  Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                  int pageNumber = 1,
-                                                  int pageSize = 20,
-                                                  bool disableTracking = true,
-                                                  bool ignoreQueryFilter = false) where TResult : class;
+        IPagedListModel<TResult> Paged<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null,
+                                                  int pageNumber = 1, int pageSize = 20) where TResult : class;
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="selector">The selector for projection.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageNumber">The pageNumber of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="ignoreQueryFilter"></param>
+        /// <param name="queryBuilder">A function to test each element for a condition.</param>
+        /// <param name="pageSize"></param>
         /// <param name="cancellationToken">
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
-        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+        /// <param name="pageNumber"></param>
+        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilder"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
-                                                             Expression<Func<TEntity, bool>> predicate = null,
-                                                             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                             int pageNumber = 1,
-                                                             int pageSize = 20,
-                                                             bool disableTracking = true,
-                                                             bool ignoreQueryFilter = false,
-                                                             CancellationToken cancellationToken = default) where TResult : class;
+        Task<IPagedListModel<TResult>> PagedAsync<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, EFRepoQueryBuilder<TEntity> queryBuilder = null,
+                                                             int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default) where TResult : class;
 
         /// <summary>
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
