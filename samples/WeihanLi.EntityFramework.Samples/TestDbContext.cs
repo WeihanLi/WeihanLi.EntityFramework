@@ -15,7 +15,7 @@ namespace WeihanLi.EntityFramework.Samples
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDbFunction(() => DbFunctions.JsonValue(default(string), default(string)));
+            modelBuilder.HasDbFunction(() => DbFunctions.JsonValue(default, default));
         }
     }
 

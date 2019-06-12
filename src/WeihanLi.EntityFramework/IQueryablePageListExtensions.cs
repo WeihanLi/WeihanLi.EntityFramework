@@ -9,7 +9,7 @@ namespace WeihanLi.EntityFramework
     public static class IQueryablePageListExtensions
     {
         /// <summary>
-        /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageIndex"/> and <paramref name="pageSize"/>.
+        /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
         /// </summary>
         /// <typeparam name="T">The type of the source.</typeparam>
         /// <param name="source">The source to paging.</param>
@@ -22,7 +22,10 @@ namespace WeihanLi.EntityFramework
             {
                 pageNumber = 1;
             }
-
+            if (pageSize <= 0)
+            {
+                pageSize = 10;
+            }
             var count = source.Count();
             if (count == 0)
             {
@@ -44,7 +47,7 @@ namespace WeihanLi.EntityFramework
         }
 
         /// <summary>
-        /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageIndex"/> and <paramref name="pageSize"/>.
+        /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
         /// </summary>
         /// <typeparam name="T">The type of the source.</typeparam>
         /// <param name="source">The source to paging.</param>
@@ -54,7 +57,7 @@ namespace WeihanLi.EntityFramework
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
         /// <returns>An instance of  implements  <see cref="IPagedListModel{T}"/> interface.</returns>
-        public static async Task<IPagedListModel<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<IPagedListModel<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (pageNumber <= 0)
             {

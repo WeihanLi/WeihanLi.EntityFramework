@@ -1,25 +1,15 @@
-<Project>  
-  <Import Project="analyzer.props" />
-  <Import Project="sign.props" />
-  <Import Project="version.props" />
+<Project>
   <PropertyGroup>        
     <TargetFramework>netstandard2.0</TargetFramework>
     <Title>WeihanLi.EntityFramework</Title>
     <PackageId>WeihanLi.EntityFramework</PackageId>
-    <Authors>WeihanLi</Authors>
-    <Company>WeihanLi</Company>
-    <Product>WeihanLi.EntityFramework</Product>
-    <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>    
     <PackageProjectUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>ef efcore entityframework entityframeworkcore</PackageTags>
     <Description>EntityFramework Extensions</Description>
     <PackageReleaseNotes>
-        Add more EFRepository support
+        https://github.com/WeihanLi/WeihanLi.EntityFramework/tree/dev/docs/ReleaseNotes.md
     </PackageReleaseNotes>
     <Copyright>Copyright 2019 WeihanLi</Copyright>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 </Project>

@@ -16,8 +16,6 @@ namespace WeihanLi.EntityFramework.Samples
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddLog4Net();
 
-            EFRepositoryGenerator.GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
-
             var services = new ServiceCollection();
             services.AddDbContext<TestDbContext>(options =>
             {
@@ -29,6 +27,10 @@ namespace WeihanLi.EntityFramework.Samples
             });
             services.AddEFRepository();
             DependencyResolver.SetDependencyResolver(services);
+
+            DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>()
+                .GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
+
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
                 var abc = db.TestEntities.AsNoTracking().ToArray();
@@ -61,11 +63,16 @@ namespace WeihanLi.EntityFramework.Samples
                 });
                 var list = repo.GetAll().Select(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
-                
-                repo.Get(_ => _.Id, orderBy: q => q.OrderBy(_ => _.CreatedAt));
+
+                repo.Get(_ => _.Id, queryBuilder => queryBuilder
+                    .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
+
+                var list1 = repo.Get(x => x.Id, queryBuilder => queryBuilder
+                    .WithOrderBy(query => query.OrderByDescending(q => q.Id))
+                );
 
                 repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
-                Console.WriteLine($"Count: {repo.Count(c => true)}");
+                Console.WriteLine($"Count: {repo.Count()}");
             });
 
             //
