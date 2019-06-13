@@ -471,7 +471,7 @@ namespace WeihanLi.EntityFramework
 
 
 
-        public TEntity FirstOrDefault(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual TEntity FirstOrDefault(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -479,7 +479,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().FirstOrDefault();
         }
 
-        public TResult FirstOrDefault<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual TResult FirstOrDefault<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -487,7 +487,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build(selector).FirstOrDefault();
         }
 
-        public Task<TEntity> FirstOrDefaultAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual Task<TEntity> FirstOrDefaultAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -495,7 +495,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
