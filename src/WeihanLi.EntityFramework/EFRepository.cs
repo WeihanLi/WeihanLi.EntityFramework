@@ -420,6 +420,22 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
+        
+        public virtual TEntity Find(params object[] keyValues)
+        {
+            return DbContext.Set<TEntity>().Find(keyValues);
+        }
+
+        public virtual Task<TEntity> FindAsync(params object[] keyValues)
+        {
+            return DbContext.Set<TEntity>().FindAsync(keyValues);
+        }
+
+        public virtual Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
+        {
+            return DbContext.Set<TEntity>().FindAsync(keyValues, cancellationToken);
+        }
+
         public virtual List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
@@ -453,7 +469,41 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build(selector).ToListAsync(cancellationToken);
         }
 
-        public virtual IPagedListModel<TEntity> Paged(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
+
+
+        public TEntity FirstOrDefault(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build().FirstOrDefault();
+        }
+
+        public TResult FirstOrDefault<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build(selector).FirstOrDefault();
+        }
+
+        public Task<TEntity> FirstOrDefaultAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build().FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build(selector).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public virtual IPagedListModel<TEntity> GetPagedList(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -461,7 +511,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToPagedList(pageNumber, pageSize);
         }
 
-        public virtual Task<IPagedListModel<TEntity>> PagedAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
+        public virtual Task<IPagedListModel<TEntity>> GetPagedListAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
@@ -470,8 +520,8 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
 
-        public virtual IPagedListModel<TResult> Paged<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
-            int pageSize = 20) where TResult : class
+        public virtual IPagedListModel<TResult> GetPagedList<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+            int pageSize = 20)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -479,28 +529,13 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build(selector).ToPagedList(pageNumber, pageSize);
         }
 
-        public virtual Task<IPagedListModel<TResult>> PagedAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
-            int pageSize = 20, CancellationToken cancellationToken = default) where TResult : class
+        public virtual Task<IPagedListModel<TResult>> GetPagedListAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+            int pageSize = 20, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(_dbSet);
             queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.Build(selector).ToPagedListAsync(pageNumber, pageSize, cancellationToken);
-        }
-
-        public virtual TEntity Find(params object[] keyValues)
-        {
-            return DbContext.Set<TEntity>().Find(keyValues);
-        }
-
-        public virtual Task<TEntity> FindAsync(params object[] keyValues)
-        {
-            return DbContext.Set<TEntity>().FindAsync(keyValues);
-        }
-
-        public virtual Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
-        {
-            return DbContext.Set<TEntity>().FindAsync(keyValues, cancellationToken);
         }
     }
 }
