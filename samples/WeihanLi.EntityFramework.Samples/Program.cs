@@ -67,6 +67,9 @@ namespace WeihanLi.EntityFramework.Samples
                 repo.Get(_ => _.Id, queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
+                var lastItem = repo.FirstOrDefault(queryBuilder => queryBuilder
+                    .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));                
+
                 var list1 = repo.Get(x => x.Id, queryBuilder => queryBuilder
                     .WithOrderBy(query => query.OrderByDescending(q => q.Id))
                 );

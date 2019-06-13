@@ -15,53 +15,49 @@ namespace WeihanLi.EntityFramework
             where TDbContext : DbContext
             where TEntity : class
         {
-            return repository.Get(queryBuilder =>
+            return repository.FirstOrDefault(queryBuilder =>
                 queryBuilder.WithPredict(predicate)
                 .WithInclude(include)
                 .WithOrderBy(orderBy)
                 .WithNoTracking(disableTracking)
-                .IgnoreQueryFilters(ignoreQueryFilter)
-                .WithCount(1))
-                .FirstOrDefault();
+                .IgnoreQueryFilters(ignoreQueryFilter));
         }
 
         public static TResult Fetch<TDbContext, TEntity, TResult>(this EFRepository<TDbContext, TEntity> repository, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
             where TDbContext : DbContext
             where TEntity : class
         {
-            return repository.Get(selector, queryBuilder =>
+            return repository.FirstOrDefault(selector, queryBuilder =>
                 queryBuilder.WithPredict(predicate)
                     .WithInclude(include)
                     .WithOrderBy(orderBy)
                     .WithNoTracking(disableTracking)
-                    .IgnoreQueryFilters(ignoreQueryFilter)
-                    .WithCount(1)).FirstOrDefault();
+                    .IgnoreQueryFilters(ignoreQueryFilter));
         }
 
         public static Task<TEntity> FetchAsync<TDbContext, TEntity>(this EFRepository<TDbContext, TEntity> repository, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
             where TDbContext : DbContext
             where TEntity : class
         {
-            return repository.GetAsync(queryBuilder =>
+            return repository.FirstOrDefaultAsync(queryBuilder =>
                 queryBuilder.WithPredict(predicate)
                     .WithInclude(include)
                     .WithOrderBy(orderBy)
                     .WithNoTracking(disableTracking)
                     .IgnoreQueryFilters(ignoreQueryFilter)
-                    .WithCount(1), cancellationToken).ContinueWith(r => r.Result.FirstOrDefault(), cancellationToken);
+                    , cancellationToken);
         }
 
         public static Task<TResult> FetchAsync<TDbContext, TEntity, TResult>(this EFRepository<TDbContext, TEntity> repository, Expression<Func<TEntity, TResult>> selector, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false, CancellationToken cancellationToken = default)
             where TDbContext : DbContext
             where TEntity : class
         {
-            return repository.GetAsync(selector, queryBuilder =>
+            return repository.FirstOrDefaultAsync(selector, queryBuilder =>
                 queryBuilder.WithPredict(predicate)
                     .WithInclude(include)
                     .WithOrderBy(orderBy)
                     .WithNoTracking(disableTracking)
-                    .IgnoreQueryFilters(ignoreQueryFilter)
-                    .WithCount(1), cancellationToken).ContinueWith(r => r.Result.FirstOrDefault(), cancellationToken);
+                    .IgnoreQueryFilters(ignoreQueryFilter), cancellationToken);
         }
 
         public static List<TEntity> Top<TDbContext, TEntity>(this EFRepository<TDbContext, TEntity> repository, int count, Expression<Func<TEntity, bool>> predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, bool disableTracking = true, bool ignoreQueryFilter = false)
