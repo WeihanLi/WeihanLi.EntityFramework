@@ -1,16 +1,18 @@
 # Release Notes
 
-## 1.0.6
+## WeihanLi.EntityFramework
+
+### [WeihanLi.EntityFramework 1.0.6](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.6)
 
 - add `FirstOrDefault` for `EFRepository`
 
-## 1.0.5
+### [WeihanLi.EntityFramework 1.0.5](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.5)
 
 - add `CancellationToken` support for async operations
 - add `IEFRepositoryGenerator`
 - add `EFRepositoryQueryBuilder` for `EFRepository`
 - add [`sourceLink`](https://github.com/dotnet/sourcelink) support
 
-## 1.0.3
+### [WeihanLi.EntityFramework 1.0.3](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.3)
 
 - add `EFRepositoryGenerator`
