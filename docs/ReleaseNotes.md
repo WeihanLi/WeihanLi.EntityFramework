@@ -2,6 +2,12 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.0.7](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.7)
+
+- update `Update` for `EFRepository`
+- add `UpdateWithout`
+- remove none `QueryBuilder` extensions
+
 ### [WeihanLi.EntityFramework 1.0.6](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.6)
 
 - add `FirstOrDefault` for `EFRepository`
