@@ -14,76 +14,39 @@ namespace WeihanLi.EntityFramework
         where TDbContext : DbContext
         where TEntity : class
     {
-        int Update<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression);
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
 
-        int Update<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2);
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties not to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
 
-        int Update<TProperty1, TProperty2, TProperty3>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3);
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties to update</param>
+        /// <returns>affected rows</returns>
+        int Update(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions);
 
-        int Update<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4
-            );
-
-        int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4,
-            Expression<Func<TEntity, TProperty5>> propertyExpression5
-            );
-
-        int Update<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4,
-            Expression<Func<TEntity, TProperty5>> propertyExpression5,
-            Expression<Func<TEntity, TProperty6>> propertyExpression6
-            );
-
-        Task<int> UpdateAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> propertyExpression, CancellationToken cancellationToken = default);
-
-        Task<int> UpdateAsync<TProperty1, TProperty2>(TEntity entity, Expression<Func<TEntity, TProperty1>> propertyExpression1, Expression<Func<TEntity, TProperty2>> propertyExpression2, CancellationToken cancellationToken = default);
-
-        Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3, CancellationToken cancellationToken = default
-            );
-
-        Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4, CancellationToken cancellationToken = default
-            );
-
-        Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4,
-            Expression<Func<TEntity, TProperty5>> propertyExpression5, CancellationToken cancellationToken = default
-            );
-
-        Task<int> UpdateAsync<TProperty1, TProperty2, TProperty3, TProperty4, TProperty5, TProperty6>(TEntity entity,
-            Expression<Func<TEntity, TProperty1>> propertyExpression1,
-            Expression<Func<TEntity, TProperty2>> propertyExpression2,
-            Expression<Func<TEntity, TProperty3>> propertyExpression3,
-            Expression<Func<TEntity, TProperty4>> propertyExpression4,
-            Expression<Func<TEntity, TProperty5>> propertyExpression5,
-            Expression<Func<TEntity, TProperty6>> propertyExpression6, CancellationToken cancellationToken = default
-            );
-
-        int Update(TEntity entity, params string[] parameters);
-
-        Task<int> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default, params string[] parameters);
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties not to update</param>
+        /// <returns>affected rows</returns>
+        int UpdateWithout(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions);
 
         /// <summary>
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
@@ -96,16 +59,9 @@ namespace WeihanLi.EntityFramework
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
         /// </summary>
         /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
-        Task<TEntity> FindAsync(params object[] keyValues);
-
-        /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
-        /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
         /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
-        Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
+        Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate
@@ -170,7 +126,6 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken"></param>
         /// <remarks>This method default no-tracking query.</remarks>
         Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
-
 
         /// <summary>
         /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
