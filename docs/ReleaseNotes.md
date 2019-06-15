@@ -2,6 +2,12 @@
 
 ## WeihanLi.EntityFramework
 
+
+### [WeihanLi.EntityFramework 1.0.8](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.8)
+
+- rename Get with selector method name => `GetResult`/`FirstOrDefaultResult`/`GetPagedListResult`
+
+
 ### [WeihanLi.EntityFramework 1.0.7](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.7)
 
 - update `Update` for `EFRepository`
