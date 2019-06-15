@@ -336,7 +336,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToList();
         }
 
-        public virtual List<TResult> Get<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual List<TResult> GetResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -352,7 +352,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToListAsync(cancellationToken);
         }
 
-        public virtual Task<List<TResult>> GetAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
+        public virtual Task<List<TResult>> GetResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
             CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
@@ -369,7 +369,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().FirstOrDefault();
         }
 
-        public virtual TResult FirstOrDefault<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual TResult FirstOrDefaultResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -385,7 +385,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().FirstOrDefaultAsync(cancellationToken);
         }
 
-        public virtual Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual Task<TResult> FirstOrDefaultResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
             queryBuilderAction?.Invoke(queryBuilder);
@@ -410,7 +410,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
 
-        public virtual IPagedListModel<TResult> GetPagedList<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+        public virtual IPagedListModel<TResult> GetPagedListResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
@@ -419,7 +419,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build(selector).ToPagedList(pageNumber, pageSize);
         }
 
-        public virtual Task<IPagedListModel<TResult>> GetPagedListAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+        public virtual Task<IPagedListModel<TResult>> GetPagedListResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);

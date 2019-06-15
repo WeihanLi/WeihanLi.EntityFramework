@@ -89,13 +89,13 @@ GETUTCDATE()
                 var list = repo.GetAll().Select(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
 
-                repo.Get(_ => _.Id, queryBuilder => queryBuilder
+                repo.Get(queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
                 var lastItem = repo.FirstOrDefault(queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
-                var list1 = repo.Get(x => x.Id, queryBuilder => queryBuilder
+                var list1 = repo.GetResult(x => x.Id, queryBuilder => queryBuilder
                     .WithOrderBy(query => query.OrderByDescending(q => q.Id))
                 );
 
