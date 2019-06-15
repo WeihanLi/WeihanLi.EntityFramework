@@ -105,5 +105,16 @@ namespace WeihanLi.EntityFramework
             var query = Build();
             return query.Select(selector);
         }
+
+        public IQueryable<TResult> Build<TResult>(Expression<Func<TEntity, int, TResult>> selector)
+        {
+            if (null == selector)
+            {
+                throw new ArgumentNullException(nameof(selector));
+            }
+
+            var query = Build();
+            return query.Select(selector);
+        }
     }
 }
