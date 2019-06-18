@@ -318,11 +318,6 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual TEntity Find(params object[] keyValues)
-        {
-            return EntitySet.Find(keyValues);
-        }
-
         public virtual Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
         {
             return EntitySet.FindAsync(keyValues, cancellationToken);
@@ -359,6 +354,22 @@ namespace WeihanLi.EntityFramework
             queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.Build(selector).ToListAsync(cancellationToken);
+        }
+
+        public bool Any(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build().Any();
+        }
+
+        public Task<bool> AnyAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build().AnyAsync(cancellationToken);
         }
 
         public virtual TEntity FirstOrDefault(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)

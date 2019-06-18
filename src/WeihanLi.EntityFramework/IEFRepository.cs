@@ -52,13 +52,6 @@ namespace WeihanLi.EntityFramework
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
         /// </summary>
         /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <returns>The found entity or null.</returns>
-        TEntity Find(params object[] keyValues);
-
-        /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
-        /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
         /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
         Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken = default);
@@ -94,6 +87,21 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken"></param>
         /// <remarks>This method default no-tracking query.</remarks>
         Task<List<TResult>> GetResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
+        /// </summary>
+        /// <param name="queryBuilderAction">queryBuilderAction</param>
+        /// <remarks>This method default no-tracking query.</remarks>
+        bool Any(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null);
+
+        /// <summary>
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
+        /// </summary>
+        /// <param name="queryBuilderAction">queryBuilder</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <remarks>This method default no-tracking query.</remarks>
+        Task<bool> AnyAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate
