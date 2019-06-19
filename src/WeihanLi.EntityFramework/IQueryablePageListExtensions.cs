@@ -34,7 +34,7 @@ namespace WeihanLi.EntityFramework
 
             var items = source.Skip((pageNumber - 1) * pageSize)
                                     .Take(pageSize)
-                                    .ToList();
+                                    .ToArray();
             var pagedList = new PagedListModel<T>()
             {
                 PageNumber = pageNumber,
@@ -76,7 +76,7 @@ namespace WeihanLi.EntityFramework
 
             var items = await source.Skip((pageNumber - 1) * pageSize)
                                     .Take(pageSize)
-                                    .ToListAsync(cancellationToken).ConfigureAwait(false);
+                                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);
             var pagedList = new PagedListModel<T>()
             {
                 PageNumber = pageNumber,
