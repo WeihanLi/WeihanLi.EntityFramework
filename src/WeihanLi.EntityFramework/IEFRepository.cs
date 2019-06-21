@@ -15,22 +15,19 @@ namespace WeihanLi.EntityFramework
         where TEntity : class
     {
         /// <summary>
-        /// Update entity
+        /// Delete a entity
         /// </summary>
         /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties to update</param>
-        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>affected rows</returns>
-        Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
+        int Delete(TEntity entity);
 
         /// <summary>
-        /// Update entity
+        /// Delete a entity
         /// </summary>
         /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties not to update</param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>affected rows</returns>
-        Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update entity
@@ -47,6 +44,24 @@ namespace WeihanLi.EntityFramework
         /// <param name="propertyExpressions">properties not to update</param>
         /// <returns>affected rows</returns>
         int UpdateWithout(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties not to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.

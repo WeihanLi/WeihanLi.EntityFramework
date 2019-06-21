@@ -282,6 +282,30 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
+        public int Delete(TEntity entity)
+        {
+            if (entity == null)
+            {
+                return 0;
+            }
+
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Deleted;
+            return DbContext.SaveChanges();
+        }
+
+        public Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        {
+            if (entity == null)
+            {
+                return Task.FromResult(0);
+            }
+
+            var entry = DbContext.Set<TEntity>().Attach(entity);
+            entry.State = EntityState.Deleted;
+            return DbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public int Update(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions)
         {
             if (propertyExpressions == null || propertyExpressions.Length == 0)

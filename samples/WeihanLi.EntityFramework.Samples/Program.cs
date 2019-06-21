@@ -28,7 +28,9 @@ namespace WeihanLi.EntityFramework.Samples
                     .UseSqlServer(DbConnectionString);
             });
 
-            services.AddEFRepository();
+            services.AddEFRepository()
+                .AddRepository<TestDbContext>();
+
             DependencyResolver.SetDependencyResolver(services);
 
             //DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>()
