@@ -29,7 +29,8 @@ namespace WeihanLi.EntityFramework.Samples
             });
 
             services.AddEFRepository()
-                .AddRepository<TestDbContext>();
+                // .AddRepository<TestDbContext>()
+                ;
 
             DependencyResolver.SetDependencyResolver(services);
 
