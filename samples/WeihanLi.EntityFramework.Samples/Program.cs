@@ -11,6 +11,8 @@ namespace WeihanLi.EntityFramework.Samples
 {
     public class Program
     {
+        private const string DbConnectionString = "server=.;database=Test;uid=sa;pwd=Admin888";
+
         public static void Main(string[] args)
         {
             var loggerFactory = new LoggerFactory();
@@ -23,16 +25,36 @@ namespace WeihanLi.EntityFramework.Samples
                     .UseLoggerFactory(loggerFactory)
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging()
-                    .UseSqlServer("server=.;database=Test;Integrated Security=True");
+                    .UseSqlServer(DbConnectionString);
             });
-            services.AddEFRepository();
+
+            services.AddEFRepository()
+                // .AddRepository<TestDbContext>()
+                ;
+
             DependencyResolver.SetDependencyResolver(services);
 
-            DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>()
-                .GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
+            //DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>()
+            //    .GenerateRepositoryCodeFor<TestDbContext>("WeihanLi.EntityFramework.Samples.Business");
 
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
+                db.Database.EnsureCreated();
+
+                var conn = db.Database.GetDbConnection();
+                conn.Execute(@"
+INSERT INTO TestEntities
+(
+Extra,
+CreatedAt
+)
+VALUES
+(
+'{""Name"":""AA""}',
+GETUTCDATE()
+)
+");
+
                 var abc = db.TestEntities.AsNoTracking().ToArray();
                 Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
                 var names = db.TestEntities.AsNoTracking().Select(t => DbFunctions.JsonValue(t.Extra, "$.Name"))
@@ -42,12 +64,18 @@ namespace WeihanLi.EntityFramework.Samples
 
             DependencyResolver.Current.TryInvokeService<IEFRepository<TestDbContext, TestEntity>>(repo =>
             {
+                repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
+                repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
+
                 repo.Update(new TestEntity
                 {
-                    CreatedAt = DateTime.UtcNow,
                     Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
-                    Id = 3
+                    CreatedAt = DateTime.UtcNow,
+                    Id = 1
                 }, t => t.CreatedAt, t => t.Extra);
+
+                repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
+
                 repo.Insert(new[]
                 {
                     new TestEntity
@@ -64,15 +92,27 @@ namespace WeihanLi.EntityFramework.Samples
                 var list = repo.GetAll().Select(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
 
-                repo.Get(_ => _.Id, queryBuilder => queryBuilder
+                repo.Get(queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
-                var list1 = repo.Get(x => x.Id, queryBuilder => queryBuilder
-                    .WithOrderBy(query => query.OrderByDescending(q => q.Id))
+                var lastItem = repo.FirstOrDefault(queryBuilder => queryBuilder
+                    .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
+
+                var list1 = repo.GetPagedListResult(x => x.Id, queryBuilder => queryBuilder
+                    .WithOrderBy(query => query.OrderByDescending(q => q.Id)), 2, 2
                 );
 
                 repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
+
                 Console.WriteLine($"Count: {repo.Count()}");
+            });
+
+            DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
+            {
+                var conn = db.Database.GetDbConnection();
+                conn.Execute($@"
+TRUNCATE TABLE TestEntities
+");
             });
 
             //

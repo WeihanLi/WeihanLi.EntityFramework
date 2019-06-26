@@ -6,7 +6,7 @@ namespace WeihanLi.EntityFramework
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection AddEFRepository(this IServiceCollection services)
+        public static IEFRepositoryBuilder AddEFRepository(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -15,7 +15,7 @@ namespace WeihanLi.EntityFramework
 
             services.TryAddScoped(typeof(IEFRepository<,>), typeof(EFRepository<,>));
             services.TryAddSingleton<IEFRepositoryGenerator, EFRepositoryGenerator>();
-            return services;
+            return new EFRepositoryBuilder(services);
         }
     }
 }
