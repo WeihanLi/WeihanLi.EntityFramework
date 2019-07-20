@@ -32,9 +32,13 @@ namespace WeihanLi.EntityFramework
                 return new PagedListModel<T>() { PageNumber = pageNumber, PageSize = pageSize, TotalCount = 0 };
             }
 
-            var items = source.Skip((pageNumber - 1) * pageSize)
+            if (pageNumber > 1)
+            {
+                source = source.Skip((pageNumber - 1) * pageSize);
+            }
+            var items = source
                                     .Take(pageSize)
-                                    .ToList();
+                                    .ToArray();
             var pagedList = new PagedListModel<T>()
             {
                 PageNumber = pageNumber,
@@ -74,9 +78,13 @@ namespace WeihanLi.EntityFramework
                 return new PagedListModel<T>() { PageNumber = pageNumber, PageSize = pageSize, TotalCount = 0 };
             }
 
-            var items = await source.Skip((pageNumber - 1) * pageSize)
+            if (pageNumber > 1)
+            {
+                source = source.Skip((pageNumber - 1) * pageSize);
+            }
+            var items = await source
                                     .Take(pageSize)
-                                    .ToListAsync(cancellationToken).ConfigureAwait(false);
+                                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);
             var pagedList = new PagedListModel<T>()
             {
                 PageNumber = pageNumber,

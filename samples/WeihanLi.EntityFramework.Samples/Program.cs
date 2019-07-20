@@ -28,7 +28,10 @@ namespace WeihanLi.EntityFramework.Samples
                     .UseSqlServer(DbConnectionString);
             });
 
-            services.AddEFRepository();
+            services.AddEFRepository()
+                // .AddRepository<TestDbContext>()
+                ;
+
             DependencyResolver.SetDependencyResolver(services);
 
             //DependencyResolver.Current.ResolveService<IEFRepositoryGenerator>()
@@ -97,8 +100,8 @@ GETUTCDATE()
                 var lastItem = repo.FirstOrDefault(queryBuilder => queryBuilder
                     .WithOrderBy(q => q.OrderByDescending(_ => _.Id)));
 
-                var list1 = repo.GetResult(x => x.Id, queryBuilder => queryBuilder
-                    .WithOrderBy(query => query.OrderByDescending(q => q.Id))
+                var list1 = repo.GetPagedListResult(x => x.Id, queryBuilder => queryBuilder
+                    .WithOrderBy(query => query.OrderByDescending(q => q.Id)), 2, 2
                 );
 
                 var pagedList = repo.GetPagedListResult(x => x.Id, queryBuilder => queryBuilder
