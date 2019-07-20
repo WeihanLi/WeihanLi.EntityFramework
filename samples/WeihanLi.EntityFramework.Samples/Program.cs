@@ -39,6 +39,8 @@ namespace WeihanLi.EntityFramework.Samples
                 db.Database.EnsureCreated();
 
                 var conn = db.Database.GetDbConnection();
+                conn.Execute(@"TRUNCATE TABLE TestEntities");
+
                 conn.Execute(@"
 INSERT INTO TestEntities
 (
@@ -71,7 +73,7 @@ GETUTCDATE()
                     Id = 1
                 }, t => t.CreatedAt, t => t.Extra);
 
-                repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
+                // repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
 
                 repo.Insert(new[]
                 {
@@ -86,7 +88,7 @@ GETUTCDATE()
                         CreatedAt = DateTime.Now
                     }
                 });
-                var list = repo.GetAll().Select(_ => _.Id).ToArray();
+                var list = repo.GetResult(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {list.StringJoin(",")}");
 
                 repo.Get(queryBuilder => queryBuilder
@@ -98,6 +100,11 @@ GETUTCDATE()
                 var list1 = repo.GetResult(x => x.Id, queryBuilder => queryBuilder
                     .WithOrderBy(query => query.OrderByDescending(q => q.Id))
                 );
+
+                var pagedList = repo.GetPagedListResult(x => x.Id, queryBuilder => queryBuilder
+                    .WithOrderBy(query => query.OrderByDescending(q => q.Id))
+                , 1, 2);
+                Console.WriteLine(pagedList.ToJson());
 
                 repo.Delete(t => DbFunctions.JsonValue(t.Extra, "$.Name") == "Abcdes");
 
