@@ -15,22 +15,19 @@ namespace WeihanLi.EntityFramework
         where TEntity : class
     {
         /// <summary>
-        /// Update entity
+        /// Delete a entity
         /// </summary>
         /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties to update</param>
-        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>affected rows</returns>
-        Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
+        int Delete(TEntity entity);
 
         /// <summary>
-        /// Update entity
+        /// Delete a entity
         /// </summary>
         /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties not to update</param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>affected rows</returns>
-        Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update entity
@@ -49,11 +46,22 @@ namespace WeihanLi.EntityFramework
         int UpdateWithout(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions);
 
         /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
+        /// Update entity
         /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <returns>The found entity or null.</returns>
-        TEntity Find(params object[] keyValues);
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyExpressions">properties not to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
@@ -94,6 +102,21 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken"></param>
         /// <remarks>This method default no-tracking query.</remarks>
         Task<List<TResult>> GetResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
+        /// </summary>
+        /// <param name="queryBuilderAction">queryBuilderAction</param>
+        /// <remarks>This method default no-tracking query.</remarks>
+        bool Any(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null);
+
+        /// <summary>
+        /// Gets the <see cref="List{TEntity}"/> based on a predicate
+        /// </summary>
+        /// <param name="queryBuilderAction">queryBuilder</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <remarks>This method default no-tracking query.</remarks>
+        Task<bool> AnyAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate
