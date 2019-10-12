@@ -342,9 +342,9 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
+        public virtual async Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
         {
-            return EntitySet.FindAsync(keyValues, cancellationToken);
+            return await EntitySet.FindAsync(keyValues, cancellationToken);
         }
 
         public virtual List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
