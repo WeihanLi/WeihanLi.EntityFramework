@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>        
-    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Title>WeihanLi.EntityFramework</Title>
     <PackageId>WeihanLi.EntityFramework</PackageId>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>    
