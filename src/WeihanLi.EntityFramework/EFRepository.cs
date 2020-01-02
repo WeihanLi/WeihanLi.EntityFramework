@@ -347,6 +347,15 @@ namespace WeihanLi.EntityFramework
             return await EntitySet.FindAsync(keyValues, cancellationToken);
         }
 
+
+        public virtual IQueryable<TEntity> Query(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        {
+            var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
+            queryBuilderAction?.Invoke(queryBuilder);
+
+            return queryBuilder.Build();
+        }
+
         public virtual List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(EntitySet);
