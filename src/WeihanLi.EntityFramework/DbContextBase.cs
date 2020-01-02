@@ -10,11 +10,11 @@ namespace WeihanLi.EntityFramework
     /// </summary>
     public abstract class DbContextBase : DbContext
     {
-        public DbContextBase() : base()
+        protected DbContextBase()
         {
         }
 
-        public DbContextBase(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        protected DbContextBase(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
         }
 

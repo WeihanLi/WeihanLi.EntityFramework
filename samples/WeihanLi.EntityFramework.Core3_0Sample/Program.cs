@@ -12,7 +12,9 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
 {
     public class Program
     {
-        private const string DbConnectionString = "server=.;database=TestDb;uid=sa;pwd=Admin888";
+        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+        //"server=.;database=TestDb;uid=sa;pwd=Admin888"
+        ;
 
         public static void Main(string[] args)
         {
@@ -26,7 +28,9 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
                     .UseLoggerFactory(loggerFactory)
                     //.EnableDetailedErrors()
                     //.EnableSensitiveDataLogging()
-                    .UseSqlServer(DbConnectionString);
+                    .UseSqlServer(DbConnectionString)
+                    //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+                    ;
             });
 
             services.AddEFRepository()
