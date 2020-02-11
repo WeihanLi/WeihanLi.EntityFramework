@@ -34,7 +34,6 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
             });
 
             services.AddEFRepository()
-                // .AddRepository<TestDbContext>()
                 ;
 
             DependencyResolver.SetDependencyResolver(services);
@@ -62,6 +61,14 @@ GETUTCDATE()
                 var abc = db.TestEntities.AsNoTracking().ToArray();
                 Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
             });
+
+            DependencyResolver.Current.TryInvokeService<IEFRepositoryFactory<TestDbContext>>(repoFactory =>
+            {
+                var repo = repoFactory.GetRepository<TestEntity>();
+                var count = repo.Count();
+                Console.WriteLine(count);
+            });
+
             DependencyResolver.Current.TryInvokeService<IEFRepository<TestDbContext, TestEntity>>(repo =>
             {
                 var ids0 = repo.GetResult(_ => _.Id).ToArray();
