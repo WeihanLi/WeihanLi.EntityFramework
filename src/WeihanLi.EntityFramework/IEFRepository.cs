@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,6 +71,13 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
         /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
         Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="IQueryable{TEntity}"/> based on a predicate
+        /// </summary>
+        /// <param name="queryBuilderAction">queryBuilder</param>
+        /// <remarks>This method default no-tracking query.</remarks>
+        IQueryable<TEntity> Query(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null);
 
         /// <summary>
         /// Gets the <see cref="List{TEntity}"/> based on a predicate
