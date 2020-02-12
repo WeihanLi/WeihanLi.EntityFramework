@@ -2,6 +2,14 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.2.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.2.0)
+
+- add `IEFRepositoryFactory`
+
+### [WeihanLi.EntityFramework 1.1.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.1.0)
+
+- add `Query` for `IEFRepository` return raw `IQueryable<TEntity>`
+
 ### [WeihanLi.EntityFramework 1.0.9](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.0.9)
 
 - add `Delete`/`Any` for `IEFRepository`
