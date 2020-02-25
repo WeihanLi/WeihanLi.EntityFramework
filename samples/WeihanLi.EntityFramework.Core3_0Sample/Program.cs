@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
 using WeihanLi.Common.Data;
+using WeihanLi.Common.Helpers;
 using WeihanLi.EntityFramework.Samples;
 using WeihanLi.Extensions;
 
@@ -80,6 +82,22 @@ GETUTCDATE()
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
 
+                var whereExpression = ExpressionHelper.True<TestEntity>();
+                Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;
+                var whereExpression1 = whereExpression
+                    .And(t => t.Id > 0)
+                    .And(ExpressionHelper.True<TestEntity>())
+                    .And(t => t.Id > -1);
+
+                var abcExp = Expression.Lambda<Func<TestEntity, bool>>
+                    (Expression.AndAlso(idExp.Body, whereExpression.Body), idExp.Parameters);
+
+                var list00 = repo.GetResult(_ => _.Id, queryBuilder =>
+                    queryBuilder.WithPredict(whereExpression1)).ToArray();
+                var list01 = repo.GetResult(_ => _.Id, queryBuilder =>
+                    queryBuilder.WithPredict(abcExp)).ToArray();
+                Console.WriteLine($"Ids: {list00.StringJoin(",")}");
+
                 repo.Update(new TestEntity
                 {
                     Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
@@ -121,6 +139,27 @@ GETUTCDATE()
                 Console.WriteLine(pagedList.ToJson());
 
                 Console.WriteLine($"Count: {repo.Count()}");
+            });
+
+            DependencyResolver.Current.TryInvokeService<IEFUnitOfWork<TestDbContext>>(uow =>
+            {
+                var originColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("********** UnitOfWork ************");
+                Console.WriteLine($"uow count0: {uow.DbSet<TestEntity>().Count()}");
+
+                uow.DbSet<TestEntity>().Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Extra = "1212", });
+
+                Console.WriteLine($"uow count1: {uow.DbSet<TestEntity>().Count()}");
+
+                uow.DbSet<TestEntity>().Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Extra = "1212", });
+
+                uow.Commit();
+
+                Console.WriteLine($"uow count2: {uow.DbSet<TestEntity>().Count()}");
+                Console.WriteLine("********** UnitOfWork ************");
+
+                Console.ForegroundColor = originColor;
             });
 
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
