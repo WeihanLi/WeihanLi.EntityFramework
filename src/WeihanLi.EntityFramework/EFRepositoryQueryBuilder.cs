@@ -17,11 +17,18 @@ namespace WeihanLi.EntityFramework
             _dbSet = dbSet;
         }
 
-        private Expression<Func<TEntity, bool>> _whereExpression = t => true;
+        private Expression<Func<TEntity, bool>> _whereExpression;
 
         public EFRepositoryQueryBuilder<TEntity> WithPredict(Expression<Func<TEntity, bool>> predict)
         {
-            _whereExpression = _whereExpression.And(predict);
+            if (null == _whereExpression)
+            {
+                _whereExpression = predict;
+            }
+            else
+            {
+                _whereExpression = _whereExpression.And(predict);
+            }
             return this;
         }
 
@@ -76,22 +83,22 @@ namespace WeihanLi.EntityFramework
             {
                 query = query.IgnoreQueryFilters();
             }
-            query = query.Where(_whereExpression);
+            if (_whereExpression != null)
+            {
+                query = query.Where(_whereExpression);
+            }
             if (_orderByExpression != null)
             {
                 query = _orderByExpression(query);
             }
-
             if (_count > 0)
             {
                 query = query.Take(_count);
             }
-
             foreach (var include in _includeExpressions)
             {
                 query = include(query);
             }
-
             return query;
         }
 
