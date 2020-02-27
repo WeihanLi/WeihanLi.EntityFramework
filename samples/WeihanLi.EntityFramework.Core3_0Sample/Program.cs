@@ -145,6 +145,7 @@ GETUTCDATE()
             {
                 var originColor = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Green;
+
                 Console.WriteLine("********** UnitOfWork ************");
                 Console.WriteLine($"uow count0: {uow.DbSet<TestEntity>().Count()}");
 
@@ -154,7 +155,11 @@ GETUTCDATE()
 
                 uow.DbSet<TestEntity>().Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Extra = "1212", });
 
+                Console.ForegroundColor = originColor;
+
                 uow.Commit();
+
+                Console.ForegroundColor = ConsoleColor.Green;
 
                 Console.WriteLine($"uow count2: {uow.DbSet<TestEntity>().Count()}");
                 Console.WriteLine("********** UnitOfWork ************");
