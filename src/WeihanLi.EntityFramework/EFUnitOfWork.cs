@@ -13,6 +13,8 @@ namespace WeihanLi.EntityFramework
             _dbContext = dbContext;
         }
 
+        public TDbContext DbContext => _dbContext;
+
         public DbSet<TEntity> DbSet<TEntity>() where TEntity : class
         {
             return _dbContext.Set<TEntity>();

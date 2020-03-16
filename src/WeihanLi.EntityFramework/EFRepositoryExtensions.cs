@@ -12,7 +12,7 @@ namespace WeihanLi.EntityFramework
             TEntity entity, CancellationToken cancellationToken)
             where TDbContext : DbContext
             where TEntity : class
-            => repository.UpdateAsync(entity, null, cancellationToken);
+            => repository.UpdateAsync(entity, Array.Empty<string>(), cancellationToken);
 
         public static Task<int> UpdateAsync<TDbContext, TEntity>(this IEFRepository<TDbContext, TEntity> repository,
             TEntity entity,
@@ -37,6 +37,9 @@ namespace WeihanLi.EntityFramework
         public static Task<TEntity> FindAsync<TDbContext, TEntity>(this IEFRepository<TDbContext, TEntity> repository,
             params object[] keyValues)
             where TDbContext : DbContext
-            where TEntity : class => repository.FindAsync(keyValues);
+            where TEntity : class
+        {
+            return repository.DbContext.FindAsync<TEntity>(keyValues, CancellationToken.None);
+        }
     }
 }
