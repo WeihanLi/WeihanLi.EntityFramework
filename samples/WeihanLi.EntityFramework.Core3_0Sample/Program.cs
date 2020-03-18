@@ -76,9 +76,6 @@ GETUTCDATE()
                 var ids0 = repo.GetResult(_ => _.Id).ToArray();
                 Console.WriteLine($"Ids: {ids0.StringJoin(",")}");
 
-                var idCatch = repo.FindAsync(1);
-                idCatch.Wait();
-
                 var list0 = repo.GetResult(_ => _.Id, queryBuilder => queryBuilder.WithPredict(t => t.Id > 0)).ToArray();
                 Console.WriteLine($"Ids: {list0.StringJoin(",")}");
 

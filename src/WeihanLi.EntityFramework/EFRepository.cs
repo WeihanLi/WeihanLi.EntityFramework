@@ -27,6 +27,33 @@ namespace WeihanLi.EntityFramework
             return new EFUnitOfWork<TDbContext>(DbContext);
         }
 
+        public TEntity Find(params object[] keyValues)
+        {
+            return DbContext.Find<TEntity>(keyValues);
+        }
+
+        public int Delete(params object[] keyValues)
+        {
+            var entity = DbContext.Find<TEntity>(keyValues);
+            if (null == entity)
+            {
+                return 0;
+            }
+            DbContext.Set<TEntity>().Remove(entity);
+            return DbContext.SaveChanges();
+        }
+
+        public async Task<int> DeleteAsync(object[] keyValues, CancellationToken cancellationToken)
+        {
+            var entity = DbContext.Find<TEntity>(keyValues);
+            if (null == entity)
+            {
+                return 0;
+            }
+            DbContext.Set<TEntity>().Remove(entity);
+            return await DbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public virtual int Count(Expression<Func<TEntity, bool>> whereExpression) => DbContext.Set<TEntity>().Count(whereExpression);
 
         public virtual Task<int> CountAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)

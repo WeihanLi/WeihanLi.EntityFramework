@@ -1,13 +1,25 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Internal;
+using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
+        public static EntityEntry<TEntity> Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
+        {
+            var entity = dbContext.Find<TEntity>(keyValues);
+            if (entity == null)
+            {
+                return null;
+            }
+
+            return dbContext.Remove(entity);
+        }
+
         public static EntityEntry<TEntity> Update<TEntity>(this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
             if (propNames == null || propNames.Length == 0)
@@ -15,11 +27,24 @@ namespace WeihanLi.EntityFramework
                 return dbContext.Update(entity);
             }
 
-            var entry = dbContext.GetEntityEntry(entity);
-            entry.State = EntityState.Unchanged;
-            foreach (var expression in propNames)
+            var entry = dbContext.GetEntityEntry(entity, out var existBefore);
+            if (existBefore)
             {
-                entry.Property(expression).IsModified = true;
+                foreach (var propEntry in entry.Properties)
+                {
+                    if (!propNames.Contains(propEntry.Metadata.Name))
+                    {
+                        propEntry.IsModified = false;
+                    }
+                }
+            }
+            else
+            {
+                entry.State = EntityState.Unchanged;
+                foreach (var propName in propNames)
+                {
+                    entry.Property(propName).IsModified = true;
+                }
             }
 
             return entry;
@@ -32,7 +57,7 @@ namespace WeihanLi.EntityFramework
                 return dbContext.Update(entity);
             }
 
-            var entry = dbContext.GetEntityEntry(entity);
+            var entry = dbContext.GetEntityEntry(entity, out _);
             entry.State = EntityState.Modified;
             foreach (var expression in propNames)
             {
@@ -49,11 +74,27 @@ namespace WeihanLi.EntityFramework
                 return dbContext.Update(entity);
             }
 
-            var entry = dbContext.GetEntityEntry(entity);
-            entry.State = EntityState.Unchanged;
-            foreach (var expression in propertyExpressions)
+            var entry = dbContext.GetEntityEntry(entity, out var existBefore);
+
+            if (existBefore)
             {
-                entry.Property(expression).IsModified = true;
+                var propNames = propertyExpressions.Select(x => x.GetMemberName()).ToArray();
+
+                foreach (var propEntry in entry.Properties)
+                {
+                    if (!propNames.Contains(propEntry.Metadata.Name))
+                    {
+                        propEntry.IsModified = false;
+                    }
+                }
+            }
+            else
+            {
+                entry.State = EntityState.Unchanged;
+                foreach (var expression in propertyExpressions)
+                {
+                    entry.Property(expression).IsModified = true;
+                }
             }
 
             return entry;
@@ -66,7 +107,7 @@ namespace WeihanLi.EntityFramework
                 return dbContext.Update(entity);
             }
 
-            var entry = dbContext.GetEntityEntry(entity);
+            var entry = dbContext.GetEntityEntry(entity, out _);
 
             entry.State = EntityState.Modified;
             foreach (var expression in propertyExpressions)
@@ -77,11 +118,44 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity)
+        private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity, out bool existBefore)
       where TEntity : class
         {
-            var internalEntry = dbContext.GetDependencies().StateManager.GetOrCreateEntry(entity);
-            return (EntityEntry<TEntity>)internalEntry.ToEntityEntry();
+            var type = typeof(TEntity);
+
+            var entityType = dbContext.Model.FindEntityType(type);
+
+            var keysGetter = entityType.FindPrimaryKey().Properties
+                .Select(x => x.PropertyInfo.GetValueGetter<TEntity>())
+                .ToArray();
+
+            var keyValues = keysGetter
+                .Select(x => x.Invoke(entity))
+                .ToArray();
+
+            var oldEntity = dbContext.Set<TEntity>().Local
+                .FirstOrDefault(x => GetEntityKeyValues(keysGetter, x).SequenceEqual(keyValues));
+
+            EntityEntry<TEntity> entityEntry;
+            if (null == oldEntity)
+            {
+                existBefore = false;
+                entityEntry = dbContext.Attach(entity);
+            }
+            else
+            {
+                existBefore = true;
+                entityEntry = dbContext.Entry(oldEntity);
+                entityEntry.CurrentValues.SetValues(entity);
+            }
+
+            return entityEntry;
+        }
+
+        private static object[] GetEntityKeyValues<TEntity>(Func<TEntity, object>[] keyValueGetter, TEntity entity)
+        {
+            var keyValues = keyValueGetter.Select(x => x.Invoke(entity)).ToArray();
+            return keyValues;
         }
     }
 }

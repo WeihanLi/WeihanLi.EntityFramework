@@ -4,11 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework
 {
-    public interface IEFUnitOfWork<TDbContext> where TDbContext : DbContext
+    public interface IEFUnitOfWork<out TDbContext> where TDbContext : DbContext
     {
         TDbContext DbContext { get; }
-
-        DbSet<TEntity> DbSet<TEntity>() where TEntity : class;
 
         int Commit();
 

@@ -24,6 +24,28 @@ namespace WeihanLi.EntityFramework
         IEFUnitOfWork<TDbContext> GetUnitOfWork();
 
         /// <summary>
+        /// Find an entity
+        /// </summary>
+        /// <param name="keyValues">keyValues</param>
+        /// <returns>the entity founded, if not found, null returned</returns>
+        TEntity Find(params object[] keyValues);
+
+        /// <summary>
+        /// Delete a entity
+        /// </summary>
+        /// <param name="keyValues">keyValues</param>
+        /// <returns>affected rows</returns>
+        int Delete(params object[] keyValues);
+
+        /// <summary>
+        /// Delete a entity
+        /// </summary>
+        /// <param name="keyValues">entity</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> DeleteAsync(object[] keyValues, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Delete a entity
         /// </summary>
         /// <param name="entity">entity</param>
