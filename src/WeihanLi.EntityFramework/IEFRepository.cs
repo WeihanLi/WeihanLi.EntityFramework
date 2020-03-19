@@ -11,7 +11,7 @@ using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework
 {
-    public interface IEFRepository<TDbContext, TEntity> : IRepository<TEntity>
+    public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
         where TDbContext : DbContext
         where TEntity : class
     {

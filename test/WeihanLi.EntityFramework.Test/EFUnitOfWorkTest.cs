@@ -26,7 +26,7 @@ namespace WeihanLi.EntityFramework.Test
             {
                 _semaphore.Wait();
 
-                _output.WriteLine("----- TransactionTest Begin -----");
+                _output.WriteLine($"----- TransactionTest Begin {DateTime.UtcNow.Ticks} -----");
 
                 Repository.Insert(new TestEntity()
                 {
@@ -94,11 +94,10 @@ namespace WeihanLi.EntityFramework.Test
 
                     Assert.Equal(1, repo.Delete(1));
                 }
-
-                _output.WriteLine("----- TransactionTest End -----");
             }
             finally
             {
+                _output.WriteLine($"----- TransactionTest End {DateTime.UtcNow.Ticks} -----");
                 _semaphore.Release();
             }
         }
@@ -110,7 +109,7 @@ namespace WeihanLi.EntityFramework.Test
             {
                 await _semaphore.WaitAsync();
 
-                _output.WriteLine("----- TransactionAsyncTest Begin -----");
+                _output.WriteLine($"----- TransactionAsyncTest Begin {DateTime.UtcNow.Ticks}-----");
 
                 await Repository.InsertAsync(new[]
                 {
@@ -130,6 +129,7 @@ namespace WeihanLi.EntityFramework.Test
                         Name = "xss3",
                     }
                 });
+
                 using (var scope = Services.CreateScope())
                 {
                     var repo = scope.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
@@ -180,11 +180,10 @@ namespace WeihanLi.EntityFramework.Test
                 Assert.Equal(new string('4', 6), entity.Name);
 
                 Assert.Equal(1, await Repository.DeleteAsync(1));
-
-                _output.WriteLine("----- TransactionAsyncTest End -----");
             }
             finally
             {
+                _output.WriteLine($"----- TransactionAsyncTest End {DateTime.UtcNow.Ticks} -----");
                 _semaphore.Release();
             }
         }

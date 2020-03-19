@@ -18,4 +18,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WeihanLi.EntityFramework\WeihanLi.EntityFramework.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

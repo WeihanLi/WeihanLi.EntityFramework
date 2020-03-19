@@ -133,11 +133,11 @@ namespace WeihanLi.EntityFramework
                 .Select(x => x.Invoke(entity))
                 .ToArray();
 
-            var oldEntity = dbContext.Set<TEntity>().Local
+            var originalEntity = dbContext.Set<TEntity>().Local
                 .FirstOrDefault(x => GetEntityKeyValues(keysGetter, x).SequenceEqual(keyValues));
 
             EntityEntry<TEntity> entityEntry;
-            if (null == oldEntity)
+            if (null == originalEntity)
             {
                 existBefore = false;
                 entityEntry = dbContext.Attach(entity);
@@ -145,7 +145,7 @@ namespace WeihanLi.EntityFramework
             else
             {
                 existBefore = true;
-                entityEntry = dbContext.Entry(oldEntity);
+                entityEntry = dbContext.Entry(originalEntity);
                 entityEntry.CurrentValues.SetValues(entity);
             }
 
