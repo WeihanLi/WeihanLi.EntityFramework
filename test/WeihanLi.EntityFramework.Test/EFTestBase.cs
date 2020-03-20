@@ -15,13 +15,15 @@ namespace WeihanLi.EntityFramework.Test
             Services = fixture.Services;
             Repository = fixture.Services
                 .GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
-
-            //
             if (Repository.DbContext.Database.IsInMemory())
             {
                 Repository.DbContext.Database.EnsureDeleted();
             }
-            Repository.DbContext.Database.EnsureCreated();
+            else
+            {
+                Repository.DbContext.Database.EnsureCreated();
+                Repository.DbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WeihanLi.Common.Data;
 using Xunit;
@@ -22,18 +23,22 @@ namespace WeihanLi.EntityFramework.Test
         [Fact]
         public void TransactionTest()
         {
+            IServiceScope scope1 = null;
             try
             {
-                _semaphore.Wait();
+                scope1 = Services.CreateScope();
+                var repository = scope1.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
 
                 _output.WriteLine($"----- TransactionTest Begin {DateTime.UtcNow.Ticks} -----");
 
-                Repository.Insert(new TestEntity()
+                repository.DbContext.Database.EnsureCreated();
+
+                repository.Insert(new TestEntity()
                 {
                     CreatedAt = DateTime.UtcNow,
                     Name = "xss",
                 });
-                Repository.Update(new TestEntity()
+                repository.Update(new TestEntity()
                 {
                     Id = 1,
                     Name = new string('x', 6)
@@ -41,7 +46,6 @@ namespace WeihanLi.EntityFramework.Test
                 using (var scope = Services.CreateScope())
                 {
                     var repo = scope.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
-                    var ttt = repo.DbContext.Find<TestEntity>(1);
                     repo.Insert(new TestEntity()
                     {
                         CreatedAt = DateTime.UtcNow,
@@ -49,8 +53,8 @@ namespace WeihanLi.EntityFramework.Test
                     });
                 }
 
-                var beforeCount = Repository.Count();
-                var uow = Repository.GetUnitOfWork();
+                var beforeCount = repository.Count();
+                var uow = repository.GetUnitOfWork();
                 uow.DbContext.Update(new TestEntity()
                 {
                     Id = 1,
@@ -74,12 +78,12 @@ namespace WeihanLi.EntityFramework.Test
                     Name = "xyy1",
                 });
 
-                var beforeCommitCount = Repository.Count();
+                var beforeCommitCount = repository.Count();
                 Assert.Equal(beforeCount, beforeCommitCount);
 
                 uow.Commit();
 
-                var committedCount = Repository.Count();
+                var committedCount = repository.Count();
                 Assert.Equal(committedCount, beforeCount + 1);
 
                 using (var scope = Services.CreateScope())
@@ -97,21 +101,43 @@ namespace WeihanLi.EntityFramework.Test
             }
             finally
             {
+                if (Repository.DbContext.Database.IsInMemory())
+                {
+                    Repository.DbContext.Database.EnsureDeleted();
+                }
+                else
+                {
+                    Repository.DbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
+                }
                 _output.WriteLine($"----- TransactionTest End {DateTime.UtcNow.Ticks} -----");
-                _semaphore.Release();
             }
         }
 
         [Fact]
         public async Task TransactionAsyncTest()
         {
+            IServiceScope scope1 = null;
             try
             {
                 await _semaphore.WaitAsync();
+                scope1 = Services.CreateScope();
+                var repository = scope1.ServiceProvider.GetRequiredService<IEFRepositoryFactory<TestDbContext>>()
+                    .GetRepository<TestEntity>();
 
                 _output.WriteLine($"----- TransactionAsyncTest Begin {DateTime.UtcNow.Ticks}-----");
 
-                await Repository.InsertAsync(new[]
+                repository.DbContext.Database.EnsureCreated();
+
+                //for (var i = 0; i < 3; i++)
+                //{
+                //    await Repository.InsertAsync(new TestEntity()
+                //    {
+                //        CreatedAt = DateTime.UtcNow,
+                //        Name = $"xss-{i}",
+                //    });
+                //}
+
+                await repository.InsertAsync(new[]
                 {
                     new TestEntity()
                     {
@@ -140,8 +166,8 @@ namespace WeihanLi.EntityFramework.Test
                     });
                 }
 
-                var beforeCount = await Repository.CountAsync();
-                var uow = Repository.GetUnitOfWork();
+                var beforeCount = await repository.CountAsync();
+                var uow = repository.GetUnitOfWork();
                 uow.DbContext.Update(new TestEntity()
                 {
                     Id = 3,
@@ -165,26 +191,36 @@ namespace WeihanLi.EntityFramework.Test
                     Name = "xyy1",
                 });
 
-                var beforeCommitCount = await Repository.CountAsync();
+                var beforeCommitCount = await repository.CountAsync();
                 Assert.Equal(beforeCount, beforeCommitCount);
 
                 await uow.CommitAsync();
 
-                var committedCount = await Repository.CountAsync();
+                var committedCount = await repository.CountAsync();
                 Assert.Equal(committedCount, beforeCount + 1);
 
-                entity = await Repository.DbContext.FindAsync<TestEntity>(3);
+                entity = await repository.DbContext.FindAsync<TestEntity>(3);
                 Assert.Equal(new string('3', 6), entity.Name);
 
-                entity = await Repository.DbContext.FindAsync<TestEntity>(new object[] { 4 }, CancellationToken.None);
+                entity = await repository.DbContext.FindAsync<TestEntity>(new object[] { 4 }, CancellationToken.None);
                 Assert.Equal(new string('4', 6), entity.Name);
 
                 Assert.Equal(1, await Repository.DeleteAsync(1));
             }
             finally
             {
+                if (Repository.DbContext.Database.IsInMemory())
+                {
+                    Repository.DbContext.Database.EnsureDeleted();
+                }
+                else
+                {
+                    Repository.DbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
+                }
                 _output.WriteLine($"----- TransactionAsyncTest End {DateTime.UtcNow.Ticks} -----");
+
                 _semaphore.Release();
+                scope1?.Dispose();
             }
         }
     }

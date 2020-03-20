@@ -11,6 +11,9 @@ namespace WeihanLi.EntityFramework.Test
         private readonly IServiceScope _serviceScope;
         public IServiceProvider Services { get; }
 
+        private const string DbConnectionString =
+            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
         public EFTestFixture()
         {
             IServiceCollection serviceCollection = new ServiceCollection();
@@ -18,9 +21,15 @@ namespace WeihanLi.EntityFramework.Test
             {
                 options.UseLoggerFactory(LoggerFactory.Create(loggingBuilder =>
                 {
+                    loggingBuilder.AddLog4Net();
+                    //loggingBuilder.AddProvider(new DelegateLoggerProvider((category, logLevel, exception, msg) =>
+                    //{
+                    //    _outputHelper.WriteLine($"{category}:[{logLevel}] {msg}\n {exception}");
+                    //}));
                 }));
-                options.EnableDetailedErrors();
+                //options.UseSqlServer(DbConnectionString);
                 options.UseInMemoryDatabase("Tests");
+                options.EnableDetailedErrors();
             });
             serviceCollection.AddEFRepository();
 
@@ -37,11 +46,12 @@ namespace WeihanLi.EntityFramework.Test
             {
                 dbContext.Database.EnsureDeleted();
             }
+
             _serviceScope.Dispose();
         }
     }
 
-    [CollectionDefinition("EFTest")]
+    [CollectionDefinition("EFTest", DisableParallelization = true)]
     public class EFTestCollection : ICollectionFixture<EFTestFixture>
     {
     }
