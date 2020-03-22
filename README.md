@@ -16,6 +16,9 @@ see details [here](./docs/ReleaseNotes.md)
   
   - `EFRepository`
   - `EFRepositoryGenerator`
+- UoW
+  
+  - `EFUnitOfWork` 
 
 - DbFunctions
   
