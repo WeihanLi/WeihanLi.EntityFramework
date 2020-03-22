@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -11,6 +13,23 @@ namespace WeihanLi.EntityFramework
     {
         internal static readonly Version EFCoreVersion = typeof(DbContext)
             .Assembly.GetName().Version;
+
+        /// <summary>
+        ///     <para>
+        ///         Returns true if the database provider currently in use is a relational database.
+        ///     </para>
+        /// </summary>
+        /// <param name="databaseFacade"> The facade from <see cref="DbContext.Database" />. </param>
+        /// <returns> True if a relational database provider is being used; false otherwise. </returns>
+        public static bool IsRelational([NotNull] this DatabaseFacade databaseFacade)
+        {
+            if (null == databaseFacade)
+            {
+                throw new ArgumentNullException(nameof(databaseFacade));
+            }
+
+            return !databaseFacade.ProviderName.EndsWith("InMemory", StringComparison.Ordinal);
+        }
 
         public static EntityEntry<TEntity> Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
         {

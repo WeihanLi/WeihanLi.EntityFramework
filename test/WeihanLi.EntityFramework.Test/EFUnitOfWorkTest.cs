@@ -26,6 +26,7 @@ namespace WeihanLi.EntityFramework.Test
             IServiceScope scope1 = null;
             try
             {
+                _semaphore.Wait();
                 scope1 = Services.CreateScope();
                 var repository = scope1.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
 
@@ -109,6 +110,8 @@ namespace WeihanLi.EntityFramework.Test
                 {
                     Repository.DbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
                 }
+
+                _semaphore.Release();
                 _output.WriteLine($"----- TransactionTest End {DateTime.UtcNow.Ticks} -----");
             }
         }
@@ -221,6 +224,95 @@ namespace WeihanLi.EntityFramework.Test
 
                 _semaphore.Release();
                 scope1?.Dispose();
+            }
+        }
+
+        [Fact]
+        public void RollbackTest()
+        {
+            try
+            {
+                _semaphore.Wait();
+
+                using (var scope = Services.CreateScope())
+                {
+                    var unitOfWork = scope.ServiceProvider
+                        .GetRequiredService<IEFUnitOfWork<TestDbContext>>();
+                    unitOfWork.DbContext.TestEntities
+                        .Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "saa" });
+                    unitOfWork.DbContext.TestEntities
+                        .Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "saa" });
+                    unitOfWork.Commit();
+                }
+                using (var scope = Services.CreateScope())
+                {
+                    var unitOfWork = scope.ServiceProvider
+                        .GetRequiredService<IEFUnitOfWork<TestDbContext>>();
+                    var count = unitOfWork.DbContext.TestEntities.Count();
+
+                    unitOfWork.DbContext.TestEntities.Add(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow });
+                    unitOfWork.DbContext.TestEntities.Add(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow });
+
+                    unitOfWork.Rollback();
+
+                    var count2 = unitOfWork.DbContext.TestEntities.Count();
+                    Assert.Equal(count, count2);
+
+                    if (!unitOfWork.DbContext.Database.IsInMemory())
+                    {
+                        // can not recommit when rollback already
+                        Assert.Throws<InvalidOperationException>(() => unitOfWork.Commit());
+                    }
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        [Fact]
+        public async Task RollbackAsyncTest()
+        {
+            try
+            {
+                await _semaphore.WaitAsync();
+
+                using (var scope = Services.CreateScope())
+                {
+                    var unitOfWork = scope.ServiceProvider
+                        .GetRequiredService<IEFUnitOfWork<TestDbContext>>();
+                    unitOfWork.DbContext.TestEntities
+                        .Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "saa" });
+                    unitOfWork.DbContext.TestEntities
+                        .Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "saa" });
+                    await unitOfWork.CommitAsync();
+                }
+                using (var scope = Services.CreateScope())
+                {
+                    var unitOfWork = scope.ServiceProvider
+                        .GetRequiredService<IEFUnitOfWork<TestDbContext>>();
+
+                    var count = unitOfWork.DbContext.TestEntities.Count();
+
+                    unitOfWork.DbContext.TestEntities.Add(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow });
+                    unitOfWork.DbContext.TestEntities.Add(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow });
+
+                    await unitOfWork.RollbackAsync();
+
+                    var count2 = unitOfWork.DbContext.TestEntities.Count();
+                    Assert.Equal(count, count2);
+
+                    if (!unitOfWork.DbContext.Database.IsInMemory())
+                    {
+                        // can not recommit when rollback already
+                        await Assert.ThrowsAsync<InvalidOperationException>(() => unitOfWork.CommitAsync());
+                    }
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
     }
