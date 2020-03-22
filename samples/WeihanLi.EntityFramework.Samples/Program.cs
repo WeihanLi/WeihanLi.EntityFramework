@@ -127,6 +127,7 @@ TRUNCATE TABLE TestEntities
             });
 
             //
+            Console.WriteLine("completed");
             Console.ReadLine();
         }
     }

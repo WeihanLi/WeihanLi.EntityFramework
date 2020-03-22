@@ -9,6 +9,9 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
+        internal static readonly Version EFCoreVersion = typeof(DbContext)
+            .Assembly.GetName().Version;
+
         public static EntityEntry<TEntity> Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
         {
             var entity = dbContext.Find<TEntity>(keyValues);

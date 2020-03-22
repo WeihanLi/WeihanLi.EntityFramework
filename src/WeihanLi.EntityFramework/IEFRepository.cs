@@ -34,13 +34,6 @@ namespace WeihanLi.EntityFramework
         /// Find an entity
         /// </summary>
         /// <param name="keyValues">keyValues</param>
-        /// <returns>the entity founded, if not found, null returned</returns>
-        Task<TEntity> FindAsync(params object[] keyValues);
-
-        /// <summary>
-        /// Find an entity
-        /// </summary>
-        /// <param name="keyValues">keyValues</param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>the entity founded, if not found, null returned</returns>
         Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);

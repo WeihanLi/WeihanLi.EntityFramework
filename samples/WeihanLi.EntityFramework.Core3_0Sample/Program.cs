@@ -84,7 +84,7 @@ GETUTCDATE()
 
                 var foundEntity = repo.Find(1);
 
-                foundEntity = repo.FindAsync(1).GetAwaiter().GetResult();
+                repo.FindAsync(1).Wait();
 
                 var whereExpression = ExpressionHelper.True<TestEntity>();
                 Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;
@@ -178,6 +178,8 @@ GETUTCDATE()
 TRUNCATE TABLE TestEntities
 ");
             });
+
+            Console.WriteLine("completed");
             Console.ReadLine();
         }
     }

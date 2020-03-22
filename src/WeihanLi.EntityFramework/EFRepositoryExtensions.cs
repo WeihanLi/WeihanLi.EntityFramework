@@ -28,6 +28,14 @@ namespace WeihanLi.EntityFramework
             where TEntity : class
             => repository.UpdateWithoutAsync(entity, propertyExpressions);
 
+        public static Task<TEntity> FindAsync<TDbContext, TEntity>(this IEFRepository<TDbContext, TEntity> repository,
+            params object[] keyValues)
+            where TDbContext : DbContext
+            where TEntity : class
+        {
+            return repository.FindAsync(keyValues, CancellationToken.None);
+        }
+
         public static Task<int> DeleteAsync<TDbContext, TEntity>(this IEFRepository<TDbContext, TEntity> repository,
             params object[] keyValues)
             where TDbContext : DbContext
