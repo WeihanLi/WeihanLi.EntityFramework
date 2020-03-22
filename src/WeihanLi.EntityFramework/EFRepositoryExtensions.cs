@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework
@@ -42,6 +43,14 @@ namespace WeihanLi.EntityFramework
             where TEntity : class
         {
             return repository.DeleteAsync(keyValues, CancellationToken.None);
+        }
+
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext, TEntity>(
+            [NotNull]this IEFRepository<TDbContext, TEntity> repository)
+            where TDbContext : DbContext
+            where TEntity : class
+        {
+            return new EFUnitOfWork<TDbContext>(repository.DbContext);
         }
     }
 }

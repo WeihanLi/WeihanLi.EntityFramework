@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework
@@ -13,6 +14,14 @@ namespace WeihanLi.EntityFramework
                 throw new ArgumentNullException(nameof(unitOfWork));
             }
             return unitOfWork.DbContext.Set<TEntity>();
+        }
+
+        public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>(
+            [NotNull]this IEFUnitOfWork<TDbContext> unitOfWork)
+            where TDbContext : DbContext
+            where TEntity : class
+        {
+            return new EFRepository<TDbContext, TEntity>(unitOfWork.DbContext);
         }
     }
 }

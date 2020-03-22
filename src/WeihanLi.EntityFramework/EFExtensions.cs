@@ -32,6 +32,19 @@ namespace WeihanLi.EntityFramework
                 .GetService<IRelationalConnection>() != null;
         }
 
+        public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>(this TDbContext dbContext)
+            where TEntity : class
+            where TDbContext : DbContext
+        {
+            return new EFRepository<TDbContext, TEntity>(dbContext);
+        }
+
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>(this TDbContext dbContext)
+            where TDbContext : DbContext
+        {
+            return new EFUnitOfWork<TDbContext>(dbContext);
+        }
+
         public static EntityEntry<TEntity> Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
         {
             var entity = dbContext.Find<TEntity>(keyValues);

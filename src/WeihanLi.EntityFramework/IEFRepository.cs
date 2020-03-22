@@ -18,12 +18,6 @@ namespace WeihanLi.EntityFramework
         TDbContext DbContext { get; }
 
         /// <summary>
-        /// Get a unit of work, handle in a transaction
-        /// </summary>
-        /// <returns>UnitOfWork</returns>
-        IEFUnitOfWork<TDbContext> GetUnitOfWork();
-
-        /// <summary>
         /// Find an entity
         /// </summary>
         /// <param name="keyValues">keyValues</param>

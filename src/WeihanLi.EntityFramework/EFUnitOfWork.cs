@@ -6,45 +6,43 @@ namespace WeihanLi.EntityFramework
 {
     public class EFUnitOfWork<TDbContext> : IEFUnitOfWork<TDbContext> where TDbContext : DbContext
     {
-        private readonly TDbContext _dbContext;
-
         public EFUnitOfWork(TDbContext dbContext)
         {
-            _dbContext = dbContext;
-            if (_dbContext.IsRelationalDatabase())
+            DbContext = dbContext;
+            if (DbContext.IsRelationalDatabase())
             {
-                _dbContext.Database.BeginTransaction();
+                DbContext.Database.BeginTransaction();
             }
         }
 
-        public TDbContext DbContext => _dbContext;
+        public TDbContext DbContext { get; }
 
         public virtual void Commit()
         {
-            _dbContext.Database.CurrentTransaction?.Commit();
-            _dbContext.SaveChanges();
+            DbContext.Database.CurrentTransaction?.Commit();
+            DbContext.SaveChanges();
         }
 
         public virtual Task CommitAsync(CancellationToken cancellationToken)
         {
-            _dbContext.Database.CurrentTransaction?.Commit();
-            return _dbContext.SaveChangesAsync(cancellationToken);
+            DbContext.Database.CurrentTransaction?.Commit();
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public virtual void Rollback()
         {
-            _dbContext.Database.CurrentTransaction?.Rollback();
+            DbContext.Database.CurrentTransaction?.Rollback();
         }
 
         public virtual Task RollbackAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            _dbContext.Database.CurrentTransaction?.Rollback();
+            DbContext.Database.CurrentTransaction?.Rollback();
             return Task.CompletedTask;
         }
 
         public virtual void Dispose()
         {
-            _dbContext.Database.CurrentTransaction?.Dispose();
+            DbContext.Database.CurrentTransaction?.Dispose();
         }
     }
 }

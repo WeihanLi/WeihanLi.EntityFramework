@@ -320,41 +320,50 @@ namespace WeihanLi.EntityFramework.Test
         [Fact]
         public void HybridTest()
         {
-            using (var scope = Services.CreateScope())
+            try
             {
-                Repository.Insert(new TestEntity()
+                _semaphore.Wait();
+
+                using (var scope = Services.CreateScope())
                 {
-                    Name = "_00"
-                });
+                    Repository.Insert(new TestEntity()
+                    {
+                        Name = "_00"
+                    });
 
-                var repository = scope.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
-                repository.Insert(new TestEntity() { Name = "x111", CreatedAt = DateTime.UtcNow, });
+                    var repository = scope.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
+                    repository.Insert(new TestEntity() { Name = "x111", CreatedAt = DateTime.UtcNow, });
 
-                var count0 = repository.Count();
+                    var count0 = repository.Count();
 
-                using var uow = scope.ServiceProvider.GetRequiredService<IEFUnitOfWork<TestDbContext>>();
-                uow.DbContext.Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "xx" });
-                uow.DbContext.Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "xx" });
+                    using var uow = scope.ServiceProvider.GetRequiredService<IEFUnitOfWork<TestDbContext>>();
+                    uow.DbContext.Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "xx" });
+                    uow.DbContext.Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "xx" });
 
-                var result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
+                    var result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
 
-                result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
+                    result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
 
-                var count1 = repository.Count();
+                    var count1 = repository.Count();
 
-                Repository.Insert(new TestEntity() { Name = "_111", CreatedAt = DateTime.UtcNow, });
+                    Repository.Insert(new TestEntity() { Name = "_111", CreatedAt = DateTime.UtcNow, });
 
-                var count2 = repository.Count();
+                    var count2 = repository.Count();
 
-                uow.Rollback();
+                    uow.Rollback();
 
-                var count3 = repository.Count();
+                    var count3 = repository.Count();
 
-                result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
+                    result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
 
-                var count4 = repository.Count();
+                    var count4 = repository.Count();
 
-                //uow.Commit();
+                    //uow.Commit();
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
     }
