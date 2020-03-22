@@ -32,20 +32,20 @@ namespace WeihanLi.EntityFramework
                 .GetService<IRelationalConnection>() != null;
         }
 
-        public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>(this TDbContext dbContext)
+        public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
             where TEntity : class
             where TDbContext : DbContext
         {
             return new EFRepository<TDbContext, TEntity>(dbContext);
         }
 
-        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>(this TDbContext dbContext)
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] this TDbContext dbContext)
             where TDbContext : DbContext
         {
             return new EFUnitOfWork<TDbContext>(dbContext);
         }
 
-        public static EntityEntry<TEntity> Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
+        public static EntityEntry<TEntity> Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
         {
             var entity = dbContext.Find<TEntity>(keyValues);
             if (entity == null)
@@ -56,7 +56,7 @@ namespace WeihanLi.EntityFramework
             return dbContext.Remove(entity);
         }
 
-        public static EntityEntry<TEntity> Update<TEntity>(this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
+        public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
             if (propNames == null || propNames.Length == 0)
             {
@@ -86,7 +86,7 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        public static EntityEntry<TEntity> UpdateWithout<TEntity>(this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
+        public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
             if (propNames == null || propNames.Length == 0)
             {
@@ -103,7 +103,7 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        public static EntityEntry<TEntity> Update<TEntity>(this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
+        public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
         {
             if (propertyExpressions == null || propertyExpressions.Length == 0)
             {
@@ -136,7 +136,7 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        public static EntityEntry<TEntity> UpdateWithout<TEntity>(this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
+        public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
         {
             if (propertyExpressions == null || propertyExpressions.Length == 0)
             {
@@ -154,7 +154,7 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity, out bool existBefore)
+        private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)
       where TEntity : class
         {
             var type = typeof(TEntity);

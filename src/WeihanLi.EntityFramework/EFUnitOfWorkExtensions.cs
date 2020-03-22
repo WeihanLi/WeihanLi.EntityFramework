@@ -6,7 +6,7 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFUnitOfWorkExtensions
     {
-        public static DbSet<TEntity> DbSet<TEntity>(this IEFUnitOfWork<DbContext> unitOfWork)
+        public static DbSet<TEntity> DbSet<TEntity>([NotNull] this IEFUnitOfWork<DbContext> unitOfWork)
             where TEntity : class
         {
             if (null == unitOfWork)

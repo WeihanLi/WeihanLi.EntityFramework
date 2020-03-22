@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework
 {
-    public static class IQueryablePageListExtensions
+    public static class QueryablePageListExtensions
     {
         /// <summary>
         /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
@@ -16,7 +17,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber">The number of the page, index from 1.</param>
         /// <param name="pageSize">The size of the page.</param>
         /// <returns>An instance of  implements <see cref="IPagedListModel{T}"/> interface.</returns>
-        public static IPagedListModel<T> ToPagedList<T>(this IQueryable<T> source, int pageNumber, int pageSize)
+        public static IPagedListModel<T> ToPagedList<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
             {
@@ -61,7 +62,7 @@ namespace WeihanLi.EntityFramework
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
         /// <returns>An instance of  implements  <see cref="IPagedListModel{T}"/> interface.</returns>
-        public static async Task<IPagedListModel<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        public static async Task<IPagedListModel<T>> ToPagedListAsync<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (pageNumber <= 0)
             {
