@@ -11,7 +11,9 @@ namespace WeihanLi.EntityFramework.Samples
 {
     public class Program
     {
-        private const string DbConnectionString = "server=.;database=Test;uid=sa;pwd=Admin888";
+        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;"
+            // "server=.;database=Test;uid=sa;pwd=Admin888"
+            ;
 
         public static void Main(string[] args)
         {
@@ -69,6 +71,8 @@ GETUTCDATE()
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
 
+                var foundEntity = repo.FindAsync(1).GetAwaiter().GetResult();
+
                 repo.Update(new TestEntity
                 {
                     Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
@@ -123,6 +127,7 @@ TRUNCATE TABLE TestEntities
             });
 
             //
+            Console.WriteLine("completed");
             Console.ReadLine();
         }
     }

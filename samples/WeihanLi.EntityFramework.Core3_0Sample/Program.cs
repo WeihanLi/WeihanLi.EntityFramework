@@ -14,7 +14,7 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
 {
     public class Program
     {
-        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;"
         //"server=.;database=TestDb;uid=sa;pwd=Admin888"
         ;
 
@@ -82,6 +82,10 @@ GETUTCDATE()
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
 
+                var foundEntity = repo.Find(1);
+
+                repo.FindAsync(1).Wait();
+
                 var whereExpression = ExpressionHelper.True<TestEntity>();
                 Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;
                 var whereExpression1 = whereExpression
@@ -145,6 +149,7 @@ GETUTCDATE()
             {
                 var originColor = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Green;
+
                 Console.WriteLine("********** UnitOfWork ************");
                 Console.WriteLine($"uow count0: {uow.DbSet<TestEntity>().Count()}");
 
@@ -154,7 +159,11 @@ GETUTCDATE()
 
                 uow.DbSet<TestEntity>().Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Extra = "1212", });
 
+                Console.ForegroundColor = originColor;
+
                 uow.Commit();
+
+                Console.ForegroundColor = ConsoleColor.Green;
 
                 Console.WriteLine($"uow count2: {uow.DbSet<TestEntity>().Count()}");
                 Console.WriteLine("********** UnitOfWork ************");
@@ -169,6 +178,8 @@ GETUTCDATE()
 TRUNCATE TABLE TestEntities
 ");
             });
+
+            Console.WriteLine("completed");
             Console.ReadLine();
         }
     }

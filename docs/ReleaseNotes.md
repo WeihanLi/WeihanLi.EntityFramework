@@ -2,6 +2,11 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.3.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.3.0)
+
+- add `IEFUnitOfWork`
+- optimize `EFRepositoryQueryBuilder` set default predict to null
+
 ### [WeihanLi.EntityFramework 1.2.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.2.0)
 
 - add `IEFRepositoryFactory`
