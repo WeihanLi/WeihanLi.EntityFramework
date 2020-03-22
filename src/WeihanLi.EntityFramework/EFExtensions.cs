@@ -13,17 +13,16 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
-        internal static readonly Version EFCoreVersion = typeof(DbContext)
-            .Assembly.GetName().Version;
-
         /// <summary>
+        /// is relational database used now
+        /// Please use dbContext.Database.IsRelational()
         ///     <para>
         ///         Returns true if the database provider currently in use is a relational database.
         ///     </para>
         /// </summary>
         /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
         /// <returns> True if a relational database provider is being used; false otherwise. </returns>
-        public static bool IsRelational([NotNull] this DbContext dbContext)
+        public static bool IsRelationalDatabase([NotNull] this DbContext dbContext)
         {
             if (null == dbContext)
             {
