@@ -5,6 +5,8 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -19,16 +21,16 @@ namespace WeihanLi.EntityFramework
         ///         Returns true if the database provider currently in use is a relational database.
         ///     </para>
         /// </summary>
-        /// <param name="databaseFacade"> The facade from <see cref="DbContext.Database" />. </param>
+        /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
         /// <returns> True if a relational database provider is being used; false otherwise. </returns>
-        public static bool IsRelational([NotNull] this DatabaseFacade databaseFacade)
+        public static bool IsRelational([NotNull] this DbContext dbContext)
         {
-            if (null == databaseFacade)
+            if (null == dbContext)
             {
-                throw new ArgumentNullException(nameof(databaseFacade));
+                throw new ArgumentNullException(nameof(dbContext));
             }
-
-            return !databaseFacade.ProviderName.EndsWith("InMemory", StringComparison.Ordinal);
+            return dbContext.GetInfrastructure()
+                .GetService<IRelationalConnection>() != null;
         }
 
         public static EntityEntry<TEntity> Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
