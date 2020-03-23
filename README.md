@@ -8,7 +8,13 @@ EntityFramework extensions
 
 ## Package Release Notes
 
-see details [here](./docs/ReleaseNotes.md)
+> Package Versions
+>
+> For EF Core 2.x , use 1.4.x and below
+>
+> For EF Core 3.x, use 1.5.0 and above
+
+for more package version details, see package release notes details [here](./docs/ReleaseNotes.md)
 
 ## Features
 
