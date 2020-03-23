@@ -13,7 +13,7 @@ namespace WeihanLi.EntityFramework.Test
         public void IsRelationTest()
         {
             Assert.Equal(!Repository.DbContext.Database.IsInMemory(),
-                Repository.DbContext.IsRelational());
+                Repository.DbContext.IsRelationalDatabase());
         }
     }
 }

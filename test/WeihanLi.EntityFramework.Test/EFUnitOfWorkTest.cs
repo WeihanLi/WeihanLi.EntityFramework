@@ -55,7 +55,8 @@ namespace WeihanLi.EntityFramework.Test
                 }
 
                 var beforeCount = repository.Count();
-                var uow = repository.GetUnitOfWork();
+
+                using var uow = repository.GetUnitOfWork();
                 uow.DbContext.Update(new TestEntity()
                 {
                     Id = 1,
@@ -102,17 +103,10 @@ namespace WeihanLi.EntityFramework.Test
             }
             finally
             {
-                if (Repository.DbContext.Database.IsInMemory())
-                {
-                    Repository.DbContext.Database.EnsureDeleted();
-                }
-                else
-                {
-                    Repository.DbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
-                }
-
-                _semaphore.Release();
+                Repository.DbContext.CleanData();
+                scope1?.Dispose();
                 _output.WriteLine($"----- TransactionTest End {DateTime.UtcNow.Ticks} -----");
+                _semaphore.Release();
             }
         }
 
@@ -170,7 +164,7 @@ namespace WeihanLi.EntityFramework.Test
                 }
 
                 var beforeCount = await repository.CountAsync();
-                var uow = repository.GetUnitOfWork();
+                using var uow = repository.GetUnitOfWork();
                 uow.DbContext.Update(new TestEntity()
                 {
                     Id = 3,
@@ -212,18 +206,11 @@ namespace WeihanLi.EntityFramework.Test
             }
             finally
             {
-                if (Repository.DbContext.Database.IsInMemory())
-                {
-                    Repository.DbContext.Database.EnsureDeleted();
-                }
-                else
-                {
-                    Repository.DbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
-                }
+                Repository.DbContext.CleanData();
+                scope1?.Dispose();
                 _output.WriteLine($"----- TransactionAsyncTest End {DateTime.UtcNow.Ticks} -----");
 
                 _semaphore.Release();
-                scope1?.Dispose();
             }
         }
 
@@ -257,16 +244,11 @@ namespace WeihanLi.EntityFramework.Test
 
                     var count2 = unitOfWork.DbContext.TestEntities.Count();
                     Assert.Equal(count, count2);
-
-                    if (!unitOfWork.DbContext.Database.IsInMemory())
-                    {
-                        // can not recommit when rollback already
-                        Assert.Throws<InvalidOperationException>(() => unitOfWork.Commit());
-                    }
                 }
             }
             finally
             {
+                Repository.DbContext.CleanData();
                 _semaphore.Release();
             }
         }
@@ -302,16 +284,120 @@ namespace WeihanLi.EntityFramework.Test
 
                     var count2 = unitOfWork.DbContext.TestEntities.Count();
                     Assert.Equal(count, count2);
+                }
+            }
+            finally
+            {
+                Repository.DbContext.CleanData();
+                _semaphore.Release();
+            }
+        }
 
-                    if (!unitOfWork.DbContext.Database.IsInMemory())
+        [Fact]
+        public void HybridTest()
+        {
+            if (!Repository.DbContext.IsRelationalDatabase())
+            {
+                return;
+            }
+            try
+            {
+                _semaphore.Wait();
+
+                using (var scope = Services.CreateScope())
+                {
+                    Assert.Equal(0, Repository.Count());
+
+                    Repository.Insert(new TestEntity()
                     {
-                        // can not recommit when rollback already
-                        await Assert.ThrowsAsync<InvalidOperationException>(() => unitOfWork.CommitAsync());
+                        Name = "_00"
+                    });
+                    Assert.Equal(1, Repository.Count());
+
+                    var repository = scope.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
+                    repository.Insert(new TestEntity() { Name = "x111", CreatedAt = DateTime.UtcNow, });
+
+                    // 2
+                    var count0 = repository.Count();
+
+                    Assert.Equal(2, count0);
+
+                    using var uow = scope.ServiceProvider.GetRequiredService<IEFUnitOfWork<TestDbContext>>();
+                    uow.DbContext.Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "xx" });
+                    uow.DbContext.Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "xx" });
+
+                    // 3
+                    var result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
+                    Assert.Equal(3, result);
+
+                    // 1
+                    result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
+                    Assert.Equal(1, result);
+
+                    // 6
+                    var count1 = repository.Count();
+                    Assert.Equal(6, count1);
+
+                    Repository.Insert(new TestEntity() { Name = "_111", CreatedAt = DateTime.UtcNow, });
+
+                    // 7
+                    var count2 = repository.Count();
+                    Assert.Equal(7, count2);
+
+                    uow.Rollback();
+
+                    // 3
+                    var count3 = repository.Count();
+                    Assert.Equal(3, count3);
+
+                    // 1
+                    result = repository.Insert(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "yyyy" });
+                    Assert.Equal(1, result);
+
+                    // 4
+                    var count4 = repository.Count();
+                    Assert.Equal(4, count4);
+
+                    //uow.Commit();
+                }
+
+                Repository.DbContext.CleanData();
+
+                using (var scope = Services.CreateScope())
+                {
+                    using (var uow = scope.ServiceProvider
+                        .GetRequiredService<IEFUnitOfWork<TestDbContext>>())
+                    {
+                        var repository = uow.GetRepository<TestDbContext, TestEntity>();
+
+                        var count = repository.Count();
+                        Assert.Equal(0, count);
+
+                        repository.Insert(new TestEntity()
+                        {
+                            Name = "zz_000",
+                            CreatedAt = DateTime.UtcNow,
+                        });
+                        uow.DbContext.Add(new TestEntity()
+                        {
+                            Name = "zzz_000",
+                            CreatedAt = DateTime.UtcNow,
+                        });
+                        uow.DbContext.Add(new TestEntity()
+                        {
+                            Name = "zzz_000",
+                            CreatedAt = DateTime.UtcNow,
+                        });
+                        uow.Commit();
+
+                        count = repository.Count();
+                        Assert.Equal(3, count);
                     }
                 }
             }
             finally
             {
+                Repository.DbContext.CleanData();
                 _semaphore.Release();
             }
         }
