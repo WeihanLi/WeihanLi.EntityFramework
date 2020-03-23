@@ -2,6 +2,18 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.4.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.4.0)
+
+- update `IEFUnitOfWork`
+- add `Update`/`UpdateWithout` extension methods for dbContext
+- add `dbContext.IsRelationalDatabase`
+- fix `EFRepository.FindAsync` issue with EF Core 3.x(will remove support for ef core 2.x in next release)
+
+### [WeihanLi.EntityFramework 1.3.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.3.0)
+
+- add `IEFUnitOfWork`
+- optimize `EFRepositoryQueryBuilder` set default predict to null
+
 ### [WeihanLi.EntityFramework 1.3.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.3.0)
 
 - add `IEFUnitOfWork`
