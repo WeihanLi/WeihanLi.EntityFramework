@@ -1,15 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
+using WeihanLi.Common.Data;
 
 namespace WeihanLi.EntityFramework
 {
-    public interface IEFUnitOfWork<TDbContext> where TDbContext : DbContext
+    public interface IEFUnitOfWork<out TDbContext> : IUnitOfWork, IDisposable where TDbContext : DbContext
     {
-        DbSet<TEntity> DbSet<TEntity>() where TEntity : class;
-
-        int Commit();
-
-        Task<int> CommitAsync(CancellationToken cancellationToken = default);
+        TDbContext DbContext { get; }
     }
 }

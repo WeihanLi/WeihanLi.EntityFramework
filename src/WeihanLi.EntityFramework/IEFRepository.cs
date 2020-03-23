@@ -11,10 +11,42 @@ using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework
 {
-    public interface IEFRepository<TDbContext, TEntity> : IRepository<TEntity>
+    public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
         where TDbContext : DbContext
         where TEntity : class
     {
+        TDbContext DbContext { get; }
+
+        /// <summary>
+        /// Find an entity
+        /// </summary>
+        /// <param name="keyValues">keyValues</param>
+        /// <returns>the entity founded, if not found, null returned</returns>
+        TEntity Find(params object[] keyValues);
+
+        /// <summary>
+        /// Find an entity
+        /// </summary>
+        /// <param name="keyValues">keyValues</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>the entity founded, if not found, null returned</returns>
+        Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Delete a entity
+        /// </summary>
+        /// <param name="keyValues">keyValues</param>
+        /// <returns>affected rows</returns>
+        int Delete(params object[] keyValues);
+
+        /// <summary>
+        /// Delete a entity
+        /// </summary>
+        /// <param name="keyValues">entity</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> DeleteAsync(object[] keyValues, CancellationToken cancellationToken);
+
         /// <summary>
         /// Delete a entity
         /// </summary>
@@ -29,6 +61,40 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>affected rows</returns>
         Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyNames">properties to update</param>
+        /// <returns>affected rows</returns>
+        int Update(TEntity entity, params string[] propertyNames);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyNames">properties not to update</param>
+        /// <returns>affected rows</returns>
+        int UpdateWithout(TEntity entity, params string[] propertyNames);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyNames">properties to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateAsync(TEntity entity, string[] propertyNames, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Update entity
+        /// </summary>
+        /// <param name="entity">entity</param>
+        /// <param name="propertyNames">properties not to update</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>affected rows</returns>
+        Task<int> UpdateWithoutAsync(TEntity entity, string[] propertyNames, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update entity
@@ -63,14 +129,6 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>affected rows</returns>
         Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
-        /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
-        Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="IQueryable{TEntity}"/> based on a predicate

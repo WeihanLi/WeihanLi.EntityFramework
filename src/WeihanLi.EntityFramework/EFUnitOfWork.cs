@@ -1,31 +1,52 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace WeihanLi.EntityFramework
 {
     public class EFUnitOfWork<TDbContext> : IEFUnitOfWork<TDbContext> where TDbContext : DbContext
     {
-        private readonly TDbContext _dbContext;
+        // https://docs.microsoft.com/en-us/ef/core/saving/transactions
+        private readonly IDbContextTransaction _transaction = null;
 
         public EFUnitOfWork(TDbContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
+            if (DbContext.IsRelationalDatabase())
+            {
+                _transaction = DbContext.Database.BeginTransaction();
+            }
         }
 
-        public DbSet<TEntity> DbSet<TEntity>() where TEntity : class
+        public TDbContext DbContext { get; }
+
+        public virtual void Commit()
         {
-            return _dbContext.Set<TEntity>();
+            DbContext.SaveChanges();
+            _transaction?.Commit();
         }
 
-        public virtual int Commit()
+        public virtual async Task CommitAsync(CancellationToken cancellationToken)
         {
-            return _dbContext.SaveChanges();
+            await DbContext.SaveChangesAsync(cancellationToken);
+            _transaction?.Commit();
         }
 
-        public Task<int> CommitAsync(CancellationToken cancellationToken)
+        public virtual void Rollback()
         {
-            return _dbContext.SaveChangesAsync(cancellationToken);
+            _transaction?.Rollback();
+        }
+
+        public virtual Task RollbackAsync(CancellationToken cancellationToken)
+        {
+            _transaction?.Rollback();
+            return Task.CompletedTask;
+        }
+
+        public virtual void Dispose()
+        {
+            _transaction?.Dispose();
         }
     }
 }

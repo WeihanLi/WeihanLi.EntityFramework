@@ -14,7 +14,7 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
 {
     public class Program
     {
-        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;"
         //"server=.;database=TestDb;uid=sa;pwd=Admin888"
         ;
 
@@ -81,6 +81,10 @@ GETUTCDATE()
 
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
+
+                var foundEntity = repo.Find(1);
+
+                repo.FindAsync(1).Wait();
 
                 var whereExpression = ExpressionHelper.True<TestEntity>();
                 Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;
@@ -174,6 +178,8 @@ GETUTCDATE()
 TRUNCATE TABLE TestEntities
 ");
             });
+
+            Console.WriteLine("completed");
             Console.ReadLine();
         }
     }
