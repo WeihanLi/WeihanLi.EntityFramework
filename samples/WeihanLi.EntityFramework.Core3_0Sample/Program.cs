@@ -84,7 +84,7 @@ GETUTCDATE()
 
                 var foundEntity = repo.Find(1);
 
-                repo.FindAsync(1).Wait();
+                repo.FindAsync(1).AsTask().Wait();
 
                 var whereExpression = ExpressionHelper.True<TestEntity>();
                 Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;

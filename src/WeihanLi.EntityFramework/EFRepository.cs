@@ -32,7 +32,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.Find<TEntity>(keyValues);
         }
 
-        public Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
+        public ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
         {
             return DbContext.FindAsync<TEntity>(keyValues);
         }
