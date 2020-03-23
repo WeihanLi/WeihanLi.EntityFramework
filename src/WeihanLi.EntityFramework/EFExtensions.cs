@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Internal;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -26,7 +27,7 @@ namespace WeihanLi.EntityFramework
                 throw new ArgumentNullException(nameof(dbContext));
             }
 
-            return !dbContext.Database.ProviderName.EndsWith("InMemory");
+            return ((IDatabaseFacadeDependenciesAccessor)dbContext.Database).Dependencies is IRelationalDatabaseFacadeDependencies;
         }
 
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
