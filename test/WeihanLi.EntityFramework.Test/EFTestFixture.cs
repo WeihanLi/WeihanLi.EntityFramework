@@ -27,8 +27,8 @@ namespace WeihanLi.EntityFramework.Test
                     //    _outputHelper.WriteLine($"{category}:[{logLevel}] {msg}\n {exception}");
                     //}));
                 }));
-                options.UseSqlServer(DbConnectionString);
-                //options.UseInMemoryDatabase("Tests");
+                //options.UseSqlServer(DbConnectionString);
+                options.UseInMemoryDatabase("Tests");
                 options.EnableDetailedErrors();
             });
             serviceCollection.AddEFRepository();

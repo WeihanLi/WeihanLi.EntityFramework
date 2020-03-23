@@ -1,17 +1,21 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace WeihanLi.EntityFramework
 {
     public class EFUnitOfWork<TDbContext> : IEFUnitOfWork<TDbContext> where TDbContext : DbContext
     {
+        // https://docs.microsoft.com/en-us/ef/core/saving/transactions
+        private readonly IDbContextTransaction _transaction = null;
+
         public EFUnitOfWork(TDbContext dbContext)
         {
             DbContext = dbContext;
             if (DbContext.IsRelationalDatabase())
             {
-                DbContext.Database.BeginTransaction();
+                _transaction = DbContext.Database.BeginTransaction();
             }
         }
 
@@ -19,30 +23,30 @@ namespace WeihanLi.EntityFramework
 
         public virtual void Commit()
         {
-            DbContext.Database.CurrentTransaction?.Commit();
             DbContext.SaveChanges();
+            _transaction?.Commit();
         }
 
-        public virtual Task CommitAsync(CancellationToken cancellationToken)
+        public virtual async Task CommitAsync(CancellationToken cancellationToken)
         {
-            DbContext.Database.CurrentTransaction?.Commit();
-            return DbContext.SaveChangesAsync(cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
+            _transaction?.Commit();
         }
 
         public virtual void Rollback()
         {
-            DbContext.Database.CurrentTransaction?.Rollback();
+            _transaction?.Rollback();
         }
 
-        public virtual Task RollbackAsync(CancellationToken cancellationToken = new CancellationToken())
+        public virtual Task RollbackAsync(CancellationToken cancellationToken)
         {
-            DbContext.Database.CurrentTransaction?.Rollback();
+            _transaction?.Rollback();
             return Task.CompletedTask;
         }
 
         public virtual void Dispose()
         {
-            DbContext.Database.CurrentTransaction?.Dispose();
+            _transaction?.Dispose();
         }
     }
 }

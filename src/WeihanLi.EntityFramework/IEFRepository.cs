@@ -30,7 +30,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="keyValues">keyValues</param>
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>the entity founded, if not found, null returned</returns>
-        Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
+        ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
 
         /// <summary>
         /// Delete a entity
