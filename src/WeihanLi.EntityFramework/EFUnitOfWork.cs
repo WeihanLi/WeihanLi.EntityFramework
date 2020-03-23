@@ -38,7 +38,7 @@ namespace WeihanLi.EntityFramework
             _transaction?.Rollback();
         }
 
-        public virtual Task RollbackAsync(CancellationToken cancellationToken = new CancellationToken())
+        public virtual Task RollbackAsync(CancellationToken cancellationToken)
         {
             _transaction?.Rollback();
             return Task.CompletedTask;
