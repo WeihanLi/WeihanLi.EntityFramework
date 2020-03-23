@@ -4,9 +4,6 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -15,7 +12,7 @@ namespace WeihanLi.EntityFramework
     {
         /// <summary>
         /// is relational database used now
-        /// Please use dbContext.Database.IsRelational()
+        /// Please use dbContext.Database.IsRelational() with efcore 5.0
         ///     <para>
         ///         Returns true if the database provider currently in use is a relational database.
         ///     </para>
@@ -28,8 +25,8 @@ namespace WeihanLi.EntityFramework
             {
                 throw new ArgumentNullException(nameof(dbContext));
             }
-            return dbContext.GetInfrastructure()
-                .GetService<IRelationalConnection>() != null;
+
+            return !dbContext.Database.ProviderName.EndsWith("InMemory");
         }
 
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
