@@ -11,6 +11,7 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
+
         /// <summary>
         /// is relational database used now
         /// Please use dbContext.Database.IsRelational() with efcore 5.0
@@ -28,6 +29,13 @@ namespace WeihanLi.EntityFramework
             }
 
             return ((IDatabaseFacadeDependenciesAccessor)dbContext.Database).Dependencies is IRelationalDatabaseFacadeDependencies;
+        }
+
+        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
+        {
+            return condition
+                ? query.Where(predicate)
+                : query;
         }
 
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
