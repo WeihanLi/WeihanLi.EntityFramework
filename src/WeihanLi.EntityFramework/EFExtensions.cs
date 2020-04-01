@@ -11,7 +11,6 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
-
         /// <summary>
         /// is relational database used now
         /// Please use dbContext.Database.IsRelational() with efcore 5.0
@@ -158,6 +157,12 @@ namespace WeihanLi.EntityFramework
             }
 
             return entry;
+        }
+
+        public static string GetTableName<TEntity>(this DbContext dbContext)
+        {
+            var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
+            return entityType?.GetTableName();
         }
 
         private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)
