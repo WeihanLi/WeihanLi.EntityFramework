@@ -8,13 +8,13 @@ namespace WeihanLi.EntityFramework.Interceptors
 {
     public class QueryWithNoLockDbCommandInterceptor : DbCommandInterceptor
     {
-        private static readonly Regex _tableAliasRegex =
+        private static readonly Regex TableAliasRegex =
             new Regex(@"(?<tableAlias>AS \[[a-zA-Z]\w*\](?! WITH \(NOLOCK\)))",
                 RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public override InterceptionResult<object> ScalarExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<object> result)
         {
-            command.CommandText = _tableAliasRegex.Replace(
+            command.CommandText = TableAliasRegex.Replace(
                 command.CommandText,
                 "${tableAlias} WITH (NOLOCK)"
                 );
@@ -24,7 +24,7 @@ namespace WeihanLi.EntityFramework.Interceptors
         public override Task<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            command.CommandText = _tableAliasRegex.Replace(
+            command.CommandText = TableAliasRegex.Replace(
                 command.CommandText,
                 "${tableAlias} WITH (NOLOCK)"
                 );
@@ -33,7 +33,7 @@ namespace WeihanLi.EntityFramework.Interceptors
 
         public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
         {
-            command.CommandText = _tableAliasRegex.Replace(
+            command.CommandText = TableAliasRegex.Replace(
                 command.CommandText,
                 "${tableAlias} WITH (NOLOCK)"
                 );
@@ -43,7 +43,7 @@ namespace WeihanLi.EntityFramework.Interceptors
         public override Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            command.CommandText = _tableAliasRegex.Replace(
+            command.CommandText = TableAliasRegex.Replace(
                 command.CommandText,
                 "${tableAlias} WITH (NOLOCK)"
                 );
