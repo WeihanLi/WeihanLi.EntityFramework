@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Internal;
+using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -165,6 +166,53 @@ namespace WeihanLi.EntityFramework
         {
             var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
             return entityType?.GetTableName();
+        }
+
+        public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, object entity)
+        {
+            var type = entity.GetType();
+
+            var entityType = dbContext.Model.FindEntityType(type);
+
+            var keysGetter = entityType.FindPrimaryKey().Properties
+                .Select(x => new
+                {
+                    x.PropertyInfo.Name,
+                    ValueGetter = x.PropertyInfo.GetValueGetter(),
+                })
+                .ToArray();
+
+            return keysGetter
+                .Select(x => new KeyEntry()
+                {
+                    Name = x.Name,
+                    Value = x.ValueGetter.Invoke(entity)
+                })
+                .ToArray();
+        }
+
+        public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, TEntity entity)
+            where TEntity : class
+        {
+            var type = typeof(TEntity);
+
+            var entityType = dbContext.Model.FindEntityType(type);
+
+            var keysGetter = entityType.FindPrimaryKey().Properties
+                .Select(x => new
+                {
+                    x.PropertyInfo.Name,
+                    ValueGetter = x.PropertyInfo.GetValueGetter<TEntity>(),
+                })
+                .ToArray();
+
+            return keysGetter
+                .Select(x => new KeyEntry
+                {
+                    Name = x.Name,
+                    Value = x.ValueGetter.Invoke(entity)
+                })
+                .ToArray();
         }
 
         private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)

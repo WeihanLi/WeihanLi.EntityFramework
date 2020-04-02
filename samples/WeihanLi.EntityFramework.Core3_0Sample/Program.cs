@@ -8,7 +8,6 @@ using WeihanLi.Common;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
 using WeihanLi.EntityFramework.Interceptors;
-using WeihanLi.EntityFramework.Samples;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Core3_Sample
@@ -157,6 +156,8 @@ GETUTCDATE()
                 Console.WriteLine($"uow count1: {uow.DbSet<TestEntity>().Count()}");
 
                 uow.DbSet<TestEntity>().Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Extra = "1212", });
+
+                uow.GetRepository<TestEntity>().Delete(uow.DbContext.TestEntities.First());
 
                 Console.ForegroundColor = originColor;
 
