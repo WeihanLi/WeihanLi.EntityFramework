@@ -7,10 +7,11 @@ using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
+using WeihanLi.EntityFramework.Interceptors;
 using WeihanLi.EntityFramework.Samples;
 using WeihanLi.Extensions;
 
-namespace WeihanLi.EntityFramework.Core3_0Sample
+namespace WeihanLi.EntityFramework.Core3_Sample
 {
     public class Program
     {
@@ -31,7 +32,7 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
                     //.EnableDetailedErrors()
                     //.EnableSensitiveDataLogging()
                     .UseSqlServer(DbConnectionString)
-                    //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+                    .AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
 
@@ -83,8 +84,6 @@ GETUTCDATE()
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
 
                 var foundEntity = repo.Find(1);
-
-                repo.FindAsync(1).AsTask().Wait();
 
                 var whereExpression = ExpressionHelper.True<TestEntity>();
                 Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;
