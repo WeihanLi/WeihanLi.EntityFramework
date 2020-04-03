@@ -6,10 +6,6 @@ namespace WeihanLi.EntityFramework.Audit
 {
     public interface IAuditConfigBuilder
     {
-        IAuditConfigBuilder EnableAudit();
-
-        IAuditConfigBuilder DisableAudit();
-
         IAuditConfigBuilder WithUserIdProvider(IAuditUserIdProvider auditUserProvider);
 
         IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true);
@@ -29,19 +25,6 @@ namespace WeihanLi.EntityFramework.Audit
         private readonly List<Func<PropertyEntry, bool>> _propertyFilters = new List<Func<PropertyEntry, bool>>();
 
         private bool _saveUnModifiedProperty;
-        private bool _enabled = true;
-
-        public IAuditConfigBuilder EnableAudit()
-        {
-            _enabled = true;
-            return this;
-        }
-
-        public IAuditConfigBuilder DisableAudit()
-        {
-            _enabled = false;
-            return this;
-        }
 
         public IAuditConfigBuilder WithUserIdProvider(IAuditUserIdProvider auditUserProvider)
         {
@@ -86,7 +69,6 @@ namespace WeihanLi.EntityFramework.Audit
         {
             return new AuditConfigOptions()
             {
-                AuditEnabled = _enabled,
                 Enrichers = _auditPropertyEnrichers,
                 EntityFilters = _entityFilters,
                 PropertyFilters = _propertyFilters,
@@ -98,7 +80,7 @@ namespace WeihanLi.EntityFramework.Audit
 
     internal class AuditConfigOptions
     {
-        public bool AuditEnabled { get; set; }
+        public bool AuditEnabled { get; set; } = true;
 
         public bool SaveUnModifiedProperties { get; set; }
 
@@ -142,6 +124,16 @@ namespace WeihanLi.EntityFramework.Audit
     public class AuditConfig
     {
         internal static AuditConfigOptions AuditConfigOptions = new AuditConfigOptions();
+
+        public static void EnableAudit()
+        {
+            AuditConfigOptions.AuditEnabled = true;
+        }
+
+        public static void DisableAudit()
+        {
+            AuditConfigOptions.AuditEnabled = false;
+        }
 
         public static void Configure(Action<IAuditConfigBuilder> configAction)
         {

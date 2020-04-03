@@ -15,25 +15,16 @@ namespace WeihanLi.EntityFramework.Core3_Sample
 {
     public class Program
     {
-        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;"
-        //"server=.;database=TestDb;uid=sa;pwd=Admin888"
-        ;
+        private const string DbConnectionString =
+                @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
 
         public static void Main(string[] args)
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddLog4Net();
 
-            AuditConfig.Configure(builder =>
-            {
-                builder
-                    .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
-                    .WithUnModifiedProperty()
-                    .EnrichWithProperty("MachineName", Environment.MachineName)
-                    //.EnrichWithProperty("OSType", Environment.OSVersion.VersionString)
-                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
-                    ;
-            });
+            // disable auto audit
+            AuditConfig.DisableAudit();
 
             var services = new ServiceCollection();
             services.AddDbContext<TestDbContext>(options =>
@@ -46,12 +37,53 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     .AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
-
-            services.AddEFRepository()
-                ;
-
+            services.AddEFRepository();
             DependencyResolver.SetDependencyResolver(services);
 
+            AutoAuditTest();
+
+            Console.WriteLine("completed");
+            Console.ReadLine();
+        }
+
+        private static void AutoAuditTest()
+        {
+            AuditConfig.Configure(builder =>
+            {
+                builder
+                    .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
+                    //.WithUnModifiedProperty()
+                    .EnrichWithProperty("MachineName", Environment.MachineName)
+                    //.EnrichWithProperty("OSType", Environment.OSVersion.VersionString)
+                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    .IgnoreProperty("CreatedAt")
+                    ;
+            });
+            //
+            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            {
+                dbContext.Database.EnsureCreated();
+                var testEntity = new TestEntity()
+                {
+                    Extra = new { Name = "Tom" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity);
+                dbContext.SaveChanges();
+
+                testEntity.CreatedAt = DateTimeOffset.Now;
+                testEntity.Extra = new { Name = "Jerry" }.ToJson();
+                dbContext.SaveChanges();
+
+                dbContext.Remove(testEntity);
+                dbContext.SaveChanges();
+            });
+
+            AuditConfig.DisableAudit();
+        }
+
+        private static void RepositoryTest()
+        {
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
                 db.Database.EnsureCreated();
@@ -82,9 +114,6 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                 var abc = db.TestEntities.AsNoTracking().ToArray();
                 Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
             });
-
-            // disable auto audit
-            // AuditConfig.Configure(builder => builder.DisableAudit());
 
             DependencyResolver.Current.TryInvokeService<IEFRepositoryFactory<TestDbContext>>(repoFactory =>
             {
@@ -201,9 +230,6 @@ namespace WeihanLi.EntityFramework.Core3_Sample
 TRUNCATE TABLE {tableName}
 ");
             });
-
-            Console.WriteLine("completed");
-            Console.ReadLine();
         }
     }
 }
