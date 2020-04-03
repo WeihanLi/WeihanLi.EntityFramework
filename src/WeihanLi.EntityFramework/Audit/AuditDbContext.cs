@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit
@@ -52,9 +50,6 @@ namespace WeihanLi.EntityFramework.Audit
         {
             if (null != AuditEntries && AuditEntries.Count > 0)
             {
-                var auditUserProvider = this.GetInfrastructure().GetService<IAuditUserIdProvider>()
-                                        ?? EnvironmentAuditUserIdProvider.Instance.Value;
-
                 foreach (var auditEntry in AuditEntries)
                 {
                     // update TemporaryProperties
@@ -104,7 +99,7 @@ namespace WeihanLi.EntityFramework.Audit
                         NewValue = auditEntry.NewValues?.ToJson(),
                         Details = auditEntry.Extra.Count == 0 ? null : auditEntry.Extra.ToJson(),
                         UpdatedAt = DateTimeOffset.UtcNow,
-                        UpdatedBy = auditUserProvider.GetUserId(),
+                        UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider?.GetUserId(),
                     };
                     AuditRecords.Add(auditRecord);
                 }

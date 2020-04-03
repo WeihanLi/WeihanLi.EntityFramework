@@ -72,7 +72,7 @@ namespace WeihanLi.EntityFramework.Audit
                 Enrichers = _auditPropertyEnrichers,
                 EntityFilters = _entityFilters,
                 PropertyFilters = _propertyFilters,
-                UserProvider = _auditUserProvider,
+                UserIdProvider = _auditUserProvider,
                 SaveUnModifiedProperties = _saveUnModifiedProperty,
             };
         }
@@ -86,7 +86,7 @@ namespace WeihanLi.EntityFramework.Audit
         private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
         private IReadOnlyCollection<Func<PropertyEntry, bool>> _propertyFilters = Array.Empty<Func<PropertyEntry, bool>>();
 
-        public IAuditUserIdProvider UserProvider { get; set; }
+        public IAuditUserIdProvider UserIdProvider { get; set; }
 
         public IReadOnlyCollection<IAuditPropertyEnricher> Enrichers
         {
