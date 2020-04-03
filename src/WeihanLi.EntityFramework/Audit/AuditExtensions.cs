@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace WeihanLi.EntityFramework.Audit
@@ -45,13 +46,43 @@ namespace WeihanLi.EntityFramework.Audit
 
         #region IAuditConfigBuilder
 
+        public static IAuditConfigBuilder IgnoreEntityType(this IAuditConfigBuilder configBuilder, Type entityType)
+        {
+            configBuilder.WithEntityFilter(entityEntry => entityEntry.Entity.GetType() != entityType);
+            return configBuilder;
+        }
+
+        public static IAuditConfigBuilder IgnoreEntity<TEntity>(this IAuditConfigBuilder configBuilder) where TEntity : class
+        {
+            configBuilder.WithEntityFilter(entityEntry => entityEntry.Entity.GetType() != typeof(TEntity));
+            return configBuilder;
+        }
+
+        public static IAuditConfigBuilder IgnoreTable(this IAuditConfigBuilder configBuilder, string tableName)
+        {
+            configBuilder.WithEntityFilter(entityEntry => entityEntry.Metadata.GetTableName() != tableName);
+            return configBuilder;
+        }
+
         public static IAuditConfigBuilder WithEntityFilter(this IAuditConfigBuilder configBuilder, Func<EntityEntry, bool> filterFunc)
         {
             configBuilder.WithEntityFilter(filterFunc);
             return configBuilder;
         }
 
-        public static IAuditConfigBuilder WithFilter(this IAuditConfigBuilder configBuilder, Func<PropertyEntry, bool> filterFunc)
+        public static IAuditConfigBuilder IgnoreProperty(this IAuditConfigBuilder configBuilder, string propertyName)
+        {
+            configBuilder.WithPropertyFilter(propertyEntry => propertyEntry.Metadata.Name != propertyName);
+            return configBuilder;
+        }
+
+        public static IAuditConfigBuilder IgnoreColumn(this IAuditConfigBuilder configBuilder, string columnName)
+        {
+            configBuilder.WithPropertyFilter(propertyEntry => propertyEntry.Metadata.GetColumnName() != columnName);
+            return configBuilder;
+        }
+
+        public static IAuditConfigBuilder WithPropertyFilter(this IAuditConfigBuilder configBuilder, Func<PropertyEntry, bool> filterFunc)
         {
             configBuilder.WithPropertyFilter(filterFunc);
             return configBuilder;
