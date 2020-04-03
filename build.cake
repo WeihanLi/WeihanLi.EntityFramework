@@ -4,7 +4,8 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-
+var stable = Argument("stable", "false");
+var apiKey = Argument("apiKey", "");
 
 var solutionPath = "./WeihanLi.EntityFramework.sln";
 var srcProjects  = GetFiles("./src/**/*.csproj");
@@ -89,7 +90,7 @@ Task("pack")
          NoRestore = true,
          NoBuild = true
       };
-      if(branchName != "master"){
+      if(branchName != "master" && stable != "true"){
          settings.VersionSuffix = $"preview-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
       }
       foreach (var project in packProjects)
@@ -103,12 +104,12 @@ bool PublishArtifacts(){
    if(!isWindowsAgent){
       return false;
    }
-   if(branchName == "master" || branchName == "preview")
+   if(branchName == "master" || branchName == "preview" || !string.IsNullOrEmpty(apiKey))
    {
       var pushSetting =new DotNetCoreNuGetPushSettings
       {
          Source = EnvironmentVariable("Nuget__SourceUrl") ?? "https://api.nuget.org/v3/index.json",
-         ApiKey = EnvironmentVariable("Nuget__ApiKey")
+         ApiKey = EnvironmentVariable("Nuget__ApiKey") ?? apiKey
       };
       var packages = GetFiles($"{artifacts}/*.nupkg");
       foreach(var package in packages)
