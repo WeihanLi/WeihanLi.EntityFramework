@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
+using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Interceptors;
 using WeihanLi.Extensions;
 
@@ -22,6 +23,17 @@ namespace WeihanLi.EntityFramework.Core3_Sample
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddLog4Net();
+
+            AuditConfig.Configure(builder =>
+            {
+                builder
+                    .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
+                    .WithUnModifiedProperty()
+                    .EnrichWithProperty("MachineName", Environment.MachineName)
+                    .EnrichWithProperty("OSType", Environment.OSVersion.VersionString)
+                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    ;
+            });
 
             var services = new ServiceCollection();
             services.AddDbContext<TestDbContext>(options =>

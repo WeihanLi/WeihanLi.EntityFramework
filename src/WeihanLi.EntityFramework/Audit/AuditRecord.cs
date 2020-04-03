@@ -1,28 +1,29 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace WeihanLi.EntityFramework.Models
+namespace WeihanLi.EntityFramework.Audit
 {
-    public class UpdateRecord
+    public class AuditRecord
     {
+        public long Id { get; set; }
+
+        [Required]
+        [StringLength(128)]
         public string TableName { get; set; }
 
         public OperationType OperationType { get; set; }
 
+        [StringLength(256)]
         public string ObjectId { get; set; }
+
+        public string OriginValue { get; set; }
+
+        public string NewValue { get; set; }
 
         public string Details { get; set; }
 
         public string UpdatedBy { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; }
-    }
-
-    public enum OperationType : sbyte
-    {
-        Update = 0,
-
-        Add = 1,
-
-        Delete = 2,
     }
 }

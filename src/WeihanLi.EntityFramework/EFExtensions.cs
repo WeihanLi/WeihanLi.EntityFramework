@@ -168,65 +168,29 @@ namespace WeihanLi.EntityFramework
             return entityType?.GetTableName();
         }
 
-        public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, EntityEntry entityEntry)
+        public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
         {
-            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
-        }
+            if (!entityEntry.IsKeySet)
+                return null;
 
-        public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, EntityEntry<TEntity> entityEntry) where TEntity : class
-        {
-            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
-        }
-
-        public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, object entity)
-        {
-            var type = entity.GetType();
-
-            var entityType = dbContext.Model.FindEntityType(type);
-
-            var keysGetter = entityType.FindPrimaryKey().Properties
-                .Select(x => new
-                {
-                    x.Name,
-                    ColumnName = x.GetColumnName(),
-                    ValueGetter = x.PropertyInfo.GetValueGetter(),
-                })
+            var keyProps = entityEntry.Properties
+                .Where(p => p.Metadata.IsPrimaryKey())
                 .ToArray();
+            if (keyProps.Length == 0)
+                return null;
 
-            return keysGetter
-                .Select(x => new KeyEntry()
+            var keyEntries = new KeyEntry[keyProps.Length];
+            for (var i = 0; i < keyProps.Length; i++)
+            {
+                keyEntries[i] = new KeyEntry()
                 {
-                    PropertyName = x.Name,
-                    ColumnName = x.ColumnName,
-                    Value = x.ValueGetter.Invoke(entity)
-                })
-                .ToArray();
-        }
+                    PropertyName = keyProps[i].Metadata.Name,
+                    ColumnName = keyProps[i].Metadata.GetColumnName(),
+                    Value = keyProps[i].CurrentValue,
+                };
+            }
 
-        public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, TEntity entity)
-            where TEntity : class
-        {
-            var type = typeof(TEntity);
-
-            var entityType = dbContext.Model.FindEntityType(type);
-
-            var keysGetter = entityType.FindPrimaryKey().Properties
-                .Select(x => new
-                {
-                    x.Name,
-                    ColumnName = x.GetColumnName(),
-                    ValueGetter = x.PropertyInfo.GetValueGetter<TEntity>(),
-                })
-                .ToArray();
-
-            return keysGetter
-                .Select(x => new KeyEntry()
-                {
-                    PropertyName = x.Name,
-                    ColumnName = x.ColumnName,
-                    Value = x.ValueGetter.Invoke(entity)
-                })
-                .ToArray();
+            return keyEntries;
         }
 
         private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)

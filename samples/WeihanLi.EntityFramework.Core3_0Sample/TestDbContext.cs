@@ -1,105 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using WeihanLi.EntityFramework.Models;
-using WeihanLi.Extensions;
+using WeihanLi.EntityFramework.Audit;
 
 // ReSharper disable once CheckNamespace
 namespace WeihanLi.EntityFramework
 {
-    public class TestDbContext : DbContextBase
+    public class TestDbContext : AuditDbContext
     {
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
         {
         }
 
         public DbSet<TestEntity> TestEntities { get; set; }
-
-        protected override Task BeforeSaveChanges()
-        {
-            var updates = new List<UpdateRecord>();
-            foreach (var entityEntry in ChangeTracker.Entries())
-            {
-                if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
-                {
-                    continue;
-                }
-
-                if (entityEntry.State == EntityState.Added)
-                {
-                    updates.Add(new UpdateRecord()
-                    {
-                        TableName = entityEntry.Metadata.GetTableName(),
-                        OperationType = OperationType.Add,
-                        UpdatedAt = DateTimeOffset.UtcNow,
-                        UpdatedBy = "",
-                        ObjectId = this.GetKeyValues(entityEntry)?.ToJson(),
-                        Details = entityEntry.Properties
-                        .ToDictionary(x => x.Metadata.GetColumnName(), x => x.CurrentValue)
-                            .ToJson(),
-                    });
-                    // Console.WriteLine($"new entity added, entityType:{entityEntry.Entity.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity:{entityEntry.Entity.ToJson()}");
-                }
-                else if (entityEntry.State == EntityState.Deleted)
-                {
-                    updates.Add(new UpdateRecord()
-                    {
-                        TableName = entityEntry.Metadata.GetTableName(),
-                        OperationType = OperationType.Delete,
-
-                        ObjectId = this.GetKeyValues(entityEntry)?.ToJson(),
-                        Details = entityEntry.Properties
-                            .ToDictionary(x => x.Metadata.GetColumnName(), x => x.OriginalValue)
-                            .ToJson(),
-
-                        UpdatedAt = DateTimeOffset.UtcNow,
-                        UpdatedBy = "",
-                    });
-                    // Console.WriteLine($"entity({entityEntry.Entity}) deleted, entityType:{entityEntry.Entity?.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity key:{this.GetKeyValues(entityEntry.Entity).ToJson()}");
-                }
-                else if (entityEntry.State == EntityState.Modified)
-                {
-                    var changedProperties = entityEntry.Properties
-                        .Where(propertyEntry => propertyEntry.IsModified)
-                        .Select(x => new
-                        {
-                            ColumnName = x.Metadata.GetColumnName(),
-                            Before = x.OriginalValue,
-                            After = x.CurrentValue
-                        })
-                        .ToArray();
-
-                    // Console.WriteLine($"entity({entityEntry.Entity}) updated, entityType:{entityEntry.Entity?.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity key:{this.GetKeyValues(entityEntry.Entity).ToJson()}");
-                    // Console.WriteLine(changedProperties.Select(x => x.ToJson()).StringJoin(Environment.NewLine));
-
-                    updates.Add(new UpdateRecord()
-                    {
-                        TableName = entityEntry.Metadata.GetTableName(),
-                        OperationType = OperationType.Update,
-
-                        ObjectId = this.GetKeyValues(entityEntry).ToJson(),
-                        Details = changedProperties.ToJson(),
-
-                        UpdatedAt = DateTimeOffset.UtcNow,
-                        UpdatedBy = "",
-                    });
-                }
-            }
-
-            if (updates.Count > 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"updates:{Environment.NewLine}----------------------");
-                Console.WriteLine(updates.ToJson());
-                Console.WriteLine();
-            }
-
-            return Task.CompletedTask;
-        }
     }
 
     [Table("tabTestEntities")]
