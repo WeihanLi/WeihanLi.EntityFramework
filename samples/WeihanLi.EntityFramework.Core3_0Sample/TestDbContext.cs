@@ -93,7 +93,8 @@ namespace WeihanLi.EntityFramework
             if (updates.Count > 0)
             {
                 Console.WriteLine();
-                Console.WriteLine($"updates:{Environment.NewLine}----------------------{Environment.NewLine}{updates.ToJson()}");
+                Console.WriteLine($"updates:{Environment.NewLine}----------------------");
+                Console.WriteLine(updates.ToJson());
                 Console.WriteLine();
             }
 
