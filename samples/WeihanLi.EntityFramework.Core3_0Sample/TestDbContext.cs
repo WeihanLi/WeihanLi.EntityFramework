@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
 // ReSharper disable once CheckNamespace
@@ -19,6 +21,7 @@ namespace WeihanLi.EntityFramework
 
         protected override Task BeforeSaveChanges()
         {
+            var updates = new List<UpdateRecord>();
             foreach (var entityEntry in ChangeTracker.Entries())
             {
                 if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
@@ -28,30 +31,66 @@ namespace WeihanLi.EntityFramework
 
                 if (entityEntry.State == EntityState.Added)
                 {
-                    Console.WriteLine($"new entity added, entityType:{entityEntry.Entity.GetType()}, entity:{entityEntry.Entity.ToJson()}");
+                    updates.Add(new UpdateRecord()
+                    {
+                        Details = entityEntry.Entity.ToJson(),
+                        TableName = entityEntry.Metadata.GetTableName(),
+                        OperationType = OperationType.Add,
+                        UpdatedAt = DateTimeOffset.UtcNow,
+                        UpdatedBy = "",
+                        ObjectId = this.GetKeyValues(entityEntry).ToJson()
+                    });
+                    // Console.WriteLine($"new entity added, entityType:{entityEntry.Entity.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity:{entityEntry.Entity.ToJson()}");
                 }
                 else if (entityEntry.State == EntityState.Deleted)
                 {
-                    Console.WriteLine($"entity({entityEntry.Entity}) deleted, entityType:{entityEntry.Entity?.GetType()}, entity key:{this.GetKeyValues(entityEntry.Entity).ToJson()}");
+                    updates.Add(new UpdateRecord()
+                    {
+                        TableName = entityEntry.Metadata.GetTableName(),
+                        OperationType = OperationType.Delete,
+
+                        ObjectId = this.GetKeyValues(entityEntry).ToJson(),
+                        Details = entityEntry.Entity?.ToJson(),
+
+                        UpdatedAt = DateTimeOffset.UtcNow,
+                        UpdatedBy = "",
+                    });
+                    // Console.WriteLine($"entity({entityEntry.Entity}) deleted, entityType:{entityEntry.Entity?.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity key:{this.GetKeyValues(entityEntry.Entity).ToJson()}");
                 }
                 else if (entityEntry.State == EntityState.Modified)
                 {
-                    Console.WriteLine($"entity({entityEntry.Entity}) updated, entityType:{entityEntry.Entity?.GetType()}, entity key:{this.GetKeyValues(entityEntry.Entity).ToJson()}");
-                    var changedProperties = entityEntry.Properties.Where(propertyEntry => propertyEntry.IsModified)
+                    var changedProperties = entityEntry.Properties
+                        .Where(propertyEntry => propertyEntry.IsModified)
                         .Select(x => new
                         {
-                            Name = x.Metadata.Name,
                             ColumnName = x.Metadata.GetColumnName(),
                             Before = x.OriginalValue.ToJsonOrString(),
                             After = x.CurrentValue.ToJsonOrString()
                         })
                         .ToArray();
-                    Console.WriteLine(changedProperties.Select(x => x.ToJson()).StringJoin(Environment.NewLine));
+
+                    // Console.WriteLine($"entity({entityEntry.Entity}) updated, entityType:{entityEntry.Entity?.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity key:{this.GetKeyValues(entityEntry.Entity).ToJson()}");
+                    // Console.WriteLine(changedProperties.Select(x => x.ToJson()).StringJoin(Environment.NewLine));
+
+                    updates.Add(new UpdateRecord()
+                    {
+                        TableName = entityEntry.Metadata.GetTableName(),
+                        OperationType = OperationType.Update,
+
+                        ObjectId = this.GetKeyValues(entityEntry).ToJson(),
+                        Details = changedProperties.ToJson(),
+
+                        UpdatedAt = DateTimeOffset.UtcNow,
+                        UpdatedBy = "",
+                    });
                 }
-                // ... auto logging update
-                //var originValue = entityEntry.OriginalValues.ToJson();
-                //var currentValue = entityEntry.CurrentValues.ToJson();
-                //Console.WriteLine($"originValue: {originValue}, currentValue: {currentValue}");
+            }
+
+            if (updates.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"updates:{Environment.NewLine}----------------------{Environment.NewLine}{updates.ToJson()}");
+                Console.WriteLine();
             }
 
             return Task.CompletedTask;
@@ -66,6 +105,6 @@ namespace WeihanLi.EntityFramework
 
         public string Extra { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

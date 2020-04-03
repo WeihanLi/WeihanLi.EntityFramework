@@ -177,7 +177,7 @@ namespace WeihanLi.EntityFramework
             var keysGetter = entityType.FindPrimaryKey().Properties
                 .Select(x => new
                 {
-                    x.PropertyInfo.Name,
+                    x.Name,
                     ValueGetter = x.PropertyInfo.GetValueGetter(),
                 })
                 .ToArray();
@@ -191,6 +191,16 @@ namespace WeihanLi.EntityFramework
                 .ToArray();
         }
 
+        public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, EntityEntry entityEntry)
+        {
+            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
+        }
+
+        public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, EntityEntry<TEntity> entityEntry) where TEntity : class
+        {
+            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
+        }
+
         public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, TEntity entity)
             where TEntity : class
         {
@@ -201,7 +211,7 @@ namespace WeihanLi.EntityFramework
             var keysGetter = entityType.FindPrimaryKey().Properties
                 .Select(x => new
                 {
-                    x.PropertyInfo.Name,
+                    x.Name,
                     ValueGetter = x.PropertyInfo.GetValueGetter<TEntity>(),
                 })
                 .ToArray();
