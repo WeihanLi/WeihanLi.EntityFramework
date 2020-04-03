@@ -23,24 +23,27 @@ namespace WeihanLi.EntityFramework.Audit
 
         protected override Task BeforeSaveChanges()
         {
-            AuditEntries = new List<AuditEntry>();
-            foreach (var entityEntry in ChangeTracker.Entries())
+            if (AuditConfig.AuditConfigOptions.AuditEnabled)
             {
-                if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
+                AuditEntries = new List<AuditEntry>();
+                foreach (var entityEntry in ChangeTracker.Entries())
                 {
-                    continue;
-                }
-                if (entityEntry.Entity.GetType() == typeof(AuditRecord))
-                {
-                    continue;
-                }
-                //
-                if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
+                    if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
+                    {
+                        continue;
+                    }
+                    if (entityEntry.Entity.GetType() == typeof(AuditRecord))
+                    {
+                        continue;
+                    }
+                    //
+                    if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
                         entityFilter.Invoke(entityEntry) == false))
-                {
-                    continue;
+                    {
+                        continue;
+                    }
+                    AuditEntries.Add(new AuditEntry(entityEntry));
                 }
-                AuditEntries.Add(new AuditEntry(entityEntry));
             }
 
             return Task.CompletedTask;

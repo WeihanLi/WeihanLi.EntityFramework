@@ -30,7 +30,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
                     .WithUnModifiedProperty()
                     .EnrichWithProperty("MachineName", Environment.MachineName)
-                    .EnrichWithProperty("OSType", Environment.OSVersion.VersionString)
+                    //.EnrichWithProperty("OSType", Environment.OSVersion.VersionString)
                     .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
                     ;
             });
@@ -82,6 +82,9 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                 var abc = db.TestEntities.AsNoTracking().ToArray();
                 Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
             });
+
+            // disable auto audit
+            // AuditConfig.Configure(builder => builder.DisableAudit());
 
             DependencyResolver.Current.TryInvokeService<IEFRepositoryFactory<TestDbContext>>(repoFactory =>
             {
