@@ -33,12 +33,14 @@ namespace WeihanLi.EntityFramework
                 {
                     updates.Add(new UpdateRecord()
                     {
-                        Details = entityEntry.Entity.ToJson(),
                         TableName = entityEntry.Metadata.GetTableName(),
                         OperationType = OperationType.Add,
                         UpdatedAt = DateTimeOffset.UtcNow,
                         UpdatedBy = "",
-                        ObjectId = this.GetKeyValues(entityEntry).ToJson()
+                        ObjectId = this.GetKeyValues(entityEntry)?.ToJson(),
+                        Details = entityEntry.Properties
+                        .ToDictionary(x => x.Metadata.GetColumnName(), x => x.CurrentValue)
+                            .ToJson(),
                     });
                     // Console.WriteLine($"new entity added, entityType:{entityEntry.Entity.GetType()}, tableName:{entityEntry.Metadata.GetTableName()}, entity:{entityEntry.Entity.ToJson()}");
                 }
@@ -49,8 +51,10 @@ namespace WeihanLi.EntityFramework
                         TableName = entityEntry.Metadata.GetTableName(),
                         OperationType = OperationType.Delete,
 
-                        ObjectId = this.GetKeyValues(entityEntry).ToJson(),
-                        Details = entityEntry.Entity?.ToJson(),
+                        ObjectId = this.GetKeyValues(entityEntry)?.ToJson(),
+                        Details = entityEntry.Properties
+                            .ToDictionary(x => x.Metadata.GetColumnName(), x => x.OriginalValue)
+                            .ToJson(),
 
                         UpdatedAt = DateTimeOffset.UtcNow,
                         UpdatedBy = "",
@@ -64,8 +68,8 @@ namespace WeihanLi.EntityFramework
                         .Select(x => new
                         {
                             ColumnName = x.Metadata.GetColumnName(),
-                            Before = x.OriginalValue.ToJsonOrString(),
-                            After = x.CurrentValue.ToJsonOrString()
+                            Before = x.OriginalValue,
+                            After = x.CurrentValue
                         })
                         .ToArray();
 
@@ -97,12 +101,15 @@ namespace WeihanLi.EntityFramework
         }
     }
 
+    [Table("tabTestEntities")]
     public class TestEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("PKID")]
         public int Id { get; set; }
 
+        [Column("ExtraSettings")]
         public string Extra { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }

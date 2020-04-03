@@ -2,7 +2,9 @@
 {
     public class KeyEntry
     {
-        public string Name { get; set; }
+        public string PropertyName { get; set; }
+
+        public string ColumnName { get; set; }
 
         public object Value { get; set; }
     }

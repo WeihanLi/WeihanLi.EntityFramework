@@ -43,22 +43,29 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
                 db.Database.EnsureCreated();
+                var tableName = db.GetTableName<TestEntity>();
 
                 var conn = db.Database.GetDbConnection();
-                conn.Execute(@"TRUNCATE TABLE TestEntities");
+                conn.Execute($@"TRUNCATE TABLE {tableName}");
 
-                conn.Execute(@"
-INSERT INTO TestEntities
-(
-Extra,
-CreatedAt
-)
-VALUES
-(
-'{""Name"":""AA""}',
-GETUTCDATE()
-)
-");
+                db.GetRepository<TestDbContext, TestEntity>().Insert(new TestEntity()
+                {
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Extra = "{\"Name\": \"Tom\"}"
+                });
+
+                //                conn.Execute($@"
+                //INSERT INTO {tableName}
+                //(
+                //Extra,
+                //CreatedAt
+                //)
+                //VALUES
+                //(
+                //'{{""Name"":""AA""}}',
+                //GETUTCDATE()
+                //)
+                //");
 
                 var abc = db.TestEntities.AsNoTracking().ToArray();
                 Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
@@ -173,9 +180,10 @@ GETUTCDATE()
 
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
+                var tableName = db.GetTableName<TestEntity>();
                 var conn = db.Database.GetDbConnection();
                 conn.Execute($@"
-TRUNCATE TABLE TestEntities
+TRUNCATE TABLE {tableName}
 ");
             });
 

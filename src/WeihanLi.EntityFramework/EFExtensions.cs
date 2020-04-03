@@ -168,6 +168,16 @@ namespace WeihanLi.EntityFramework
             return entityType?.GetTableName();
         }
 
+        public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, EntityEntry entityEntry)
+        {
+            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
+        }
+
+        public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, EntityEntry<TEntity> entityEntry) where TEntity : class
+        {
+            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
+        }
+
         public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, object entity)
         {
             var type = entity.GetType();
@@ -178,6 +188,7 @@ namespace WeihanLi.EntityFramework
                 .Select(x => new
                 {
                     x.Name,
+                    ColumnName = x.GetColumnName(),
                     ValueGetter = x.PropertyInfo.GetValueGetter(),
                 })
                 .ToArray();
@@ -185,20 +196,11 @@ namespace WeihanLi.EntityFramework
             return keysGetter
                 .Select(x => new KeyEntry()
                 {
-                    Name = x.Name,
+                    PropertyName = x.Name,
+                    ColumnName = x.ColumnName,
                     Value = x.ValueGetter.Invoke(entity)
                 })
                 .ToArray();
-        }
-
-        public static KeyEntry[] GetKeyValues([NotNull] this DbContext dbContext, EntityEntry entityEntry)
-        {
-            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
-        }
-
-        public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, EntityEntry<TEntity> entityEntry) where TEntity : class
-        {
-            return entityEntry.IsKeySet ? GetKeyValues(dbContext, entityEntry.Entity) : null;
         }
 
         public static KeyEntry[] GetKeyValues<TEntity>([NotNull] this DbContext dbContext, TEntity entity)
@@ -212,14 +214,16 @@ namespace WeihanLi.EntityFramework
                 .Select(x => new
                 {
                     x.Name,
+                    ColumnName = x.GetColumnName(),
                     ValueGetter = x.PropertyInfo.GetValueGetter<TEntity>(),
                 })
                 .ToArray();
 
             return keysGetter
-                .Select(x => new KeyEntry
+                .Select(x => new KeyEntry()
                 {
-                    Name = x.Name,
+                    PropertyName = x.Name,
+                    ColumnName = x.ColumnName,
                     Value = x.ValueGetter.Invoke(entity)
                 })
                 .ToArray();
