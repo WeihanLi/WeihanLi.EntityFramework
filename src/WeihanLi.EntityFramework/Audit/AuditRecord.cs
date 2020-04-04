@@ -22,6 +22,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public string Extra { get; set; }
 
+        [StringLength(128)]
         public string UpdatedBy { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; }
