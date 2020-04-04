@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Newtonsoft.Json;
 
 namespace WeihanLi.EntityFramework.Audit
 {
@@ -86,8 +85,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public Dictionary<string, object> Properties { get; }
 
-        [JsonIgnore]
-        public List<PropertyEntry> TemporaryProperties { get; internal set; }
+        internal List<PropertyEntry> TemporaryProperties { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; }
 
