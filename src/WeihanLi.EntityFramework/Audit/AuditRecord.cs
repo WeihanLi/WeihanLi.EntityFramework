@@ -20,7 +20,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public string NewValue { get; set; }
 
-        public string Details { get; set; }
+        public string Extra { get; set; }
 
         public string UpdatedBy { get; set; }
 

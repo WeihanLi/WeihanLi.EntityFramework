@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit
 {
@@ -16,12 +18,12 @@ namespace WeihanLi.EntityFramework.Audit
                 throw new ArgumentNullException(nameof(auditEntry));
             }
 
-            if (auditEntry.Extra.ContainsKey(propertyName) && overwrite == false)
+            if (auditEntry.Properties.ContainsKey(propertyName) && overwrite == false)
             {
                 return false;
             }
 
-            auditEntry.Extra[propertyName] = propertyValue;
+            auditEntry.Properties[propertyName] = propertyValue;
             return true;
         }
 
@@ -33,12 +35,12 @@ namespace WeihanLi.EntityFramework.Audit
                 throw new ArgumentNullException(nameof(auditEntry));
             }
 
-            if (auditEntry.Extra.ContainsKey(propertyName) && overwrite == false)
+            if (auditEntry.Properties.ContainsKey(propertyName) && overwrite == false)
             {
                 return false;
             }
 
-            auditEntry.Extra[propertyName] = propertyValueFactory?.Invoke(auditEntry);
+            auditEntry.Properties[propertyName] = propertyValueFactory?.Invoke(auditEntry);
             return true;
         }
 
@@ -70,6 +72,13 @@ namespace WeihanLi.EntityFramework.Audit
             return configBuilder;
         }
 
+        public static IAuditConfigBuilder IgnoreProperty<TEntity>(this IAuditConfigBuilder configBuilder, Expression<Func<TEntity, object>> propertyExpression) where TEntity : class
+        {
+            var propertyName = propertyExpression.GetMemberName();
+            configBuilder.WithPropertyFilter(propertyEntry => propertyEntry.Metadata.Name != propertyName);
+            return configBuilder;
+        }
+
         public static IAuditConfigBuilder IgnoreProperty(this IAuditConfigBuilder configBuilder, string propertyName)
         {
             configBuilder.WithPropertyFilter(propertyEntry => propertyEntry.Metadata.Name != propertyName);
@@ -82,9 +91,16 @@ namespace WeihanLi.EntityFramework.Audit
             return configBuilder;
         }
 
+        public static IAuditConfigBuilder IgnoreColumn(this IAuditConfigBuilder configBuilder, string tableName, string columnName)
+        {
+            configBuilder.WithPropertyFilter((entityEntry, propertyEntry) => entityEntry.Metadata.GetTableName() != tableName
+                                                                            && propertyEntry.Metadata.GetColumnName() != columnName);
+            return configBuilder;
+        }
+
         public static IAuditConfigBuilder WithPropertyFilter(this IAuditConfigBuilder configBuilder, Func<PropertyEntry, bool> filterFunc)
         {
-            configBuilder.WithPropertyFilter(filterFunc);
+            configBuilder.WithPropertyFilter((entity, prop) => filterFunc.Invoke(prop));
             return configBuilder;
         }
 
@@ -97,6 +113,18 @@ namespace WeihanLi.EntityFramework.Audit
         public static IAuditConfigBuilder WithEnricher<TEnricher>(this IAuditConfigBuilder configBuilder) where TEnricher : IAuditPropertyEnricher, new()
         {
             configBuilder.WithEnricher(new TEnricher());
+            return configBuilder;
+        }
+
+        public static IAuditConfigBuilder WithStore<TAuditStore>(this IAuditConfigBuilder configBuilder) where TAuditStore : IAuditStore, new()
+        {
+            configBuilder.WithStore(new TAuditStore());
+            return configBuilder;
+        }
+
+        public static IAuditConfigBuilder WithStore<TAuditStore>(this IAuditConfigBuilder configBuilder, params object[] parameters) where TAuditStore : IAuditStore
+        {
+            configBuilder.WithStore((IAuditStore)Activator.CreateInstance(typeof(TAuditStore), parameters));
             return configBuilder;
         }
 

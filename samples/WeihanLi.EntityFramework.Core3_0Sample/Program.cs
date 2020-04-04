@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -46,6 +49,34 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             Console.ReadLine();
         }
 
+        private class AuditFileStore : IAuditStore
+        {
+            private readonly string _fileName;
+
+            public AuditFileStore()
+            {
+                _fileName = "auditLogs.txt";
+            }
+
+            public AuditFileStore(string fileName)
+            {
+                _fileName = fileName.GetValueOrDefault("auditLogs.txt");
+            }
+
+            public async Task Save(ICollection<AuditEntry> auditEntries)
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
+
+                using (var fileStream = File.Exists(path)
+                    ? new FileStream(path, FileMode.Append)
+                    : File.Create(path)
+                    )
+                {
+                    await fileStream.WriteAsync(auditEntries.ToJson().GetBytes());
+                }
+            }
+        }
+
         private static void AutoAuditTest()
         {
             AuditConfig.Configure(builder =>
@@ -54,14 +85,18 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
                     //.WithUnModifiedProperty()
                     .EnrichWithProperty("MachineName", Environment.MachineName)
-                    //.EnrichWithProperty("OSType", Environment.OSVersion.VersionString)
                     .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    .WithStore<AuditFileStore>()
+                    .WithStore<AuditFileStore>("logs0.txt")
+                    .IgnoreEntity<AuditRecord>()
+                    .IgnoreProperty<TestEntity>(t => t.CreatedAt)
                     .IgnoreProperty("CreatedAt")
                     ;
             });
             //
             DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
             {
+                dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
                 var testEntity = new TestEntity()
                 {
@@ -75,7 +110,23 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                 testEntity.Extra = new { Name = "Jerry" }.ToJson();
                 dbContext.SaveChanges();
 
-                dbContext.Remove(testEntity);
+                //dbContext.Remove(testEntity);
+                //dbContext.SaveChanges();
+            });
+            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            {
+                var testEntity = new TestEntity()
+                {
+                    Extra = new { Name = "Tom1" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity);
+                dbContext.SaveChanges();
+
+                dbContext.Remove(new TestEntity()
+                {
+                    Id = 1
+                });
                 dbContext.SaveChanges();
             });
 

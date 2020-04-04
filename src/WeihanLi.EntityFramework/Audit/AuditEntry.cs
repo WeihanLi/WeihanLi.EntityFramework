@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json;
 
 namespace WeihanLi.EntityFramework.Audit
 {
@@ -11,7 +13,7 @@ namespace WeihanLi.EntityFramework.Audit
         {
             TableName = entityEntry.Metadata.GetTableName();
             KeyValues = new Dictionary<string, object>(4);
-            Extra = new Dictionary<string, object>(16);
+            Properties = new Dictionary<string, object>(16);
             if (entityEntry.Properties.Any(x => x.IsTemporary))
             {
                 TemporaryProperties = new List<PropertyEntry>(4);
@@ -35,7 +37,7 @@ namespace WeihanLi.EntityFramework.Audit
             }
             foreach (var propertyEntry in entityEntry.Properties)
             {
-                if (AuditConfig.AuditConfigOptions.PropertyFilters.Any(f => f.Invoke(propertyEntry) == false))
+                if (AuditConfig.AuditConfigOptions.PropertyFilters.Any(f => f.Invoke(entityEntry, propertyEntry) == false))
                 {
                     continue;
                 }
@@ -82,8 +84,13 @@ namespace WeihanLi.EntityFramework.Audit
 
         public OperationType OperationType { get; }
 
-        public Dictionary<string, object> Extra { get; }
+        public Dictionary<string, object> Properties { get; }
 
+        [JsonIgnore]
         public List<PropertyEntry> TemporaryProperties { get; internal set; }
+
+        public DateTimeOffset UpdatedAt { get; set; }
+
+        public string UpdatedBy { get; set; }
     }
 }

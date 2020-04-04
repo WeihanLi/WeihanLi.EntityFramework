@@ -10,9 +10,11 @@ namespace WeihanLi.EntityFramework.Audit
 
         IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true);
 
+        IAuditConfigBuilder WithStore(IAuditStore auditStore);
+
         IAuditConfigBuilder WithEntityFilter(Func<EntityEntry, bool> entityFilter);
 
-        IAuditConfigBuilder WithPropertyFilter(Func<PropertyEntry, bool> propertyFilter);
+        IAuditConfigBuilder WithPropertyFilter(Func<EntityEntry, PropertyEntry, bool> propertyFilter);
 
         IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher);
     }
@@ -22,8 +24,8 @@ namespace WeihanLi.EntityFramework.Audit
         private IAuditUserIdProvider _auditUserProvider = EnvironmentAuditUserIdProvider.Instance.Value;
         private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new List<IAuditPropertyEnricher>(8);
         private readonly List<Func<EntityEntry, bool>> _entityFilters = new List<Func<EntityEntry, bool>>();
-        private readonly List<Func<PropertyEntry, bool>> _propertyFilters = new List<Func<PropertyEntry, bool>>();
-
+        private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new List<Func<EntityEntry, PropertyEntry, bool>>();
+        private readonly List<IAuditStore> _auditStores = new List<IAuditStore>(4);
         private bool _saveUnModifiedProperty;
 
         public IAuditConfigBuilder WithUserIdProvider(IAuditUserIdProvider auditUserProvider)
@@ -38,6 +40,16 @@ namespace WeihanLi.EntityFramework.Audit
             return this;
         }
 
+        public IAuditConfigBuilder WithStore(IAuditStore auditStore)
+        {
+            if (null != auditStore)
+            {
+                _auditStores.Add(auditStore);
+            }
+
+            return this;
+        }
+
         public IAuditConfigBuilder WithEntityFilter(Func<EntityEntry, bool> entityFilter)
         {
             if (null != entityFilter)
@@ -47,7 +59,7 @@ namespace WeihanLi.EntityFramework.Audit
             return this;
         }
 
-        public IAuditConfigBuilder WithPropertyFilter(Func<PropertyEntry, bool> propertyFilter)
+        public IAuditConfigBuilder WithPropertyFilter(Func<EntityEntry, PropertyEntry, bool> propertyFilter)
         {
             if (null != propertyFilter)
             {
@@ -73,6 +85,7 @@ namespace WeihanLi.EntityFramework.Audit
                 EntityFilters = _entityFilters,
                 PropertyFilters = _propertyFilters,
                 UserIdProvider = _auditUserProvider,
+                Stores = _auditStores,
                 SaveUnModifiedProperties = _saveUnModifiedProperty,
             };
         }
@@ -84,11 +97,21 @@ namespace WeihanLi.EntityFramework.Audit
 
         public bool SaveUnModifiedProperties { get; set; }
 
-        private IReadOnlyCollection<IAuditPropertyEnricher> _enrichers = Array.Empty<IAuditPropertyEnricher>();
-        private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
-        private IReadOnlyCollection<Func<PropertyEntry, bool>> _propertyFilters = Array.Empty<Func<PropertyEntry, bool>>();
-
         public IAuditUserIdProvider UserIdProvider { get; set; }
+
+        private IReadOnlyCollection<IAuditStore> _stores = Array.Empty<IAuditStore>();
+
+        public IReadOnlyCollection<IAuditStore> Stores
+        {
+            get => _stores;
+            set
+            {
+                if (value != null)
+                    _stores = value;
+            }
+        }
+
+        private IReadOnlyCollection<IAuditPropertyEnricher> _enrichers = Array.Empty<IAuditPropertyEnricher>();
 
         public IReadOnlyCollection<IAuditPropertyEnricher> Enrichers
         {
@@ -100,6 +123,8 @@ namespace WeihanLi.EntityFramework.Audit
             }
         }
 
+        private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
+
         public IReadOnlyCollection<Func<EntityEntry, bool>> EntityFilters
         {
             get => _entityFilters;
@@ -110,7 +135,9 @@ namespace WeihanLi.EntityFramework.Audit
             }
         }
 
-        public IReadOnlyCollection<Func<PropertyEntry, bool>> PropertyFilters
+        private IReadOnlyCollection<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = Array.Empty<Func<EntityEntry, PropertyEntry, bool>>();
+
+        public IReadOnlyCollection<Func<EntityEntry, PropertyEntry, bool>> PropertyFilters
         {
             get => _propertyFilters;
             set
