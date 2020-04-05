@@ -48,7 +48,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         #region IAuditConfigBuilder
 
-        public static IAuditConfigBuilder IgnoreEntityType(this IAuditConfigBuilder configBuilder, Type entityType)
+        public static IAuditConfigBuilder IgnoreEntity(this IAuditConfigBuilder configBuilder, Type entityType)
         {
             configBuilder.WithEntityFilter(entityEntry => entityEntry.Entity.GetType() != entityType);
             return configBuilder;

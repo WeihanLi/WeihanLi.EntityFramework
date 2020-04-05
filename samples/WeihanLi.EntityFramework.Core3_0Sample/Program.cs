@@ -26,9 +26,6 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddLog4Net();
 
-            // disable auto audit
-            AuditConfig.DisableAudit();
-
             var services = new ServiceCollection();
             services.AddDbContext<TestDbContext>(options =>
             {
@@ -36,8 +33,9 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     .UseLoggerFactory(loggerFactory)
                     //.EnableDetailedErrors()
                     //.EnableSensitiveDataLogging()
+                    // .UseInMemoryDatabase("Tests")
                     .UseSqlServer(DbConnectionString)
-                    .AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+                    //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
             services.AddEFRepository();
@@ -55,12 +53,12 @@ namespace WeihanLi.EntityFramework.Core3_Sample
 
             public AuditFileStore()
             {
-                _fileName = "auditLogs.txt";
+                _fileName = "audits.log";
             }
 
             public AuditFileStore(string fileName)
             {
-                _fileName = fileName.GetValueOrDefault("auditLogs.txt");
+                _fileName = fileName.GetValueOrDefault("audits.log");
             }
 
             public async Task Save(ICollection<AuditEntry> auditEntries)
