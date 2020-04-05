@@ -79,21 +79,28 @@ namespace WeihanLi.EntityFramework.Core3_Sample
 
         private static void AutoAuditTest()
         {
+            // 审计配置
             AuditConfig.Configure(builder =>
             {
                 builder
+                    // 配置操作用户获取方式
                     .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
-                    //.WithUnModifiedProperty()
+                    //.WithUnModifiedProperty() // 保存未修改的属性,默认只保存发生修改的属性
+                    // 保存更多属性
                     .EnrichWithProperty("MachineName", Environment.MachineName)
                     .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    // 保存到自定义的存储
                     .WithStore<AuditFileStore>()
                     .WithStore<AuditFileStore>("logs0.txt")
+                    // 忽略指定实体
                     .IgnoreEntity<AuditRecord>()
+                    // 忽略指定实体的某个属性
                     .IgnoreProperty<TestEntity>(t => t.CreatedAt)
+                    // 忽略所有属性名称为 CreatedAt 的属性
                     .IgnoreProperty("CreatedAt")
                     ;
             });
-            //
+            
             DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
             {
                 dbContext.Database.EnsureDeleted();
@@ -110,26 +117,32 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                 testEntity.Extra = new { Name = "Jerry" }.ToJson();
                 dbContext.SaveChanges();
 
-                //dbContext.Remove(testEntity);
-                //dbContext.SaveChanges();
-            });
-            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
-            {
-                var testEntity = new TestEntity()
+                dbContext.Remove(testEntity);
+                dbContext.SaveChanges();
+
+                var testEntity1 = new TestEntity()
                 {
                     Extra = new { Name = "Tom1" }.ToJson(),
                     CreatedAt = DateTimeOffset.UtcNow,
                 };
-                dbContext.TestEntities.Add(testEntity);
+                dbContext.TestEntities.Add(testEntity1);
+                var testEntity2 = new TestEntity()
+                {
+                    Extra = new { Name = "Tom2" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
-
+            });
+            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            {
                 dbContext.Remove(new TestEntity()
                 {
-                    Id = 1
+                    Id = 2
                 });
                 dbContext.SaveChanges();
             });
-
+            // disable audit
             AuditConfig.DisableAudit();
         }
 
