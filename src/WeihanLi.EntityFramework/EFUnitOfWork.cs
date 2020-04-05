@@ -21,6 +21,11 @@ namespace WeihanLi.EntityFramework
 
         public TDbContext DbContext { get; }
 
+        public IEFRepository<TDbContext, TEntity> GetRepository<TEntity>() where TEntity : class
+        {
+            return new EFRepository<TDbContext, TEntity>(DbContext);
+        }
+
         public virtual void Commit()
         {
             DbContext.SaveChanges();

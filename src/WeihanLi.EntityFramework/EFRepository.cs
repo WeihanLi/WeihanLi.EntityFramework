@@ -22,11 +22,6 @@ namespace WeihanLi.EntityFramework
             DbContext = dbContext;
         }
 
-        public virtual IEFUnitOfWork<TDbContext> GetUnitOfWork()
-        {
-            return new EFUnitOfWork<TDbContext>(DbContext);
-        }
-
         public TEntity Find(params object[] keyValues)
         {
             return DbContext.Find<TEntity>(keyValues);

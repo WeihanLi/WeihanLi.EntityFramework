@@ -2,12 +2,18 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.5.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.5.0)
+
+- update EF core to 3.1(drop support EF core 2.x)
+- update `EFRepository.FindAsync` to return `ValueTask`
+- update `IsRelationalDatabase` extension
+
 ### [WeihanLi.EntityFramework 1.4.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.4.0)
 
-- update `IEFUnitOfWork`
+- update `IEFUnitOfWork`/`EFRepository`
 - add `Update`/`UpdateWithout` extension methods for dbContext
 - add `dbContext.IsRelationalDatabase`
-- fix `EFRepository.FindAsync` issue with EF Core 3.x(will remove support for ef core 2.x in next release)
+- fix `EFRepository.FindAsync` issue with EF Core 3.x
 
 ### [WeihanLi.EntityFramework 1.3.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.3.0)
 

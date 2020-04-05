@@ -1,22 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
-using WeihanLi.EntityFramework.Samples;
+using WeihanLi.EntityFramework.Audit;
 using WeihanLi.Extensions;
 
-namespace WeihanLi.EntityFramework.Core3_0Sample
+namespace WeihanLi.EntityFramework.Core3_Sample
 {
     public class Program
     {
-        private const string DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;"
-        //"server=.;database=TestDb;uid=sa;pwd=Admin888"
-        ;
+        private const string DbConnectionString =
+                @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
 
         public static void Main(string[] args)
         {
@@ -30,35 +32,147 @@ namespace WeihanLi.EntityFramework.Core3_0Sample
                     .UseLoggerFactory(loggerFactory)
                     //.EnableDetailedErrors()
                     //.EnableSensitiveDataLogging()
+                    // .UseInMemoryDatabase("Tests")
                     .UseSqlServer(DbConnectionString)
                     //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
-
-            services.AddEFRepository()
-                ;
-
+            services.AddEFRepository();
             DependencyResolver.SetDependencyResolver(services);
 
+            AutoAuditTest();
+
+            Console.WriteLine("completed");
+            Console.ReadLine();
+        }
+
+        private class AuditFileStore : IAuditStore
+        {
+            private readonly string _fileName;
+
+            public AuditFileStore()
+            {
+                _fileName = "audits.log";
+            }
+
+            public AuditFileStore(string fileName)
+            {
+                _fileName = fileName.GetValueOrDefault("audits.log");
+            }
+
+            public async Task Save(ICollection<AuditEntry> auditEntries)
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
+
+                using (var fileStream = File.Exists(path)
+                    ? new FileStream(path, FileMode.Append)
+                    : File.Create(path)
+                    )
+                {
+                    await fileStream.WriteAsync(auditEntries.ToJson().GetBytes());
+                }
+            }
+        }
+
+        private static void AutoAuditTest()
+        {
+            // 审计配置
+            AuditConfig.Configure(builder =>
+            {
+                builder
+                    // 配置操作用户获取方式
+                    .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
+                    //.WithUnModifiedProperty() // 保存未修改的属性,默认只保存发生修改的属性
+                    // 保存更多属性
+                    .EnrichWithProperty("MachineName", Environment.MachineName)
+                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    // 保存到自定义的存储
+                    .WithStore<AuditFileStore>()
+                    .WithStore<AuditFileStore>("logs0.log")
+                    // 忽略指定实体
+                    .IgnoreEntity<AuditRecord>()
+                    // 忽略指定实体的某个属性
+                    .IgnoreProperty<TestEntity>(t => t.CreatedAt)
+                    // 忽略所有属性名称为 CreatedAt 的属性
+                    .IgnoreProperty("CreatedAt")
+                    ;
+            });
+
+            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+                var testEntity = new TestEntity()
+                {
+                    Extra = new { Name = "Tom" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity);
+                dbContext.SaveChanges();
+
+                testEntity.CreatedAt = DateTimeOffset.Now;
+                testEntity.Extra = new { Name = "Jerry" }.ToJson();
+                dbContext.SaveChanges();
+
+                dbContext.Remove(testEntity);
+                dbContext.SaveChanges();
+
+                var testEntity1 = new TestEntity()
+                {
+                    Extra = new { Name = "Tom1" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity1);
+                var testEntity2 = new TestEntity()
+                {
+                    Extra = new { Name = "Tom2" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity2);
+                dbContext.SaveChanges();
+            });
+            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            {
+                dbContext.Remove(new TestEntity()
+                {
+                    Id = 2
+                });
+                dbContext.SaveChanges();
+            });
+            // disable audit
+            AuditConfig.DisableAudit();
+            // enable audit
+            // AuditConfig.EnableAudit();
+        }
+
+        private static void RepositoryTest()
+        {
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
                 db.Database.EnsureCreated();
+                var tableName = db.GetTableName<TestEntity>();
 
                 var conn = db.Database.GetDbConnection();
-                conn.Execute(@"TRUNCATE TABLE TestEntities");
+                conn.Execute($@"TRUNCATE TABLE {tableName}");
 
-                conn.Execute(@"
-INSERT INTO TestEntities
-(
-Extra,
-CreatedAt
-)
-VALUES
-(
-'{""Name"":""AA""}',
-GETUTCDATE()
-)
-");
+                db.GetRepository<TestDbContext, TestEntity>().Insert(new TestEntity()
+                {
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Extra = "{\"Name\": \"Tom\"}"
+                });
+
+                //                conn.Execute($@"
+                //INSERT INTO {tableName}
+                //(
+                //Extra,
+                //CreatedAt
+                //)
+                //VALUES
+                //(
+                //'{{""Name"":""AA""}}',
+                //GETUTCDATE()
+                //)
+                //");
 
                 var abc = db.TestEntities.AsNoTracking().ToArray();
                 Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
@@ -83,8 +197,6 @@ GETUTCDATE()
                 repo.Insert(new TestEntity() { Extra = "{}", CreatedAt = DateTime.UtcNow, });
 
                 var foundEntity = repo.Find(1);
-
-                repo.FindAsync(1).AsTask().Wait();
 
                 var whereExpression = ExpressionHelper.True<TestEntity>();
                 Expression<Func<TestEntity, bool>> idExp = t => t.Id > 0;
@@ -159,6 +271,8 @@ GETUTCDATE()
 
                 uow.DbSet<TestEntity>().Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Extra = "1212", });
 
+                uow.GetRepository<TestEntity>().Delete(uow.DbContext.TestEntities.First());
+
                 Console.ForegroundColor = originColor;
 
                 uow.Commit();
@@ -173,14 +287,12 @@ GETUTCDATE()
 
             DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
             {
+                var tableName = db.GetTableName<TestEntity>();
                 var conn = db.Database.GetDbConnection();
                 conn.Execute($@"
-TRUNCATE TABLE TestEntities
+TRUNCATE TABLE {tableName}
 ");
             });
-
-            Console.WriteLine("completed");
-            Console.ReadLine();
         }
     }
 }

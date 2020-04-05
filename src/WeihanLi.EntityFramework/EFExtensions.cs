@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Internal;
+using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -27,7 +28,16 @@ namespace WeihanLi.EntityFramework
                 throw new ArgumentNullException(nameof(dbContext));
             }
 
+#pragma warning disable EF1001 // Internal EF Core API usage.
             return ((IDatabaseFacadeDependenciesAccessor)dbContext.Database).Dependencies is IRelationalDatabaseFacadeDependencies;
+#pragma warning restore EF1001 // Internal EF Core API usage.
+        }
+
+        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
+        {
+            return condition
+                ? query.Where(predicate)
+                : query;
         }
 
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
@@ -150,6 +160,37 @@ namespace WeihanLi.EntityFramework
             }
 
             return entry;
+        }
+
+        public static string GetTableName<TEntity>(this DbContext dbContext)
+        {
+            var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
+            return entityType?.GetTableName();
+        }
+
+        public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
+        {
+            if (!entityEntry.IsKeySet)
+                return null;
+
+            var keyProps = entityEntry.Properties
+                .Where(p => p.Metadata.IsPrimaryKey())
+                .ToArray();
+            if (keyProps.Length == 0)
+                return null;
+
+            var keyEntries = new KeyEntry[keyProps.Length];
+            for (var i = 0; i < keyProps.Length; i++)
+            {
+                keyEntries[i] = new KeyEntry()
+                {
+                    PropertyName = keyProps[i].Metadata.Name,
+                    ColumnName = keyProps[i].Metadata.GetColumnName(),
+                    Value = keyProps[i].CurrentValue,
+                };
+            }
+
+            return keyEntries;
         }
 
         private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)
