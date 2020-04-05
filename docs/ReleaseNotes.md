@@ -2,6 +2,12 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.6.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.6.0)
+
+- add auto audit support
+- add `dbContext.GetTableName<TEntity>()` extensions
+- add `QueryWithNoLockInterceptor`
+
 ### [WeihanLi.EntityFramework 1.5.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.5.0)
 
 - update EF core to 3.1(drop support EF core 2.x)
