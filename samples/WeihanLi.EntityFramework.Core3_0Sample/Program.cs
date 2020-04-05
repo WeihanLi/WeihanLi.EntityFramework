@@ -11,7 +11,6 @@ using WeihanLi.Common;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
 using WeihanLi.EntityFramework.Audit;
-using WeihanLi.EntityFramework.Interceptors;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Core3_Sample
@@ -89,7 +88,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
                     // 保存到自定义的存储
                     .WithStore<AuditFileStore>()
-                    .WithStore<AuditFileStore>("logs0.txt")
+                    .WithStore<AuditFileStore>("logs0.log")
                     // 忽略指定实体
                     .IgnoreEntity<AuditRecord>()
                     // 忽略指定实体的某个属性
@@ -98,7 +97,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     .IgnoreProperty("CreatedAt")
                     ;
             });
-            
+
             DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
             {
                 dbContext.Database.EnsureDeleted();
@@ -142,6 +141,8 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             });
             // disable audit
             AuditConfig.DisableAudit();
+            // enable audit
+            // AuditConfig.EnableAudit();
         }
 
         private static void RepositoryTest()
