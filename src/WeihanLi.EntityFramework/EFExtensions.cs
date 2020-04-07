@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Metadata;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
@@ -30,17 +30,28 @@ namespace WeihanLi.EntityFramework
             return !dbContext.Database.ProviderName.EndsWith("InMemory");
         }
 
-        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
+        public static IQueryable<T> WhereIf<T>([NotNull]this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
         {
             return condition
                 ? query.Where(predicate)
                 : query;
         }
 
-        public static string GetTableName<TEntity>(this DbContext dbContext) where TEntity : class
+        public static string GetTableName<TEntity>([NotNull]this DbContext dbContext) where TEntity : class
         {
-            var relational = dbContext.Model.FindEntityType(typeof(TEntity))?.Relational();
-            return relational?.TableName;
+            return (dbContext.Model.FindEntityType(typeof(TEntity))).GetTableName();
+        }
+
+        public static string GetTableName([NotNull]this IEntityType entityType)
+        {
+            var relational = entityType.Relational();
+            return relational?.TableName ?? entityType.Name;
+        }
+
+        public static string GetColumnName([NotNull]this IProperty property)
+        {
+            var relational = property.Relational();
+            return relational?.ColumnName ?? property.Name;
         }
 
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
