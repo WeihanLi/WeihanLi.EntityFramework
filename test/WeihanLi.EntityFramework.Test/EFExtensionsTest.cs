@@ -7,7 +7,7 @@ namespace WeihanLi.EntityFramework.Test
         [Fact]
         public void GetTableNameTest()
         {
-            if (Repository.DbContext.IsRelationalDatabase())
+            if (Repository.DbContext.Database.IsRelational())
             {
                 var tableName = Repository.DbContext.GetTableName<TestEntity>();
                 Assert.Equal("TestEntities", tableName);

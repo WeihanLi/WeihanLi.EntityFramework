@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
@@ -21,6 +22,7 @@ namespace WeihanLi.EntityFramework
         /// </summary>
         /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
         /// <returns> True if a relational database provider is being used; false otherwise. </returns>
+        [Obsolete("Please use dbContext.Database.IsRelational")]
         public static bool IsRelationalDatabase([NotNull] this DbContext dbContext)
         {
             if (null == dbContext)
@@ -32,6 +34,28 @@ namespace WeihanLi.EntityFramework
             return ((IDatabaseFacadeDependenciesAccessor)dbContext.Database).Dependencies is IRelationalDatabaseFacadeDependencies;
 #pragma warning restore EF1001 // Internal EF Core API usage.
         }
+
+        /// <summary>
+        /// is relational database used now
+        /// Please use dbContext.Database.IsRelational() with efcore 5.0
+        ///     <para>
+        ///         Returns true if the database provider currently in use is a relational database.
+        ///     </para>
+        /// </summary>
+        /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
+        /// <returns> True if a relational database provider is being used; false otherwise. </returns>
+        public static bool IsRelational([NotNull] this DatabaseFacade database)
+        {
+            if (null == database)
+            {
+                throw new ArgumentNullException(nameof(database));
+            }
+
+#pragma warning disable EF1001 // Internal EF Core API usage.
+            return ((IDatabaseFacadeDependenciesAccessor)database).Dependencies is IRelationalDatabaseFacadeDependencies;
+#pragma warning restore EF1001 // Internal EF Core API usage.
+        }
+
 
         public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
         {

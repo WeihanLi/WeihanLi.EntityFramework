@@ -296,7 +296,7 @@ namespace WeihanLi.EntityFramework.Test
         [Fact]
         public void HybridTest()
         {
-            if (!Repository.DbContext.IsRelationalDatabase())
+            if (!Repository.DbContext.Database.IsRelational())
             {
                 return;
             }
