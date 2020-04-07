@@ -20,16 +20,22 @@ namespace WeihanLi.EntityFramework
 
         protected virtual Task BeforeSaveChanges() => Task.CompletedTask;
 
+        protected virtual Task AfterSaveChanges() => Task.CompletedTask;
+
         public override int SaveChanges()
         {
             BeforeSaveChanges().Wait();
-            return base.SaveChanges();
+            var result = base.SaveChanges();
+            AfterSaveChanges().Wait();
+            return result;
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             await BeforeSaveChanges();
-            return await base.SaveChangesAsync(cancellationToken);
+            var result = await base.SaveChangesAsync(cancellationToken);
+            await AfterSaveChanges();
+            return result;
         }
     }
 }
