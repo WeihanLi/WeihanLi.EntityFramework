@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WeihanLi.Common.Helpers;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit
@@ -116,6 +117,12 @@ namespace WeihanLi.EntityFramework.Audit
             return configBuilder;
         }
 
+        public static IAuditConfigBuilder WithEnricher<TEnricher>(this IAuditConfigBuilder configBuilder, params object[] parameters) where TEnricher : IAuditPropertyEnricher
+        {
+            configBuilder.WithEnricher(ActivatorHelper.CreateInstance<TEnricher>(parameters));
+            return configBuilder;
+        }
+
         public static IAuditConfigBuilder WithStore<TAuditStore>(this IAuditConfigBuilder configBuilder) where TAuditStore : IAuditStore, new()
         {
             configBuilder.WithStore(new TAuditStore());
@@ -124,7 +131,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public static IAuditConfigBuilder WithStore<TAuditStore>(this IAuditConfigBuilder configBuilder, params object[] parameters) where TAuditStore : IAuditStore
         {
-            configBuilder.WithStore((IAuditStore)Activator.CreateInstance(typeof(TAuditStore), parameters));
+            configBuilder.WithStore(ActivatorHelper.CreateInstance<TAuditStore>(parameters));
             return configBuilder;
         }
 
