@@ -149,9 +149,9 @@ namespace WeihanLi.EntityFramework.Audit
                 {
                     TableName = a.TableName,
                     OperationType = a.OperationType,
-                    Extra = a.Properties.ToJson(),
-                    OriginValue = a.OriginalValues.ToJson(),
-                    NewValue = a.NewValues.ToJson(),
+                    Extra = a.Properties.Count == 0 ? null : a.Properties.ToJson(),
+                    OriginValue = a.OriginalValues?.ToJson(),
+                    NewValue = a.NewValues?.ToJson(),
                     ObjectId = a.KeyValues.ToJson(),
                     UpdatedAt = a.UpdatedAt,
                     UpdatedBy = a.UpdatedBy,
