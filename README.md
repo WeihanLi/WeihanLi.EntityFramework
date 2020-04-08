@@ -22,13 +22,27 @@ for more package version details, see package release notes details [here](./doc
   
   - `EFRepository`
   - `EFRepositoryGenerator`
+
 - UoW
   
-  - `EFUnitOfWork` 
+  - `EFUnitOfWork`  
 
 - DbFunctions
   
   - `JsonValue` implement `JSON_VALUE` in SqlServer 2016 and above
+
+- Audit
+
+  - auto audit for entity change
+
+- Interceptors
+
+  - `QueryWithNoLockerInterceptor`
+
+- Extensions
+
+  - Update specific column
+  - Update without specific column
 
 ## Contact
 
