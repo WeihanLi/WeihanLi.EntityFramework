@@ -15,7 +15,6 @@ namespace WeihanLi.EntityFramework
     {
         /// <summary>
         /// is relational database used now
-        /// Please use dbContext.Database.IsRelational() with efcore 5.0
         ///     <para>
         ///         Returns true if the database provider currently in use is a relational database.
         ///     </para>
@@ -29,15 +28,11 @@ namespace WeihanLi.EntityFramework
             {
                 throw new ArgumentNullException(nameof(dbContext));
             }
-
-#pragma warning disable EF1001 // Internal EF Core API usage.
-            return ((IDatabaseFacadeDependenciesAccessor)dbContext.Database).Dependencies is IRelationalDatabaseFacadeDependencies;
-#pragma warning restore EF1001 // Internal EF Core API usage.
+            return dbContext.Database.IsRelational();
         }
 
         /// <summary>
         /// is relational database used now
-        /// Please use dbContext.Database.IsRelational() with efcore 5.0
         ///     <para>
         ///         Returns true if the database provider currently in use is a relational database.
         ///     </para>
