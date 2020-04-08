@@ -2,10 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using WeihanLi.EntityFramework.Audit;
 
 namespace WeihanLi.EntityFramework.Samples
 {
-    public class TestDbContext : DbContext
+    public class TestDbContext : AuditDbContext
     {
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
         {
@@ -27,6 +28,6 @@ namespace WeihanLi.EntityFramework.Samples
 
         public string Extra { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }
