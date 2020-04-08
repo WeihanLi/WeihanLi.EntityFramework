@@ -14,7 +14,7 @@ namespace WeihanLi.EntityFramework.Test
             else
             {
                 dbContext.Database.EnsureCreated();
-                dbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE TestEntities");
+                dbContext.Database.ExecuteSqlCommand("TRUNCATE TABLE TestEntities");
             }
 
             return true;

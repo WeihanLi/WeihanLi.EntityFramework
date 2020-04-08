@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace WeihanLi.EntityFramework.Test
@@ -19,17 +18,8 @@ namespace WeihanLi.EntityFramework.Test
             IServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddDbContext<TestDbContext>(options =>
             {
-                options.UseLoggerFactory(LoggerFactory.Create(loggingBuilder =>
-                {
-                    loggingBuilder.AddLog4Net();
-                    //loggingBuilder.AddProvider(new DelegateLoggerProvider((category, logLevel, exception, msg) =>
-                    //{
-                    //    _outputHelper.WriteLine($"{category}:[{logLevel}] {msg}\n {exception}");
-                    //}));
-                }));
                 options.UseSqlServer(DbConnectionString);
                 //options.UseInMemoryDatabase("Tests");
-                options.EnableDetailedErrors();
             });
             serviceCollection.AddEFRepository();
 
