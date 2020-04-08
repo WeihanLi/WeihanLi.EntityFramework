@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using WeihanLi.Extensions;
 
@@ -13,21 +14,15 @@ namespace WeihanLi.EntityFramework
     {
         /// <summary>
         /// is relational database used now
-        /// Please use dbContext.Database.IsRelational() with efcore 5.0
-        ///     <para>
-        ///         Returns true if the database provider currently in use is a relational database.
-        ///     </para>
-        /// </summary>
-        /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
         /// <returns> True if a relational database provider is being used; false otherwise. </returns>
-        public static bool IsRelationalDatabase([NotNull] this DbContext dbContext)
+        public static bool IsRelational([NotNull] this DatabaseFacade database)
         {
-            if (null == dbContext)
+            if (null == database)
             {
-                throw new ArgumentNullException(nameof(dbContext));
+                throw new ArgumentNullException(nameof(database));
             }
 
-            return !dbContext.Database.ProviderName.EndsWith("InMemory");
+            return !database.ProviderName.EndsWith("InMemory");
         }
 
         public static IQueryable<T> WhereIf<T>([NotNull]this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)

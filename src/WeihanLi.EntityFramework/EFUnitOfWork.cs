@@ -13,7 +13,7 @@ namespace WeihanLi.EntityFramework
         public EFUnitOfWork(TDbContext dbContext)
         {
             DbContext = dbContext;
-            if (DbContext.IsRelationalDatabase())
+            if (DbContext.Database.IsRelational())
             {
                 _transaction = DbContext.Database.BeginTransaction();
             }
