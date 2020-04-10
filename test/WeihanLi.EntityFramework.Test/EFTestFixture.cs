@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using WeihanLi.Common;
 using Xunit;
 
 namespace WeihanLi.EntityFramework.Test
@@ -32,6 +33,7 @@ namespace WeihanLi.EntityFramework.Test
                 options.EnableDetailedErrors();
             });
             serviceCollection.AddEFRepository();
+            DependencyResolver.SetDependencyResolver(serviceCollection);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             _serviceScope = serviceProvider.CreateScope();
