@@ -13,7 +13,7 @@ namespace WeihanLi.EntityFramework.Audit
         {
             if (invocation.ProxyTarget is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
             {
-                var auditEntries = new List<AuditEntry>(16);
+                var auditEntries = new List<AuditEntry>();
                 foreach (var entityEntry in dbContext.ChangeTracker.Entries())
                 {
                     if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
