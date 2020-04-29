@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
+using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
 using WeihanLi.EntityFramework.Audit;
@@ -37,7 +38,20 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
+            services.AddScopedProxy<TestDbContext>();
             services.AddEFRepository();
+            services.AddFluentAspects(options =>
+            {
+                options.NoInterceptMethod<DbContext>(m =>
+                    m.Name != nameof(DbContext.SaveChanges)
+                    && m.Name != nameof(DbContext.SaveChangesAsync));
+
+                options.InterceptMethod<DbContext>(m =>
+                        m.Name == nameof(DbContext.SaveChanges)
+                        || m.Name == nameof(DbContext.SaveChangesAsync))
+                    .With<AuditDbContextInterceptor>()
+                    ;
+            });
             DependencyResolver.SetDependencyResolver(services);
 
             AutoAuditTest();

@@ -19,25 +19,7 @@ namespace WeihanLi.EntityFramework
         ///         Returns true if the database provider currently in use is a relational database.
         ///     </para>
         /// </summary>
-        /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
-        /// <returns> True if a relational database provider is being used; false otherwise. </returns>
-        [Obsolete("Please use dbContext.Database.IsRelational")]
-        public static bool IsRelationalDatabase([NotNull] this DbContext dbContext)
-        {
-            if (null == dbContext)
-            {
-                throw new ArgumentNullException(nameof(dbContext));
-            }
-            return dbContext.Database.IsRelational();
-        }
-
-        /// <summary>
-        /// is relational database used now
-        ///     <para>
-        ///         Returns true if the database provider currently in use is a relational database.
-        ///     </para>
-        /// </summary>
-        /// <param name="dbContext"> The DbContext <see cref="DbContext.Database" />. </param>
+        /// <param name="database"> The DbContext database <see cref="DbContext.Database" />. </param>
         /// <returns> True if a relational database provider is being used; false otherwise. </returns>
         public static bool IsRelational([NotNull] this DatabaseFacade database)
         {
@@ -50,7 +32,6 @@ namespace WeihanLi.EntityFramework
             return ((IDatabaseFacadeDependenciesAccessor)database).Dependencies is IRelationalDatabaseFacadeDependencies;
 #pragma warning restore EF1001 // Internal EF Core API usage.
         }
-
 
         public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
         {
