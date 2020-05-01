@@ -8,11 +8,33 @@ namespace WeihanLi.EntityFramework.Audit
 {
     public class AuditEntry
     {
-        public AuditEntry(EntityEntry entityEntry)
+        public string TableName { get; set; }
+
+        public Dictionary<string, object> OriginalValues { get; set; }
+
+        public Dictionary<string, object> NewValues { get; set; }
+
+        public Dictionary<string, object> KeyValues { get; set; }
+
+        public OperationType OperationType { get; set; }
+
+        public Dictionary<string, object> Properties { get; set; }
+
+        public DateTimeOffset UpdatedAt { get; set; }
+
+        public string UpdatedBy { get; set; }
+    }
+
+    internal sealed class InternalAuditEntry : AuditEntry
+    {
+        public List<PropertyEntry> TemporaryProperties { get; set; }
+
+        public InternalAuditEntry(EntityEntry entityEntry)
         {
             TableName = entityEntry.Metadata.GetTableName();
             KeyValues = new Dictionary<string, object>(4);
             Properties = new Dictionary<string, object>(16);
+
             if (entityEntry.Properties.Any(x => x.IsTemporary))
             {
                 TemporaryProperties = new List<PropertyEntry>(4);
@@ -72,23 +94,5 @@ namespace WeihanLi.EntityFramework.Audit
                 }
             }
         }
-
-        public string TableName { get; }
-
-        public Dictionary<string, object> OriginalValues { get; }
-
-        public Dictionary<string, object> NewValues { get; }
-
-        public Dictionary<string, object> KeyValues { get; }
-
-        public OperationType OperationType { get; }
-
-        public Dictionary<string, object> Properties { get; }
-
-        internal List<PropertyEntry> TemporaryProperties { get; set; }
-
-        public DateTimeOffset UpdatedAt { get; set; }
-
-        public string UpdatedBy { get; set; }
     }
 }

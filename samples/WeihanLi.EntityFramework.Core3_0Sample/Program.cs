@@ -27,7 +27,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             loggerFactory.AddLog4Net();
 
             var services = new ServiceCollection();
-            services.AddDbContext<TestDbContext>(options =>
+            services.AddProxyDbContext<TestDbContext>(options =>
             {
                 options
                     .UseLoggerFactory(loggerFactory)
@@ -38,7 +38,6 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
-            services.AddScopedProxy<TestDbContext>();
             services.AddEFRepository();
             services.AddFluentAspects(options =>
             {
