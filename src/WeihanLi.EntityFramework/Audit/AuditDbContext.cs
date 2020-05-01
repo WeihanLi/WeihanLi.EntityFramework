@@ -36,7 +36,7 @@ namespace WeihanLi.EntityFramework.Audit
                     {
                         continue;
                     }
-                    AuditEntries.Add(new AuditEntry(entityEntry));
+                    AuditEntries.Add(new InternalAuditEntry(entityEntry));
                 }
             }
 
@@ -47,47 +47,50 @@ namespace WeihanLi.EntityFramework.Audit
         {
             if (null != AuditEntries && AuditEntries.Count > 0)
             {
-                foreach (var auditEntry in AuditEntries)
+                foreach (var entry in AuditEntries)
                 {
-                    // update TemporaryProperties
-                    if (auditEntry.TemporaryProperties != null && auditEntry.TemporaryProperties.Count > 0)
+                    if (entry is InternalAuditEntry auditEntry)
                     {
-                        foreach (var temporaryProperty in auditEntry.TemporaryProperties)
+                        // update TemporaryProperties
+                        if (auditEntry.TemporaryProperties != null && auditEntry.TemporaryProperties.Count > 0)
                         {
-                            var colName = temporaryProperty.Metadata.GetColumnName();
-                            if (temporaryProperty.Metadata.IsPrimaryKey())
+                            foreach (var temporaryProperty in auditEntry.TemporaryProperties)
                             {
-                                auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
+                                var colName = temporaryProperty.Metadata.GetColumnName();
+                                if (temporaryProperty.Metadata.IsPrimaryKey())
+                                {
+                                    auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
+                                }
+
+                                switch (auditEntry.OperationType)
+                                {
+                                    case OperationType.Add:
+                                        auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                        break;
+
+                                    case OperationType.Delete:
+                                        auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
+                                        break;
+
+                                    case OperationType.Update:
+                                        auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
+                                        auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                        break;
+                                }
                             }
-
-                            switch (auditEntry.OperationType)
-                            {
-                                case OperationType.Add:
-                                    auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
-                                    break;
-
-                                case OperationType.Delete:
-                                    auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
-                                    break;
-
-                                case OperationType.Update:
-                                    auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
-                                    auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
-                                    break;
-                            }
+                            // set to null
+                            auditEntry.TemporaryProperties = null;
                         }
-                        // set to null
-                        auditEntry.TemporaryProperties = null;
                     }
 
                     // apply enricher
                     foreach (var enricher in AuditConfig.AuditConfigOptions.Enrichers)
                     {
-                        enricher.Enrich(auditEntry);
+                        enricher.Enrich(entry);
                     }
 
-                    auditEntry.UpdatedAt = DateTimeOffset.UtcNow;
-                    auditEntry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
+                    entry.UpdatedAt = DateTimeOffset.UtcNow;
+                    entry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
                         ?.GetUserId();
                 }
 
@@ -133,7 +136,7 @@ namespace WeihanLi.EntityFramework.Audit
                     {
                         continue;
                     }
-                    AuditEntries.Add(new AuditEntry(entityEntry));
+                    AuditEntries.Add(new InternalAuditEntry(entityEntry));
                 }
             }
 

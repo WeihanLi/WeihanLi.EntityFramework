@@ -35,7 +35,10 @@ namespace WeihanLi.EntityFramework
         public virtual async Task CommitAsync(CancellationToken cancellationToken)
         {
             await DbContext.SaveChangesAsync(cancellationToken);
-            _transaction?.Commit();
+            if (null != _transaction)
+            {
+                await _transaction.CommitAsync(cancellationToken);
+            }
         }
 
         public virtual void Rollback()

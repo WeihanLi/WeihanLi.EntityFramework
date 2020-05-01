@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
+using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
 using WeihanLi.EntityFramework.Audit;
@@ -26,7 +27,19 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             loggerFactory.AddLog4Net();
 
             var services = new ServiceCollection();
-            services.AddDbContext<TestDbContext>(options =>
+            //services.AddProxyDbContext<TestDbContext>(options =>
+            //{
+            //    options
+            //        .UseLoggerFactory(loggerFactory)
+            //        //.EnableDetailedErrors()
+            //        //.EnableSensitiveDataLogging()
+            //        // .UseInMemoryDatabase("Tests")
+            //        .UseSqlServer(DbConnectionString)
+            //        //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+            //        ;
+            //});
+
+            services.AddProxyDbContextPool<TestDbContext>(options =>
             {
                 options
                     .UseLoggerFactory(loggerFactory)
@@ -38,6 +51,18 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     ;
             });
             services.AddEFRepository();
+            services.AddFluentAspects(options =>
+            {
+                options.NoInterceptMethod<DbContext>(m =>
+                    m.Name != nameof(DbContext.SaveChanges)
+                    && m.Name != nameof(DbContext.SaveChangesAsync));
+
+                options.InterceptMethod<DbContext>(m =>
+                        m.Name == nameof(DbContext.SaveChanges)
+                        || m.Name == nameof(DbContext.SaveChangesAsync))
+                    .With<AuditDbContextInterceptor>()
+                    ;
+            });
             DependencyResolver.SetDependencyResolver(services);
 
             AutoAuditTest();
