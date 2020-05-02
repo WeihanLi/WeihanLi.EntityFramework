@@ -2,6 +2,11 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.7.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.7.0)
+
+- update `AuditEntry`
+- optimize auto audit with aop
+
 ### [WeihanLi.EntityFramework 1.6.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.6.0)
 
 - add auto audit support
