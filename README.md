@@ -48,4 +48,4 @@ for more package version details, see package release notes details [here](./doc
 
 ## Contact
 
-contact me via <weihanli@outlook.com> if you need
+contact me <weihanli@outlook.com> if you need
