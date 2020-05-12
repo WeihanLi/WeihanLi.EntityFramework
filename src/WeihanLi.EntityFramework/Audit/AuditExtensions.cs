@@ -175,8 +175,7 @@ namespace WeihanLi.EntityFramework.Audit
         {
             return options.InterceptMethod<TDbContext>(m =>
                     m.Name == nameof(DbContext.SaveChanges)
-                    || m.Name == nameof(DbContext.SaveChangesAsync))
-                .With<AuditDbContextInterceptor>();
+                    || m.Name == nameof(DbContext.SaveChangesAsync));
         }
 
         public static FluentAspectOptions InterceptDbContextSaveWithAudit(this FluentAspectOptions options)
