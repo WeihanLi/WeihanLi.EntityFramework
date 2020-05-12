@@ -28,9 +28,7 @@ namespace WeihanLi.EntityFramework
                 throw new ArgumentNullException(nameof(database));
             }
 
-#pragma warning disable EF1001 // Internal EF Core API usage.
             return ((IDatabaseFacadeDependenciesAccessor)database).Dependencies is IRelationalDatabaseFacadeDependencies;
-#pragma warning restore EF1001 // Internal EF Core API usage.
         }
 
         public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)

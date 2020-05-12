@@ -7,11 +7,11 @@ using WeihanLi.Common.Aspect;
 
 namespace WeihanLi.EntityFramework.Audit
 {
-    public class AuditDbContextInterceptor : IInterceptor
+    public sealed class AuditDbContextInterceptor : IInterceptor
     {
         public async Task Invoke(IInvocation invocation, Func<Task> next)
         {
-            if (invocation.ProxyTarget is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
+            if (invocation.Target is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
             {
                 var auditEntries = new List<AuditEntry>();
                 foreach (var entityEntry in dbContext.ChangeTracker.Entries())
@@ -26,7 +26,7 @@ namespace WeihanLi.EntityFramework.Audit
                     {
                         continue;
                     }
-                    auditEntries.Add(new AuditEntry(entityEntry));
+                    auditEntries.Add(new InternalAuditEntry(entityEntry));
                 }
                 await next();
                 //
@@ -34,35 +34,38 @@ namespace WeihanLi.EntityFramework.Audit
                 {
                     foreach (var auditEntry in auditEntries)
                     {
-                        // update TemporaryProperties
-                        if (auditEntry.TemporaryProperties != null && auditEntry.TemporaryProperties.Count > 0)
+                        if (auditEntry is InternalAuditEntry internalAuditEntry)
                         {
-                            foreach (var temporaryProperty in auditEntry.TemporaryProperties)
+                            // update TemporaryProperties
+                            if (internalAuditEntry.TemporaryProperties != null && internalAuditEntry.TemporaryProperties.Count > 0)
                             {
-                                var colName = temporaryProperty.Metadata.GetColumnName();
-                                if (temporaryProperty.Metadata.IsPrimaryKey())
+                                foreach (var temporaryProperty in internalAuditEntry.TemporaryProperties)
                                 {
-                                    auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
+                                    var colName = temporaryProperty.Metadata.GetColumnName();
+                                    if (temporaryProperty.Metadata.IsPrimaryKey())
+                                    {
+                                        auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
+                                    }
+
+                                    switch (auditEntry.OperationType)
+                                    {
+                                        case OperationType.Add:
+                                            auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                            break;
+
+                                        case OperationType.Delete:
+                                            auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
+                                            break;
+
+                                        case OperationType.Update:
+                                            auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
+                                            auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                            break;
+                                    }
                                 }
-
-                                switch (auditEntry.OperationType)
-                                {
-                                    case OperationType.Add:
-                                        auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
-                                        break;
-
-                                    case OperationType.Delete:
-                                        auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
-                                        break;
-
-                                    case OperationType.Update:
-                                        auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
-                                        auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
-                                        break;
-                                }
+                                // set to null
+                                internalAuditEntry.TemporaryProperties = null;
                             }
-                            // set to null
-                            auditEntry.TemporaryProperties = null;
                         }
 
                         // apply enricher

@@ -1,6 +1,8 @@
 # WeihanLi.EntityFramework [![WeihanLi.EntityFramework](https://img.shields.io/nuget/v/WeihanLi.EntityFramework.svg)](https://www.nuget.org/packages/WeihanLi.EntityFramework/)
 
-[![Build Status](https://weihanli.visualstudio.com/Pipelines/_apis/build/status/WeihanLi.WeihanLi.EntityFramework?branchName=dev)](https://weihanli.visualstudio.com/Pipelines/_build/latest?definitionId=11&branchName=dev)
+[![Pipeline Build Status](https://weihanli.visualstudio.com/Pipelines/_apis/build/status/WeihanLi.WeihanLi.EntityFramework?branchName=dev)](https://weihanli.visualstudio.com/Pipelines/_build/latest?definitionId=11&branchName=dev)
+
+![Github Build Status](https://github.com/WeihanLi/WeihanLi.EntityFramework/workflows/dotnetcore/badge.svg)
 
 ## Intro
 
@@ -41,9 +43,9 @@ for more package version details, see package release notes details [here](./doc
 
 - Extensions
 
-  - Update specific column
-  - Update without specific column
+  - Update specific column `Update`
+  - Update without specific column `UpdateWithout`
 
 ## Contact
 
-contact me via <weihanli@outlook.com> if you need
+contact me <weihanli@outlook.com> if you need

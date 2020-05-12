@@ -27,7 +27,19 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             loggerFactory.AddLog4Net();
 
             var services = new ServiceCollection();
-            services.AddDbContext<TestDbContext>(options =>
+            //services.AddProxyDbContext<TestDbContext>(options =>
+            //{
+            //    options
+            //        .UseLoggerFactory(loggerFactory)
+            //        //.EnableDetailedErrors()
+            //        //.EnableSensitiveDataLogging()
+            //        // .UseInMemoryDatabase("Tests")
+            //        .UseSqlServer(DbConnectionString)
+            //        //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+            //        ;
+            //});
+
+            services.AddProxyDbContextPool<TestDbContext>(options =>
             {
                 options
                     .UseLoggerFactory(loggerFactory)
@@ -38,19 +50,21 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
                     ;
             });
-            services.AddScopedProxy<TestDbContext>();
             services.AddEFRepository();
             services.AddFluentAspects(options =>
             {
-                options.NoInterceptMethod<DbContext>(m =>
-                    m.Name != nameof(DbContext.SaveChanges)
-                    && m.Name != nameof(DbContext.SaveChangesAsync));
+                //options.InterceptMethod<DbContext>(m =>
+                //        m.Name == nameof(DbContext.SaveChanges)
+                //        || m.Name == nameof(DbContext.SaveChangesAsync))
+                //    .With<AuditDbContextInterceptor>();
 
-                options.InterceptMethod<DbContext>(m =>
-                        m.Name == nameof(DbContext.SaveChanges)
-                        || m.Name == nameof(DbContext.SaveChangesAsync))
-                    .With<AuditDbContextInterceptor>()
-                    ;
+                //为所有 DbContext 注册审计拦截器
+                //options.InterceptDbContextSaveWithAudit();
+
+                //options.InterceptDbContextSave<TestDbContext>()
+                //    .With<AuditDbContextInterceptor>();
+
+                options.InterceptDbContextSaveWithAudit<TestDbContext>();
             });
             DependencyResolver.SetDependencyResolver(services);
 

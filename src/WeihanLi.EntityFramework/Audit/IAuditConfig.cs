@@ -19,7 +19,7 @@ namespace WeihanLi.EntityFramework.Audit
         IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher);
     }
 
-    internal class AuditConfigBuilder : IAuditConfigBuilder
+    internal sealed class AuditConfigBuilder : IAuditConfigBuilder
     {
         private IAuditUserIdProvider _auditUserProvider = EnvironmentAuditUserIdProvider.Instance.Value;
         private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new List<IAuditPropertyEnricher>(8);
@@ -91,7 +91,7 @@ namespace WeihanLi.EntityFramework.Audit
         }
     }
 
-    internal class AuditConfigOptions
+    internal sealed class AuditConfigOptions
     {
         public bool AuditEnabled { get; set; } = true;
 
@@ -148,7 +148,7 @@ namespace WeihanLi.EntityFramework.Audit
         }
     }
 
-    public class AuditConfig
+    public sealed class AuditConfig
     {
         internal static AuditConfigOptions AuditConfigOptions = new AuditConfigOptions();
 
