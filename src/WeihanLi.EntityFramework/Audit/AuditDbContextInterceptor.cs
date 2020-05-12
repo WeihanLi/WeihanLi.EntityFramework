@@ -7,7 +7,7 @@ using WeihanLi.Common.Aspect;
 
 namespace WeihanLi.EntityFramework.Audit
 {
-    public class AuditDbContextInterceptor : IInterceptor
+    public sealed class AuditDbContextInterceptor : IInterceptor
     {
         public async Task Invoke(IInvocation invocation, Func<Task> next)
         {
