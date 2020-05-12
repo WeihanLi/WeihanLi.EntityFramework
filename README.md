@@ -43,8 +43,8 @@ for more package version details, see package release notes details [here](./doc
 
 - Extensions
 
-  - Update specific column
-  - Update without specific column
+  - Update specific column `Update`
+  - Update without specific column `UpdateWithout`
 
 ## Contact
 
