@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Helpers;
 using WeihanLi.Extensions;
 
@@ -160,5 +161,42 @@ namespace WeihanLi.EntityFramework.Audit
         }
 
         #endregion IAuditConfigBuilder
+
+        #region FluentAspectOptions
+
+        public static IInterceptionConfiguration InterceptDbContextSave(this FluentAspectOptions options)
+        {
+            return options.InterceptMethod<DbContext>(m =>
+                    m.Name == nameof(DbContext.SaveChanges)
+                    || m.Name == nameof(DbContext.SaveChangesAsync));
+        }
+
+        public static IInterceptionConfiguration InterceptDbContextSave<TDbContext>(this FluentAspectOptions options) where TDbContext : DbContext
+        {
+            return options.Intercept(c => c.Target?.GetType().IsAssignableTo<TDbContext>() == true
+                                   &&
+                                   (c.ProxyMethod.Name == nameof(DbContext.SaveChanges)
+                                    || c.ProxyMethod.Name == nameof(DbContext.SaveChangesAsync)
+                                   )
+            );
+        }
+
+        public static FluentAspectOptions InterceptDbContextSaveWithAudit(this FluentAspectOptions options)
+        {
+            options.InterceptMethod<DbContext>(m =>
+                    m.Name == nameof(DbContext.SaveChanges)
+                    || m.Name == nameof(DbContext.SaveChangesAsync))
+                .With<AuditDbContextInterceptor>();
+            return options;
+        }
+
+        public static FluentAspectOptions InterceptDbContextSaveWithAudit<TDbContext>(this FluentAspectOptions options) where TDbContext : DbContext
+        {
+            options.InterceptDbContextSave<TDbContext>()
+                .With<AuditDbContextInterceptor>();
+            return options;
+        }
+
+        #endregion FluentAspectOptions
     }
 }

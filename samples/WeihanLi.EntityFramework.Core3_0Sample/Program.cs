@@ -53,15 +53,18 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             services.AddEFRepository();
             services.AddFluentAspects(options =>
             {
-                options.NoInterceptMethod<DbContext>(m =>
-                    m.Name != nameof(DbContext.SaveChanges)
-                    && m.Name != nameof(DbContext.SaveChangesAsync));
+                //options.InterceptMethod<DbContext>(m =>
+                //        m.Name == nameof(DbContext.SaveChanges)
+                //        || m.Name == nameof(DbContext.SaveChangesAsync))
+                //    .With<AuditDbContextInterceptor>();
 
-                options.InterceptMethod<DbContext>(m =>
-                        m.Name == nameof(DbContext.SaveChanges)
-                        || m.Name == nameof(DbContext.SaveChangesAsync))
-                    .With<AuditDbContextInterceptor>()
-                    ;
+                //为所有 DbContext 注册审计拦截器
+                //options.InterceptDbContextSaveWithAudit();
+
+                //options.InterceptDbContextSave<TestDbContext>()
+                //    .With<AuditDbContextInterceptor>();
+
+                options.InterceptDbContextSaveWithAudit<TestDbContext>();
             });
             DependencyResolver.SetDependencyResolver(services);
 
