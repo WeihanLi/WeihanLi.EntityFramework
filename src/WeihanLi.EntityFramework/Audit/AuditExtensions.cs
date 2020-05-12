@@ -173,9 +173,12 @@ namespace WeihanLi.EntityFramework.Audit
 
         public static IInterceptionConfiguration InterceptDbContextSave<TDbContext>(this FluentAspectOptions options) where TDbContext : DbContext
         {
-            return options.InterceptMethod<TDbContext>(m =>
-                    m.Name == nameof(DbContext.SaveChanges)
-                    || m.Name == nameof(DbContext.SaveChangesAsync));
+            return options.Intercept(c => c.Target?.GetType().IsAssignableTo<TDbContext>() == true
+                                   &&
+                                   (c.ProxyMethod.Name == nameof(DbContext.SaveChanges)
+                                    || c.ProxyMethod.Name == nameof(DbContext.SaveChangesAsync)
+                                   )
+            );
         }
 
         public static FluentAspectOptions InterceptDbContextSaveWithAudit(this FluentAspectOptions options)
@@ -189,9 +192,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public static FluentAspectOptions InterceptDbContextSaveWithAudit<TDbContext>(this FluentAspectOptions options) where TDbContext : DbContext
         {
-            options.InterceptMethod<TDbContext>(m =>
-                    m.Name == nameof(DbContext.SaveChanges)
-                    || m.Name == nameof(DbContext.SaveChangesAsync))
+            options.InterceptDbContextSave<TDbContext>()
                 .With<AuditDbContextInterceptor>();
             return options;
         }

@@ -11,7 +11,7 @@ namespace WeihanLi.EntityFramework.Audit
     {
         public async Task Invoke(IInvocation invocation, Func<Task> next)
         {
-            if (invocation.ProxyTarget is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
+            if (invocation.Target is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
             {
                 var auditEntries = new List<AuditEntry>();
                 foreach (var entityEntry in dbContext.ChangeTracker.Entries())
