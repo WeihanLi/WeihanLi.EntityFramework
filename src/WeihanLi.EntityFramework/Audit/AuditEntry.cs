@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Audit
 {
@@ -16,7 +17,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public Dictionary<string, object> KeyValues { get; set; }
 
-        public OperationType OperationType { get; set; }
+        public DataOperationType OperationType { get; set; }
 
         public Dictionary<string, object> Properties { get; set; }
 
@@ -42,17 +43,17 @@ namespace WeihanLi.EntityFramework.Audit
 
             if (entityEntry.State == EntityState.Added)
             {
-                OperationType = OperationType.Add;
+                OperationType = DataOperationType.Add;
                 NewValues = new Dictionary<string, object>();
             }
             else if (entityEntry.State == EntityState.Deleted)
             {
-                OperationType = OperationType.Delete;
+                OperationType = DataOperationType.Delete;
                 OriginalValues = new Dictionary<string, object>();
             }
             else if (entityEntry.State == EntityState.Modified)
             {
-                OperationType = OperationType.Update;
+                OperationType = DataOperationType.Update;
                 OriginalValues = new Dictionary<string, object>();
                 NewValues = new Dictionary<string, object>();
             }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Audit
 {
@@ -11,7 +12,7 @@ namespace WeihanLi.EntityFramework.Audit
         [StringLength(128)]
         public string TableName { get; set; }
 
-        public OperationType OperationType { get; set; }
+        public DataOperationType OperationType { get; set; }
 
         [StringLength(256)]
         public string ObjectId { get; set; }
