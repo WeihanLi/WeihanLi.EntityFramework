@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using WeihanLi.Common.Models;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit
@@ -64,15 +65,15 @@ namespace WeihanLi.EntityFramework.Audit
 
                                 switch (auditEntry.OperationType)
                                 {
-                                    case OperationType.Add:
+                                    case DataOperationType.Add:
                                         auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
                                         break;
 
-                                    case OperationType.Delete:
+                                    case DataOperationType.Delete:
                                         auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
                                         break;
 
-                                    case OperationType.Update:
+                                    case DataOperationType.Update:
                                         auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
                                         auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
                                         break;

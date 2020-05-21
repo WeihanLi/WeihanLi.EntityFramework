@@ -10,6 +10,5 @@
     <PackageReleaseNotes>
         https://github.com/WeihanLi/WeihanLi.EntityFramework/tree/dev/docs/ReleaseNotes.md
     </PackageReleaseNotes>
-    <Copyright>Copyright 2019 WeihanLi</Copyright>
   </PropertyGroup>
 </Project>

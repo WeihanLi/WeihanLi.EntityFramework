@@ -11,6 +11,7 @@ using WeihanLi.Common;
 using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
+using WeihanLi.Common.Services;
 using WeihanLi.EntityFramework.Audit;
 using WeihanLi.Extensions;
 
@@ -109,7 +110,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             {
                 builder
                     // 配置操作用户获取方式
-                    .WithUserIdProvider(EnvironmentAuditUserIdProvider.Instance.Value)
+                    .WithUserIdProvider(EnvironmentUserIdProvider.Instance.Value)
                     //.WithUnModifiedProperty() // 保存未修改的属性,默认只保存发生修改的属性
                     // 保存更多属性
                     .EnrichWithProperty("MachineName", Environment.MachineName)
