@@ -165,7 +165,9 @@ namespace WeihanLi.EntityFramework.Audit
 
         public static void Configure(Action<IAuditConfigBuilder> configAction)
         {
-            if (null == configAction) return;
+            if (null == configAction)
+                return;
+
             var builder = new AuditConfigBuilder();
             configAction.Invoke(builder);
             AuditConfigOptions = builder.Build();
