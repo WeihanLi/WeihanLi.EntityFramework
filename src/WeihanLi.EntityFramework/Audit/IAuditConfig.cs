@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WeihanLi.Common.Services;
 
 namespace WeihanLi.EntityFramework.Audit
 {
     public interface IAuditConfigBuilder
     {
-        IAuditConfigBuilder WithUserIdProvider(IAuditUserIdProvider auditUserProvider);
+        IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider);
 
         IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true);
 
@@ -21,14 +22,14 @@ namespace WeihanLi.EntityFramework.Audit
 
     internal sealed class AuditConfigBuilder : IAuditConfigBuilder
     {
-        private IAuditUserIdProvider _auditUserProvider = EnvironmentAuditUserIdProvider.Instance.Value;
+        private IUserIdProvider _auditUserProvider = EnvironmentUserIdProvider.Instance.Value;
         private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new List<IAuditPropertyEnricher>(8);
         private readonly List<Func<EntityEntry, bool>> _entityFilters = new List<Func<EntityEntry, bool>>();
         private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new List<Func<EntityEntry, PropertyEntry, bool>>();
         private readonly List<IAuditStore> _auditStores = new List<IAuditStore>(4);
         private bool _saveUnModifiedProperty;
 
-        public IAuditConfigBuilder WithUserIdProvider(IAuditUserIdProvider auditUserProvider)
+        public IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider)
         {
             _auditUserProvider = auditUserProvider;
             return this;
@@ -97,7 +98,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public bool SaveUnModifiedProperties { get; set; }
 
-        public IAuditUserIdProvider UserIdProvider { get; set; }
+        public IUserIdProvider UserIdProvider { get; set; }
 
         private IReadOnlyCollection<IAuditStore> _stores = Array.Empty<IAuditStore>();
 
@@ -164,7 +165,9 @@ namespace WeihanLi.EntityFramework.Audit
 
         public static void Configure(Action<IAuditConfigBuilder> configAction)
         {
-            if (null == configAction) return;
+            if (null == configAction)
+                return;
+
             var builder = new AuditConfigBuilder();
             configAction.Invoke(builder);
             AuditConfigOptions = builder.Build();

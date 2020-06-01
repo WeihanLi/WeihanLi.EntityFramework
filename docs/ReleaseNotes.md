@@ -2,10 +2,15 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.7.1](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.7.1)
+
+- add `AuditDbContextInterceptor` extensions for `FluentAspectOptions`
+- upgrade `WeihanLi.Common` to make it possible to use `AspectCore` or `Castle` 
+
 ### [WeihanLi.EntityFramework 1.7.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.7.0)
 
 - update `AuditEntry`
-- optimize auto audit with aop
+- auto audit with aop
 
 ### [WeihanLi.EntityFramework 1.6.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.6.0)
 

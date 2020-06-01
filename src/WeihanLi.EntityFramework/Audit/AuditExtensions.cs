@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Helpers;
+using WeihanLi.Common.Services;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit
@@ -106,7 +107,7 @@ namespace WeihanLi.EntityFramework.Audit
             return configBuilder;
         }
 
-        public static IAuditConfigBuilder WithUserIdProvider<TUserIdProvider>(this IAuditConfigBuilder configBuilder) where TUserIdProvider : IAuditUserIdProvider, new()
+        public static IAuditConfigBuilder WithUserIdProvider<TUserIdProvider>(this IAuditConfigBuilder configBuilder) where TUserIdProvider : IUserIdProvider, new()
         {
             configBuilder.WithUserIdProvider(new TUserIdProvider());
             return configBuilder;
