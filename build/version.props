@@ -5,6 +5,7 @@
     <VersionPatch>0</VersionPatch>
     <VersionRevision></VersionRevision>
     <VersionPrefix>$(VersionMajor).$(VersionMinor).$(VersionPatch)</VersionPrefix>
+    <VersionSuffix Condition="'$(Configuration)'=='DEBUG'">preview</VersionSuffix>
     <InformationalVersion>$(PackageVersion)</InformationalVersion>
   </PropertyGroup>
 </Project>
