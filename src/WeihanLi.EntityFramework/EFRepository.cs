@@ -171,7 +171,7 @@ namespace WeihanLi.EntityFramework
                 .CountAsync(whereExpression, cancellationToken);
             if (total == 0)
             {
-                return new PagedListResult<TEntity>() { PageSize = pageSize };
+                return PagedListResult<TEntity>.Empty;
             }
             if (pageNumber <= 0)
             {

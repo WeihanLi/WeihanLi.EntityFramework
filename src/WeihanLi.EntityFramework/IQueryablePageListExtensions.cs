@@ -30,7 +30,7 @@ namespace WeihanLi.EntityFramework
             var count = source.Count();
             if (count == 0)
             {
-                return new PagedListResult<T>() { PageNumber = pageNumber, PageSize = pageSize, TotalCount = 0 };
+                return PagedListResult<T>.Empty;
             }
 
             if (pageNumber > 1)
@@ -76,7 +76,7 @@ namespace WeihanLi.EntityFramework
             var count = await source.CountAsync(cancellationToken).ConfigureAwait(false);
             if (count == 0)
             {
-                return new PagedListResult<T>() { PageNumber = pageNumber, PageSize = pageSize, TotalCount = 0 };
+                return PagedListResult<T>.Empty;
             }
 
             if (pageNumber > 1)
