@@ -217,17 +217,17 @@ namespace WeihanLi.EntityFramework
         Task<TResult> FirstOrDefaultResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="IPagedListResult{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="queryBuilderAction">queryBuilderAction</param>
         /// <param name="pageNumber">The pageNumber of page.</param>
         /// <param name="pageSize">The size of the page.</param>
-        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
+        /// <returns>An <see cref="IPagedListResult{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListModel<TEntity> GetPagedList(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20);
+        IPagedListResult<TEntity> GetPagedList(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
-        /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="IPagedListResult{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="queryBuilderAction">A function to test each element for a condition.</param>
         /// <param name="pageNumber">The number of page.</param>
@@ -235,24 +235,24 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken">
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
-        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
+        /// <returns>An <see cref="IPagedListResult{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListModel<TEntity>> GetPagedListAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
+        Task<IPagedListResult<TEntity>> GetPagedListAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets the <see cref="IPagedListModel{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="IPagedListResult{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="selector">The selector for projection.</param>
         /// <param name="queryBuilderAction">A function to test each element for a condition.</param>
         /// <param name="pageNumber">pageNumber</param>
         /// <param name="pageSize">pageSize</param>
-        /// <returns>An <see cref="IPagedListModel{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
+        /// <returns>An <see cref="IPagedListResult{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListModel<TResult> GetPagedListResult<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
+        IPagedListResult<TResult> GetPagedListResult<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
                                                   int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
-        /// Gets the <see cref="IPagedListModel{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// Gets the <see cref="IPagedListResult{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="selector">The selector for projection.</param>
         /// <param name="queryBuilderAction">A function to test each element for a condition.</param>
@@ -261,9 +261,9 @@ namespace WeihanLi.EntityFramework
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
         /// <param name="pageNumber"></param>
-        /// <returns>An <see cref="IPagedListModel{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
+        /// <returns>An <see cref="IPagedListResult{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListModel<TResult>> GetPagedListResultAsync<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
+        Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
                                                              int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
     }
 }
