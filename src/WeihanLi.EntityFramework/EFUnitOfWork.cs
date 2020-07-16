@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -16,6 +17,15 @@ namespace WeihanLi.EntityFramework
             if (DbContext.Database.IsRelational())
             {
                 _transaction = DbContext.Database.BeginTransaction();
+            }
+        }
+
+        internal EFUnitOfWork(TDbContext dbContext, IsolationLevel isolationLevel)
+        {
+            DbContext = dbContext;
+            if (DbContext.Database.IsRelational())
+            {
+                _transaction = DbContext.Database.BeginTransaction(isolationLevel);
             }
         }
 

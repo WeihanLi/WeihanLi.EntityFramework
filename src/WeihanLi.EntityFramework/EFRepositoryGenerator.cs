@@ -6,7 +6,7 @@ using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
-    internal class EFRepositoryGenerator : IEFRepositoryGenerator
+    internal sealed class EFRepositoryGenerator : IEFRepositoryGenerator
     {
         private readonly EFRepositoryGeneratorOptions _generatorOptions;
 

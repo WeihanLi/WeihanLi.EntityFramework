@@ -31,7 +31,7 @@ for more package version details, see package release notes details [here](./doc
 
 - DbFunctions
   
-  - `JsonValue` implement `JSON_VALUE` in SqlServer 2016 and above
+  - `JsonValue` implement `JSON_VALUE` for SqlServer 2016 and above
 
 - Audit
 

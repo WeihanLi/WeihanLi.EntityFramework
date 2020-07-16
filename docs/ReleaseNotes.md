@@ -2,6 +2,11 @@
 
 ## WeihanLi.EntityFramework
 
+### [WeihanLi.EntityFramework 1.8.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.8.0)
+
+- update IAuditUserIdProvider => IUserIdProvider
+- update OperationType => DataOperationType
+
 ### [WeihanLi.EntityFramework 1.7.1](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.7.1)
 
 - add `AuditDbContextInterceptor` extensions for `FluentAspectOptions`
