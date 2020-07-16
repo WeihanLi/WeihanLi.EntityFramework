@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +52,17 @@ namespace WeihanLi.EntityFramework
             where TEntity : class
         {
             return new EFUnitOfWork<TDbContext>(repository.DbContext);
+        }
+
+        
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext, TEntity>(
+            [NotNull]this IEFRepository<TDbContext, TEntity> repository,
+            IsolationLevel isolationLevel
+            )
+            where TDbContext : DbContext
+            where TEntity : class
+        {
+            return new EFUnitOfWork<TDbContext>(repository.DbContext, isolationLevel);
         }
     }
 }

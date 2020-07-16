@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
@@ -49,6 +50,12 @@ namespace WeihanLi.EntityFramework
             where TDbContext : DbContext
         {
             return new EFUnitOfWork<TDbContext>(dbContext);
+        }
+
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull]TDbContext dbContext, IsolationLevel isolationLevel)
+            where TDbContext : DbContext
+        {
+            return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
         }
 
         public static EntityEntry<TEntity> Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
