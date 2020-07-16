@@ -10,14 +10,14 @@ namespace WeihanLi.EntityFramework
     public static class QueryablePageListExtensions
     {
         /// <summary>
-        /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
+        /// Converts the specified source to <see cref="IPagedListResult{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
         /// </summary>
         /// <typeparam name="T">The type of the source.</typeparam>
         /// <param name="source">The source to paging.</param>
         /// <param name="pageNumber">The number of the page, index from 1.</param>
         /// <param name="pageSize">The size of the page.</param>
-        /// <returns>An instance of  implements <see cref="IPagedListModel{T}"/> interface.</returns>
-        public static IPagedListModel<T> ToPagedList<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize)
+        /// <returns>An instance of  implements <see cref="IPagedListResult{T}"/> interface.</returns>
+        public static IPagedListResult<T> ToPagedList<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
             {
@@ -30,17 +30,15 @@ namespace WeihanLi.EntityFramework
             var count = source.Count();
             if (count == 0)
             {
-                return new PagedListModel<T>() { PageNumber = pageNumber, PageSize = pageSize, TotalCount = 0 };
+                return PagedListResult<T>.Empty;
             }
 
             if (pageNumber > 1)
             {
                 source = source.Skip((pageNumber - 1) * pageSize);
             }
-            var items = source
-                                    .Take(pageSize)
-                                    .ToArray();
-            var pagedList = new PagedListModel<T>()
+            var items = source.Take(pageSize).ToArray();
+            var pagedList = new PagedListResult<T>()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
@@ -52,7 +50,7 @@ namespace WeihanLi.EntityFramework
         }
 
         /// <summary>
-        /// Converts the specified source to <see cref="IPagedListModel{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
+        /// Converts the specified source to <see cref="IPagedListResult{T}"/> by the specified <paramref name="pageNumber"/> and <paramref name="pageSize"/>.
         /// </summary>
         /// <typeparam name="T">The type of the source.</typeparam>
         /// <param name="source">The source to paging.</param>
@@ -61,8 +59,8 @@ namespace WeihanLi.EntityFramework
         /// <param name="cancellationToken">
         ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
         /// </param>
-        /// <returns>An instance of  implements  <see cref="IPagedListModel{T}"/> interface.</returns>
-        public static async Task<IPagedListModel<T>> ToPagedListAsync<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        /// <returns>An instance of  implements  <see cref="IPagedListResult{T}"/> interface.</returns>
+        public static async Task<IPagedListResult<T>> ToPagedListAsync<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (pageNumber <= 0)
             {
@@ -76,7 +74,7 @@ namespace WeihanLi.EntityFramework
             var count = await source.CountAsync(cancellationToken).ConfigureAwait(false);
             if (count == 0)
             {
-                return new PagedListModel<T>() { PageNumber = pageNumber, PageSize = pageSize, TotalCount = 0 };
+                return PagedListResult<T>.Empty;
             }
 
             if (pageNumber > 1)
@@ -86,7 +84,7 @@ namespace WeihanLi.EntityFramework
             var items = await source
                                     .Take(pageSize)
                                     .ToArrayAsync(cancellationToken);
-            var pagedList = new PagedListModel<T>()
+            var pagedList = new PagedListResult<T>()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
