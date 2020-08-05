@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace WeihanLi.EntityFramework
 {
-    internal class EFRepositoryFactory<TDbContext> : IEFRepositoryFactory<TDbContext>
+    internal sealed class EFRepositoryFactory<TDbContext> : IEFRepositoryFactory<TDbContext>
     where TDbContext : DbContext
     {
         private readonly IServiceProvider _serviceProvider;
