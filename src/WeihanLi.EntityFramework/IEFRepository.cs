@@ -48,89 +48,6 @@ namespace WeihanLi.EntityFramework
         Task<int> DeleteAsync(object[] keyValues, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Delete a entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <returns>affected rows</returns>
-        int Delete(TEntity entity);
-
-        /// <summary>
-        /// Delete a entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="cancellationToken">cancellationToken</param>
-        /// <returns>affected rows</returns>
-        Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyNames">properties to update</param>
-        /// <returns>affected rows</returns>
-        int Update(TEntity entity, params string[] propertyNames);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyNames">properties not to update</param>
-        /// <returns>affected rows</returns>
-        int UpdateWithout(TEntity entity, params string[] propertyNames);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyNames">properties to update</param>
-        /// <param name="cancellationToken">cancellationToken</param>
-        /// <returns>affected rows</returns>
-        Task<int> UpdateAsync(TEntity entity, string[] propertyNames, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyNames">properties not to update</param>
-        /// <param name="cancellationToken">cancellationToken</param>
-        /// <returns>affected rows</returns>
-        Task<int> UpdateWithoutAsync(TEntity entity, string[] propertyNames, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties to update</param>
-        /// <returns>affected rows</returns>
-        int Update(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties not to update</param>
-        /// <returns>affected rows</returns>
-        int UpdateWithout(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties to update</param>
-        /// <param name="cancellationToken">cancellationToken</param>
-        /// <returns>affected rows</returns>
-        Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Update entity
-        /// </summary>
-        /// <param name="entity">entity</param>
-        /// <param name="propertyExpressions">properties not to update</param>
-        /// <param name="cancellationToken">cancellationToken</param>
-        /// <returns>affected rows</returns>
-        Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Gets the <see cref="IQueryable{TEntity}"/> based on a predicate
         /// </summary>
         /// <param name="queryBuilderAction">queryBuilder</param>
@@ -248,7 +165,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageSize">pageSize</param>
         /// <returns>An <see cref="IPagedListResult{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        IPagedListResult<TResult> GetPagedListResult<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
+        IPagedListResult<TResult> GetPagedListResult<TResult>([NotNull] Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
                                                   int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
@@ -263,7 +180,7 @@ namespace WeihanLi.EntityFramework
         /// <param name="pageNumber"></param>
         /// <returns>An <see cref="IPagedListResult{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
         /// <remarks>This method default no-tracking query.</remarks>
-        Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>([NotNull]Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
+        Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>([NotNull] Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
                                                              int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
     }
 }
