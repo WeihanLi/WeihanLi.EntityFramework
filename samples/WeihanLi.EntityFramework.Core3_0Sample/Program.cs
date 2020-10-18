@@ -127,7 +127,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     ;
             });
 
-            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
@@ -160,7 +160,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                 dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
             });
-            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
             {
                 dbContext.Remove(new TestEntity()
                 {
