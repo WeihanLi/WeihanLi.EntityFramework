@@ -5,8 +5,6 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
@@ -34,7 +32,7 @@ namespace WeihanLi.EntityFramework
             return new EFUnitOfWork<TDbContext>(dbContext);
         }
 
-        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull]TDbContext dbContext, IsolationLevel isolationLevel)
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] TDbContext dbContext, IsolationLevel isolationLevel)
             where TDbContext : DbContext
         {
             return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
