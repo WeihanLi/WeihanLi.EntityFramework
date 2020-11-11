@@ -14,24 +14,6 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
-        /// <summary>
-        /// is relational database used now
-        ///     <para>
-        ///         Returns true if the database provider currently in use is a relational database.
-        ///     </para>
-        /// </summary>
-        /// <param name="database"> The DbContext database <see cref="DbContext.Database" />. </param>
-        /// <returns> True if a relational database provider is being used; false otherwise. </returns>
-        public static bool IsRelational([NotNull] this DatabaseFacade database)
-        {
-            if (null == database)
-            {
-                throw new ArgumentNullException(nameof(database));
-            }
-
-            return ((IDatabaseFacadeDependenciesAccessor)database).Dependencies is IRelationalDatabaseFacadeDependencies;
-        }
-
         public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
         {
             return condition

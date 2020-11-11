@@ -28,29 +28,29 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             loggerFactory.AddLog4Net();
 
             var services = new ServiceCollection();
-            //services.AddProxyDbContext<TestDbContext>(options =>
-            //{
-            //    options
-            //        .UseLoggerFactory(loggerFactory)
-            //        //.EnableDetailedErrors()
-            //        //.EnableSensitiveDataLogging()
-            //        // .UseInMemoryDatabase("Tests")
-            //        .UseSqlServer(DbConnectionString)
-            //        //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
-            //        ;
-            //});
-
-            services.AddProxyDbContextPool<TestDbContext>(options =>
+            services.AddProxyDbContext<TestDbContext>(options =>
             {
-                options
-                    .UseLoggerFactory(loggerFactory)
-                    //.EnableDetailedErrors()
-                    //.EnableSensitiveDataLogging()
-                    // .UseInMemoryDatabase("Tests")
-                    .UseSqlServer(DbConnectionString)
-                    //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
-                    ;
+               options
+                   .UseLoggerFactory(loggerFactory)
+                   //.EnableDetailedErrors()
+                   //.EnableSensitiveDataLogging()
+                   // .UseInMemoryDatabase("Tests")
+                   .UseSqlServer(DbConnectionString)
+                   //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+                   ;
             });
+
+            // services.AddProxyDbContextPool<TestDbContext>(options =>
+            // {
+            //     options
+            //         .UseLoggerFactory(loggerFactory)
+            //         //.EnableDetailedErrors()
+            //         //.EnableSensitiveDataLogging()
+            //         // .UseInMemoryDatabase("Tests")
+            //         .UseSqlServer(DbConnectionString)
+            //         //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
+            //         ;
+            // });
             services.AddEFRepository();
             services.AddFluentAspects(options =>
             {

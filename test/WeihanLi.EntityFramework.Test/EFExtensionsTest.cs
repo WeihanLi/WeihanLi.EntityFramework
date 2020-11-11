@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace WeihanLi.EntityFramework.Test
 {
