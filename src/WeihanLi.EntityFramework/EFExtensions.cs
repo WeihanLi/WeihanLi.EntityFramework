@@ -5,8 +5,6 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
@@ -14,31 +12,6 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
-        /// <summary>
-        /// is relational database used now
-        ///     <para>
-        ///         Returns true if the database provider currently in use is a relational database.
-        ///     </para>
-        /// </summary>
-        /// <param name="database"> The DbContext database <see cref="DbContext.Database" />. </param>
-        /// <returns> True if a relational database provider is being used; false otherwise. </returns>
-        public static bool IsRelational([NotNull] this DatabaseFacade database)
-        {
-            if (null == database)
-            {
-                throw new ArgumentNullException(nameof(database));
-            }
-
-            return ((IDatabaseFacadeDependenciesAccessor)database).Dependencies is IRelationalDatabaseFacadeDependencies;
-        }
-
-        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
-        {
-            return condition
-                ? query.Where(predicate)
-                : query;
-        }
-
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
             where TEntity : class
             where TDbContext : DbContext
@@ -52,7 +25,7 @@ namespace WeihanLi.EntityFramework
             return new EFUnitOfWork<TDbContext>(dbContext);
         }
 
-        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull]TDbContext dbContext, IsolationLevel isolationLevel)
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] TDbContext dbContext, IsolationLevel isolationLevel)
             where TDbContext : DbContext
         {
             return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
@@ -190,7 +163,7 @@ namespace WeihanLi.EntityFramework
                 keyEntries[i] = new KeyEntry()
                 {
                     PropertyName = keyProps[i].Metadata.Name,
-                    ColumnName = keyProps[i].Metadata.GetColumnName(),
+                    ColumnName = keyProps[i].GetColumnName(),
                     Value = keyProps[i].CurrentValue,
                 };
             }

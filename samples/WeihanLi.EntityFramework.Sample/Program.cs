@@ -15,7 +15,7 @@ using WeihanLi.Common.Services;
 using WeihanLi.EntityFramework.Audit;
 using WeihanLi.Extensions;
 
-namespace WeihanLi.EntityFramework.Core3_Sample
+namespace WeihanLi.EntityFramework.Sample
 {
     public class Program
     {
@@ -28,7 +28,18 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             loggerFactory.AddLog4Net();
 
             var services = new ServiceCollection();
-            //services.AddProxyDbContext<TestDbContext>(options =>
+            services.AddProxyDbContext<TestDbContext>(options =>
+            {
+                options
+                    .UseLoggerFactory(loggerFactory)
+                    //.EnableDetailedErrors()
+                    //.EnableSensitiveDataLogging()
+                    //.UseInMemoryDatabase("Tests")
+                    .UseSqlServer(DbConnectionString)
+                    ;
+            });
+
+            //services.AddProxyDbContextPool<TestDbContext>(options =>
             //{
             //    options
             //        .UseLoggerFactory(loggerFactory)
@@ -39,18 +50,6 @@ namespace WeihanLi.EntityFramework.Core3_Sample
             //        //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
             //        ;
             //});
-
-            services.AddProxyDbContextPool<TestDbContext>(options =>
-            {
-                options
-                    .UseLoggerFactory(loggerFactory)
-                    //.EnableDetailedErrors()
-                    //.EnableSensitiveDataLogging()
-                    // .UseInMemoryDatabase("Tests")
-                    .UseSqlServer(DbConnectionString)
-                    //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
-                    ;
-            });
             services.AddEFRepository();
             services.AddFluentAspects(options =>
             {
@@ -127,7 +126,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                     ;
             });
 
-            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
@@ -160,7 +159,7 @@ namespace WeihanLi.EntityFramework.Core3_Sample
                 dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
             });
-            DependencyResolver.TryInvokeService<TestDbContext>(dbContext =>
+            DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
             {
                 dbContext.Remove(new TestEntity()
                 {

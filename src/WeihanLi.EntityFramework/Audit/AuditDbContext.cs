@@ -57,7 +57,7 @@ namespace WeihanLi.EntityFramework.Audit
                         {
                             foreach (var temporaryProperty in auditEntry.TemporaryProperties)
                             {
-                                var colName = temporaryProperty.Metadata.GetColumnName();
+                                var colName = temporaryProperty.GetColumnName();
                                 if (temporaryProperty.Metadata.IsPrimaryKey())
                                 {
                                     auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;

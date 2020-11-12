@@ -14,7 +14,9 @@ EntityFramework extensions
 >
 > For EF Core 2.x , use 1.4.x and below
 >
-> For EF Core 3.x, use 1.5.0 and above
+> For EF Core 3.x, use 1.5.0 and above, and 2.0.0 below
+>
+> For EF Core 5.x, use 2.0.0 and above
 
 for more package version details, see package release notes details [here](./docs/ReleaseNotes.md)
 
@@ -36,10 +38,6 @@ for more package version details, see package release notes details [here](./doc
 - Audit
 
   - auto audit for entity change
-
-- Interceptors
-
-  - `QueryWithNoLockerInterceptor`
 
 - Extensions
 
