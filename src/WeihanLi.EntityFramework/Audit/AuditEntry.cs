@@ -70,7 +70,7 @@ namespace WeihanLi.EntityFramework.Audit
                     continue;
                 }
 
-                var columnName = propertyEntry.Metadata.GetColumnName();
+                var columnName = propertyEntry.GetColumnName();
                 if (propertyEntry.Metadata.IsPrimaryKey())
                 {
                     KeyValues[columnName] = propertyEntry.CurrentValue;

@@ -12,13 +12,6 @@ namespace WeihanLi.EntityFramework
 {
     public static class EFExtensions
     {
-        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
-        {
-            return condition
-                ? query.Where(predicate)
-                : query;
-        }
-
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
             where TEntity : class
             where TDbContext : DbContext
@@ -170,7 +163,7 @@ namespace WeihanLi.EntityFramework
                 keyEntries[i] = new KeyEntry()
                 {
                     PropertyName = keyProps[i].Metadata.Name,
-                    ColumnName = keyProps[i].Metadata.GetColumnName(),
+                    ColumnName = keyProps[i].GetColumnName(),
                     Value = keyProps[i].CurrentValue,
                 };
             }
