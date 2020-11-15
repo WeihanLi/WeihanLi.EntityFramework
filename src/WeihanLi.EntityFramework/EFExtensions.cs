@@ -32,13 +32,6 @@ namespace WeihanLi.EntityFramework
             return ((IDatabaseFacadeDependenciesAccessor)database).Dependencies is IRelationalDatabaseFacadeDependencies;
         }
 
-        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
-        {
-            return condition
-                ? query.Where(predicate)
-                : query;
-        }
-
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
             where TEntity : class
             where TDbContext : DbContext
@@ -52,7 +45,7 @@ namespace WeihanLi.EntityFramework
             return new EFUnitOfWork<TDbContext>(dbContext);
         }
 
-        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull]TDbContext dbContext, IsolationLevel isolationLevel)
+        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] TDbContext dbContext, IsolationLevel isolationLevel)
             where TDbContext : DbContext
         {
             return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);

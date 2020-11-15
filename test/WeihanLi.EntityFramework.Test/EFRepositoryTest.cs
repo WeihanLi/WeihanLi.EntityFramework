@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WeihanLi.Common;
 using Xunit;
@@ -54,6 +56,22 @@ namespace WeihanLi.EntityFramework.Test
                     await repo.InsertAsync(entities);
                 });
             }
+        }
+
+        [Fact]
+        public void ExistsQueryTest()
+        {
+            var condition = new { Ids = new List<int> { 1, 2, 3, 4 } };
+            DependencyResolver.TryInvoke<IEFRepository<TestDbContext, TestEntity>>(repo =>
+            {
+                repo.Insert(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow, });
+
+                var result = repo.Get(builder => builder.WithPredict(q => condition.Ids.Any(c => c == q.Id)));
+                Assert.Single(result);
+
+                result = repo.Get(builder => builder.WithPredict(q => condition.Ids.Contains(q.Id)));
+                Assert.Single(result);
+            });
         }
     }
 }
