@@ -20,14 +20,6 @@ namespace WeihanLi.EntityFramework.Test
             IServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddDbContext<TestDbContext>(options =>
             {
-                options.UseLoggerFactory(LoggerFactory.Create(loggingBuilder =>
-                {
-                    loggingBuilder.AddLog4Net();
-                    //loggingBuilder.AddProvider(new DelegateLoggerProvider((category, logLevel, exception, msg) =>
-                    //{
-                    //    _outputHelper.WriteLine($"{category}:[{logLevel}] {msg}\n {exception}");
-                    //}));
-                }));
                 //options.UseSqlServer(DbConnectionString);
                 options.UseInMemoryDatabase("Tests");
                 options.EnableDetailedErrors();
