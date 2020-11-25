@@ -18,7 +18,7 @@ EntityFramework extensions
 >
 > For EF Core 2.x , use 1.4.x and below
 >
-> For EF Core 3.x, use 1.5.0 and above, and 2.0.0 below
+> For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
 >
 > For EF Core 5.x, use 2.0.0 and above
 
