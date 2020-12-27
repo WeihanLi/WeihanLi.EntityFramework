@@ -9,7 +9,7 @@ namespace WeihanLi.EntityFramework.Audit
     {
         IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider);
 
-        IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true);
+        IAuditConfigBuilder WithUnmodifiedProperty(bool saveUnModifiedProperty = true);
 
         IAuditConfigBuilder WithStore(IAuditStore auditStore);
 
@@ -23,10 +23,10 @@ namespace WeihanLi.EntityFramework.Audit
     internal sealed class AuditConfigBuilder : IAuditConfigBuilder
     {
         private IUserIdProvider _auditUserProvider = EnvironmentUserIdProvider.Instance.Value;
-        private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new List<IAuditPropertyEnricher>(8);
-        private readonly List<Func<EntityEntry, bool>> _entityFilters = new List<Func<EntityEntry, bool>>();
-        private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new List<Func<EntityEntry, PropertyEntry, bool>>();
-        private readonly List<IAuditStore> _auditStores = new List<IAuditStore>(4);
+        private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new(4);
+        private readonly List<Func<EntityEntry, bool>> _entityFilters = new();
+        private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new();
+        private readonly List<IAuditStore> _auditStores = new(4);
         private bool _saveUnModifiedProperty;
 
         public IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider)
@@ -35,7 +35,7 @@ namespace WeihanLi.EntityFramework.Audit
             return this;
         }
 
-        public IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true)
+        public IAuditConfigBuilder WithUnmodifiedProperty(bool saveUnModifiedProperty = true)
         {
             _saveUnModifiedProperty = saveUnModifiedProperty;
             return this;
@@ -80,7 +80,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public AuditConfigOptions Build()
         {
-            return new AuditConfigOptions()
+            return new()
             {
                 Enrichers = _auditPropertyEnrichers,
                 EntityFilters = _entityFilters,
@@ -151,7 +151,7 @@ namespace WeihanLi.EntityFramework.Audit
 
     public sealed class AuditConfig
     {
-        internal static AuditConfigOptions AuditConfigOptions = new AuditConfigOptions();
+        internal static AuditConfigOptions AuditConfigOptions = new();
 
         public static void EnableAudit()
         {

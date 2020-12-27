@@ -9,7 +9,7 @@ namespace WeihanLi.EntityFramework
     public class EFUnitOfWork<TDbContext> : IEFUnitOfWork<TDbContext> where TDbContext : DbContext
     {
         // https://docs.microsoft.com/en-us/ef/core/saving/transactions
-        private readonly IDbContextTransaction _transaction = null;
+        private readonly IDbContextTransaction _transaction;
 
         public EFUnitOfWork(TDbContext dbContext)
         {

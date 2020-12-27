@@ -113,7 +113,7 @@ namespace WeihanLi.EntityFramework.Audit
         {
         }
 
-        public DbSet<AuditRecord> AuditRecords { get; set; }
+        public virtual DbSet<AuditRecord> AuditRecords { get; set; }
 
         protected override Task BeforeSaveChanges()
         {
