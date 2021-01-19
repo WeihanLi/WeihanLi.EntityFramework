@@ -18,7 +18,7 @@ namespace WeihanLi.EntityFramework.Audit
         {
         }
 
-        protected List<AuditEntry> AuditEntries { get; set; }
+        protected List<AuditEntry>? AuditEntries { get; set; }
 
         protected override Task BeforeSaveChanges()
         {
@@ -66,16 +66,16 @@ namespace WeihanLi.EntityFramework.Audit
                                 switch (auditEntry.OperationType)
                                 {
                                     case DataOperationType.Add:
-                                        auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                        auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
                                         break;
 
                                     case DataOperationType.Delete:
-                                        auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
+                                        auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
                                         break;
 
                                     case DataOperationType.Update:
-                                        auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
-                                        auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                        auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                        auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
                                         break;
                                 }
                             }
@@ -113,7 +113,7 @@ namespace WeihanLi.EntityFramework.Audit
         {
         }
 
-        public virtual DbSet<AuditRecord> AuditRecords { get; set; }
+        public virtual DbSet<AuditRecord> AuditRecords { get; set; } = null!;
 
         protected override Task BeforeSaveChanges()
         {
@@ -146,7 +146,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         protected override async Task AfterSaveChanges()
         {
-            if (null != AuditEntries && AuditEntries.Count > 0)
+            if (AuditEntries?.Count > 0)
             {
                 await base.AfterSaveChanges();
                 AuditRecords.AddRange(AuditEntries.Select(a => new AuditRecord()

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
@@ -17,18 +16,15 @@ namespace WeihanLi.EntityFramework
             _dbSet = dbSet;
         }
 
-        private readonly List<Expression<Func<TEntity, bool>>> _whereExpression = new List<Expression<Func<TEntity, bool>>>();
+        private readonly List<Expression<Func<TEntity, bool>>> _whereExpression = new();
 
         public EFRepositoryQueryBuilder<TEntity> WithPredict(Expression<Func<TEntity, bool>> predict)
         {
-            if (predict != null)
-            {
-                _whereExpression.Add(predict);
-            }
+            _whereExpression.Add(predict ?? throw new ArgumentNullException(nameof(predict)));
             return this;
         }
 
-        private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> _orderByExpression;
+        private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? _orderByExpression;
 
         public EFRepositoryQueryBuilder<TEntity> WithOrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderByExpression)
         {

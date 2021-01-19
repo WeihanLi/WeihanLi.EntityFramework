@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
+using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
@@ -31,7 +33,7 @@ namespace WeihanLi.EntityFramework
             return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
         }
 
-        public static EntityEntry<TEntity> Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
+        public static EntityEntry<TEntity>? Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
         {
             var entity = dbContext.Find<TEntity>(keyValues);
             if (entity == null)
@@ -44,7 +46,7 @@ namespace WeihanLi.EntityFramework
 
         public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
-            if (propNames == null || propNames.Length == 0)
+            if (propNames is null || propNames.Length == 0)
             {
                 return dbContext.Update(entity);
             }
@@ -74,7 +76,7 @@ namespace WeihanLi.EntityFramework
 
         public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
-            if (propNames == null || propNames.Length == 0)
+            if (propNames is null || propNames.Length == 0)
             {
                 return dbContext.Update(entity);
             }
@@ -91,7 +93,7 @@ namespace WeihanLi.EntityFramework
 
         public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
         {
-            if (propertyExpressions == null || propertyExpressions.Length == 0)
+            if (propertyExpressions is null || propertyExpressions.Length == 0)
             {
                 return dbContext.Update(entity);
             }
@@ -124,7 +126,7 @@ namespace WeihanLi.EntityFramework
 
         public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
         {
-            if (propertyExpressions == null || propertyExpressions.Length == 0)
+            if (propertyExpressions is null || propertyExpressions.Length == 0)
             {
                 return dbContext.Update(entity);
             }
@@ -143,10 +145,10 @@ namespace WeihanLi.EntityFramework
         public static string GetTableName<TEntity>(this DbContext dbContext)
         {
             var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
-            return entityType?.GetTableName();
+            return entityType?.GetTableName() ?? throw new ArgumentNullException(nameof(entityType));
         }
 
-        public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
+        public static KeyEntry[]? GetKeyValues([NotNull] this EntityEntry entityEntry)
         {
             if (!entityEntry.IsKeySet)
                 return null;
@@ -169,6 +171,16 @@ namespace WeihanLi.EntityFramework
             }
 
             return keyEntries;
+        }
+
+        public static IServiceCollection AddAutoAudit([NotNull] this IServiceCollection services,
+            Action<IAuditConfigBuilder> configAction)
+        {
+            if (configAction is null)
+                throw new ArgumentNullException(nameof(configAction));
+
+            AuditConfig.Configure(configAction);
+            return services;
         }
 
         private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)

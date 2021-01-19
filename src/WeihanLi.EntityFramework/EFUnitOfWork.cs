@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -6,10 +7,12 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace WeihanLi.EntityFramework
 {
-    public class EFUnitOfWork<TDbContext> : IEFUnitOfWork<TDbContext> where TDbContext : DbContext
+    public class EFUnitOfWork<TDbContext> :
+        IEFUnitOfWork<TDbContext> where TDbContext : DbContext
+        , IDisposable
     {
         // https://docs.microsoft.com/en-us/ef/core/saving/transactions
-        private readonly IDbContextTransaction _transaction;
+        private readonly IDbContextTransaction? _transaction;
 
         public EFUnitOfWork(TDbContext dbContext)
         {
@@ -45,7 +48,7 @@ namespace WeihanLi.EntityFramework
         public virtual async Task CommitAsync(CancellationToken cancellationToken)
         {
             await DbContext.SaveChangesAsync(cancellationToken);
-            if (null != _transaction)
+            if (_transaction is not null)
             {
                 await _transaction.CommitAsync(cancellationToken);
             }

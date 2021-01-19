@@ -51,16 +51,16 @@ namespace WeihanLi.EntityFramework.Audit
                                     switch (auditEntry.OperationType)
                                     {
                                         case DataOperationType.Add:
-                                            auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                            auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
                                             break;
 
                                         case DataOperationType.Delete:
-                                            auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
+                                            auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
                                             break;
 
                                         case DataOperationType.Update:
-                                            auditEntry.OriginalValues[colName] = temporaryProperty.OriginalValue;
-                                            auditEntry.NewValues[colName] = temporaryProperty.CurrentValue;
+                                            auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                            auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
                                             break;
                                     }
                                 }
@@ -69,21 +69,21 @@ namespace WeihanLi.EntityFramework.Audit
                             }
                         }
 
+                        auditEntry.UpdatedAt = DateTimeOffset.UtcNow;
+                        auditEntry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
+                            ?.GetUserId();
+
                         // apply enricher
                         foreach (var enricher in AuditConfig.AuditConfigOptions.Enrichers)
                         {
                             enricher.Enrich(auditEntry);
                         }
-
-                        auditEntry.UpdatedAt = DateTimeOffset.UtcNow;
-                        auditEntry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
-                            ?.GetUserId();
                     }
 
                     await Task.WhenAll(
                             AuditConfig.AuditConfigOptions.Stores
                             .Select(store => store.Save(auditEntries))
-                        );
+                        ).ConfigureAwait(false);
                 }
             }
             else

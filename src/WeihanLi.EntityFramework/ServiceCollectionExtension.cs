@@ -16,7 +16,7 @@ namespace WeihanLi.EntityFramework
         /// <returns></returns>
         public static IEFRepositoryBuilder AddEFRepository(this IServiceCollection services, ServiceLifetime efServiceLifetime = ServiceLifetime.Scoped)
         {
-            if (services == null)
+            if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }

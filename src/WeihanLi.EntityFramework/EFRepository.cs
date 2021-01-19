@@ -22,14 +22,14 @@ namespace WeihanLi.EntityFramework
             DbContext = dbContext;
         }
 
-        public TEntity Find(params object[] keyValues)
+        public TEntity? Find(params object[] keyValues)
         {
             return DbContext.Find<TEntity>(keyValues);
         }
 
-        public ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken)
+        public async ValueTask<TEntity?> FindAsync(object[] keyValues, CancellationToken cancellationToken)
         {
-            return DbContext.FindAsync<TEntity>(keyValues);
+            return await DbContext.FindAsync<TEntity>(keyValues);
         }
 
         public int Delete(params object[] keyValues)
@@ -81,12 +81,14 @@ namespace WeihanLi.EntityFramework
         public virtual Task<bool> ExistAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default) =>
             DbContext.Set<TEntity>().AnyAsync(whereExpression, cancellationToken);
 
-        public virtual TEntity Fetch(Expression<Func<TEntity, bool>> whereExpression)
-        => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
-
         public virtual Task<TEntity> FetchAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
 
         => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression, cancellationToken);
+
+#nullable disable
+
+        public virtual TEntity Fetch(Expression<Func<TEntity, bool>> whereExpression)
+        => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
 
         public virtual TEntity Fetch<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
@@ -99,7 +101,9 @@ namespace WeihanLi.EntityFramework
                 ;
         }
 
-        public virtual Task<TEntity> FetchAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false, CancellationToken cancellationToken = default)
+#nullable restore
+
+        public virtual Task<TEntity> FetchAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>>? orderByExpression, bool ascending = false, CancellationToken cancellationToken = default)
         {
             if (orderByExpression == null)
                 return DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(whereExpression, cancellationToken);
@@ -327,9 +331,9 @@ namespace WeihanLi.EntityFramework
 
         public virtual int Delete(TEntity entity)
         {
-            if (entity == null)
+            if (entity is null)
             {
-                return 0;
+                throw new ArgumentNullException(nameof(entity));
             }
 
             var entry = DbContext.Set<TEntity>().Attach(entity);
@@ -339,9 +343,9 @@ namespace WeihanLi.EntityFramework
 
         public virtual Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
-            if (entity == null)
+            if (entity is null)
             {
-                return Task.FromResult(0);
+                throw new ArgumentNullException(nameof(entity));
             }
 
             var entry = DbContext.Set<TEntity>().Attach(entity);
@@ -349,7 +353,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual IQueryable<TEntity> Query(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual IQueryable<TEntity> Query(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -357,7 +361,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build();
         }
 
-        public virtual List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual List<TEntity> Get(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -365,15 +369,17 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToList();
         }
 
-        public virtual List<TResult> GetResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual List<TResult> GetResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
         {
+            if (selector is null) throw new ArgumentNullException(nameof(selector));
+
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.Build(selector).ToList();
         }
 
-        public virtual Task<List<TEntity>> GetAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual Task<List<TEntity>> GetAsync(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -381,16 +387,18 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToListAsync(cancellationToken);
         }
 
-        public virtual Task<List<TResult>> GetResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null,
+        public virtual Task<List<TResult>> GetResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
             CancellationToken cancellationToken = default)
         {
+            if (selector is null) throw new ArgumentNullException(nameof(selector));
+
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.Build(selector).ToListAsync(cancellationToken);
         }
 
-        public virtual bool Any(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual bool Any(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -398,7 +406,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().Any();
         }
 
-        public virtual Task<bool> AnyAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual Task<bool> AnyAsync(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -406,7 +414,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().AnyAsync(cancellationToken);
         }
 
-        public virtual TEntity FirstOrDefault(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual TEntity? FirstOrDefault(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -414,31 +422,33 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().FirstOrDefault();
         }
 
-        public virtual TResult FirstOrDefaultResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null)
+        public virtual TResult? FirstOrDefaultResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
         {
+            if (selector is null) throw new ArgumentNullException(nameof(selector));
+
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.Build(selector).FirstOrDefault();
         }
 
-        public virtual Task<TEntity> FirstOrDefaultAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> FirstOrDefaultAsync(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.Build().FirstOrDefaultAsync(cancellationToken);
+            return await queryBuilder.Build().FirstOrDefaultAsync(cancellationToken);
         }
 
-        public virtual Task<TResult> FirstOrDefaultResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, CancellationToken cancellationToken = default)
+        public virtual async Task<TResult?> FirstOrDefaultResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 
-            return queryBuilder.Build(selector).FirstOrDefaultAsync(cancellationToken);
+            return await queryBuilder.Build(selector).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public virtual IPagedListResult<TEntity> GetPagedList(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
+        public virtual IPagedListResult<TEntity> GetPagedList(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, int pageNumber = 1, int pageSize = 20)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
@@ -446,7 +456,7 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToPagedList(pageNumber, pageSize);
         }
 
-        public virtual Task<IPagedListResult<TEntity>> GetPagedListAsync(Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
+        public virtual Task<IPagedListResult<TEntity>> GetPagedListAsync(Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, int pageNumber = 1, int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
@@ -455,18 +465,22 @@ namespace WeihanLi.EntityFramework
             return queryBuilder.Build().ToPagedListAsync(pageNumber, pageSize, cancellationToken);
         }
 
-        public virtual IPagedListResult<TResult> GetPagedListResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+        public virtual IPagedListResult<TResult> GetPagedListResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20)
         {
+            if (selector is null) throw new ArgumentNullException(nameof(selector));
+
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 
             return queryBuilder.Build(selector).ToPagedList(pageNumber, pageSize);
         }
 
-        public virtual Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>> queryBuilderAction = null, int pageNumber = 1,
+        public virtual Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null, int pageNumber = 1,
             int pageSize = 20, CancellationToken cancellationToken = default)
         {
+            if (selector is null) throw new ArgumentNullException(nameof(selector));
+
             var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
             queryBuilderAction?.Invoke(queryBuilder);
 

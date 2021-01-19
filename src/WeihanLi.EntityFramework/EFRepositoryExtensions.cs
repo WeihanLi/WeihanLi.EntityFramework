@@ -30,12 +30,12 @@ namespace WeihanLi.EntityFramework
             where TEntity : class
             => repository.UpdateWithoutAsync(entity, propertyExpressions);
 
-        public static ValueTask<TEntity> FindAsync<TDbContext, TEntity>([NotNull] this IEFRepository<TDbContext, TEntity> repository,
+        public static async ValueTask<TEntity?> FindAsync<TDbContext, TEntity>([NotNull] this IEFRepository<TDbContext, TEntity> repository,
             params object[] keyValues)
             where TDbContext : DbContext
             where TEntity : class
         {
-            return repository.FindAsync(keyValues, CancellationToken.None);
+            return await repository.FindAsync(keyValues, CancellationToken.None);
         }
 
         public static Task<int> DeleteAsync<TDbContext, TEntity>([NotNull] this IEFRepository<TDbContext, TEntity> repository,
@@ -47,16 +47,15 @@ namespace WeihanLi.EntityFramework
         }
 
         public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext, TEntity>(
-            [NotNull]this IEFRepository<TDbContext, TEntity> repository)
+            [NotNull] this IEFRepository<TDbContext, TEntity> repository)
             where TDbContext : DbContext
             where TEntity : class
         {
             return new EFUnitOfWork<TDbContext>(repository.DbContext);
         }
 
-        
         public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext, TEntity>(
-            [NotNull]this IEFRepository<TDbContext, TEntity> repository,
+            [NotNull] this IEFRepository<TDbContext, TEntity> repository,
             IsolationLevel isolationLevel
             )
             where TDbContext : DbContext
