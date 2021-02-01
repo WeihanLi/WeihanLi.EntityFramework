@@ -56,9 +56,9 @@ namespace WeihanLi.EntityFramework
             return this;
         }
 
-        private readonly List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> _includeExpressions = new List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>();
+        private readonly List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>> _includeExpressions = new List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>>();
 
-        public EFRepositoryQueryBuilder<TEntity> WithInclude(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include)
+        public EFRepositoryQueryBuilder<TEntity> WithInclude(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>> include)
         {
             _includeExpressions.Add(include);
             return this;

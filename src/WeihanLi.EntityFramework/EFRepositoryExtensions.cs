@@ -18,14 +18,14 @@ namespace WeihanLi.EntityFramework
 
         public static Task<int> UpdateAsync<TDbContext, TEntity>([NotNull] this IEFRepository<TDbContext, TEntity> repository,
             TEntity entity,
-            params Expression<Func<TEntity, object>>[] propertyExpressions)
+            params Expression<Func<TEntity, object?>>[] propertyExpressions)
             where TDbContext : DbContext
             where TEntity : class
             => repository.UpdateAsync(entity, propertyExpressions);
 
         public static Task<int> UpdateWithoutAsync<TDbContext, TEntity>([NotNull] this IEFRepository<TDbContext, TEntity> repository,
             TEntity entity,
-            params Expression<Func<TEntity, object>>[] propertyExpressions)
+            params Expression<Func<TEntity, object?>>[] propertyExpressions)
             where TDbContext : DbContext
             where TEntity : class
             => repository.UpdateWithoutAsync(entity, propertyExpressions);

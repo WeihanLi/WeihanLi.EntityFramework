@@ -243,8 +243,12 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual int Update(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues)
+        public virtual int Update(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object?>? propertyValues)
         {
+            if (propertyValues is null)
+            {
+                return 0;
+            }
             foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 foreach (var propertyValue in propertyValues)
@@ -256,7 +260,7 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object value, CancellationToken cancellationToken = default)
+        public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object? value, CancellationToken cancellationToken = default)
         {
             foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
@@ -266,8 +270,12 @@ namespace WeihanLi.EntityFramework
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object> propertyValues, CancellationToken cancellationToken = default)
+        public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object?>? propertyValues, CancellationToken cancellationToken = default)
         {
+            if (propertyValues is null)
+            {
+                return 0;
+            }
             foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
             {
                 foreach (var propertyValue in propertyValues)
@@ -279,25 +287,25 @@ namespace WeihanLi.EntityFramework
             return await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual int Update(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions)
+        public virtual int Update(TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions)
         {
             DbContext.Update(entity, propertyExpressions);
             return DbContext.SaveChanges();
         }
 
-        public virtual int UpdateWithout(TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions)
+        public virtual int UpdateWithout(TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions)
         {
             DbContext.UpdateWithout(entity, propertyExpressions);
             return DbContext.SaveChanges();
         }
 
-        public virtual Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions, CancellationToken cancellationToken = default)
+        public virtual Task<int> UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[] propertyExpressions, CancellationToken cancellationToken = default)
         {
             DbContext.Update(entity, propertyExpressions);
             return DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object>>[] propertyExpressions,
+        public virtual Task<int> UpdateWithoutAsync(TEntity entity, Expression<Func<TEntity, object?>>[] propertyExpressions,
             CancellationToken cancellationToken = default)
         {
             DbContext.UpdateWithout(entity, propertyExpressions);

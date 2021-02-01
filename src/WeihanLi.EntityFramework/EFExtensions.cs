@@ -46,11 +46,10 @@ namespace WeihanLi.EntityFramework
 
         public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
-            if (propNames is null || propNames.Length == 0)
+            if (propNames.IsNullOrEmpty())
             {
                 return dbContext.Update(entity);
             }
-
             var entry = dbContext.GetEntityEntry(entity, out var existBefore);
             if (existBefore)
             {
@@ -76,11 +75,10 @@ namespace WeihanLi.EntityFramework
 
         public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
         {
-            if (propNames is null || propNames.Length == 0)
+            if (propNames.IsNullOrEmpty())
             {
                 return dbContext.Update(entity);
             }
-
             var entry = dbContext.GetEntityEntry(entity, out _);
             entry.State = EntityState.Modified;
             foreach (var expression in propNames)
@@ -91,9 +89,9 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
+        public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
         {
-            if (propertyExpressions is null || propertyExpressions.Length == 0)
+            if (propertyExpressions.IsNullOrEmpty())
             {
                 return dbContext.Update(entity);
             }
@@ -124,9 +122,9 @@ namespace WeihanLi.EntityFramework
             return entry;
         }
 
-        public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object>>[] propertyExpressions) where TEntity : class
+        public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
         {
-            if (propertyExpressions is null || propertyExpressions.Length == 0)
+            if (propertyExpressions.IsNullOrEmpty())
             {
                 return dbContext.Update(entity);
             }
@@ -148,16 +146,16 @@ namespace WeihanLi.EntityFramework
             return entityType?.GetTableName() ?? throw new ArgumentNullException(nameof(entityType));
         }
 
-        public static KeyEntry[]? GetKeyValues([NotNull] this EntityEntry entityEntry)
+        public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
         {
             if (!entityEntry.IsKeySet)
-                return null;
+                return Array.Empty<KeyEntry>();
 
             var keyProps = entityEntry.Properties
                 .Where(p => p.Metadata.IsPrimaryKey())
                 .ToArray();
             if (keyProps.Length == 0)
-                return null;
+                return Array.Empty<KeyEntry>();
 
             var keyEntries = new KeyEntry[keyProps.Length];
             for (var i = 0; i < keyProps.Length; i++)
@@ -195,7 +193,7 @@ namespace WeihanLi.EntityFramework
                 .ToArray();
 
             var keyValues = keysGetter
-                .Select(x => x.Invoke(entity))
+                .Select(x => x?.Invoke(entity))
                 .ToArray();
 
             var originalEntity = dbContext.Set<TEntity>().Local
@@ -217,9 +215,9 @@ namespace WeihanLi.EntityFramework
             return entityEntry;
         }
 
-        private static object[] GetEntityKeyValues<TEntity>(Func<TEntity, object>[] keyValueGetter, TEntity entity)
+        private static object?[] GetEntityKeyValues<TEntity>(Func<TEntity, object?>?[] keyValueGetter, TEntity entity)
         {
-            var keyValues = keyValueGetter.Select(x => x.Invoke(entity)).ToArray();
+            var keyValues = keyValueGetter.Select(x => x?.Invoke(entity)).ToArray();
             return keyValues;
         }
     }
