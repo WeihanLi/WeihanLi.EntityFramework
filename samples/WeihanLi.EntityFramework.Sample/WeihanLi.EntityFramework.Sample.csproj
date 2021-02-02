@@ -8,8 +8,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WeihanLi.EntityFramework\WeihanLi.EntityFramework.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.0" />
-    <PackageReference Include="WeihanLi.Common.Logging.Log4Net" Version="1.0.42" />
+    <PackageReference Include="WeihanLi.Common.Logging.Log4Net" Version="1.0.43" />
   </ItemGroup>
 
   <ItemGroup>

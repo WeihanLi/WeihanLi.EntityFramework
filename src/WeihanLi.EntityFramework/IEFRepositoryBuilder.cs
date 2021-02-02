@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace WeihanLi.EntityFramework
 {
@@ -11,6 +12,6 @@ namespace WeihanLi.EntityFramework
     {
         public IServiceCollection Services { get; }
 
-        public EFRepositoryBuilder(IServiceCollection services) => Services = services;
+        public EFRepositoryBuilder(IServiceCollection services) => Services = services ?? throw new ArgumentNullException(nameof(services));
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework
 {
     public static class EFUnitOfWorkExtensions
     {
-        public static DbSet<TEntity> DbSet<TEntity>([NotNull] this IEFUnitOfWork<DbContext> unitOfWork)
+        public static DbSet<TEntity> DbSet<TEntity>(this IEFUnitOfWork<DbContext> unitOfWork)
             where TEntity : class
         {
-            if (null == unitOfWork)
+            if (unitOfWork is null)
             {
                 throw new ArgumentNullException(nameof(unitOfWork));
             }
@@ -17,10 +16,14 @@ namespace WeihanLi.EntityFramework
         }
 
         public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>(
-            [NotNull]this IEFUnitOfWork<TDbContext> unitOfWork)
+            this IEFUnitOfWork<TDbContext> unitOfWork)
             where TDbContext : DbContext
             where TEntity : class
         {
+            if (unitOfWork is null)
+            {
+                throw new ArgumentNullException(nameof(unitOfWork));
+            }
             return new EFRepository<TDbContext, TEntity>(unitOfWork.DbContext);
         }
     }

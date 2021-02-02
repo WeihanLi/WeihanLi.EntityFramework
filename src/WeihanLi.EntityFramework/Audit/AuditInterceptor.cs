@@ -1,37 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using WeihanLi.Common.Models;
-using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit
 {
-    public abstract class AuditDbContextBase : DbContextBase
+    public class AuditInterceptor : SaveChangesInterceptor
     {
-        protected AuditDbContextBase()
-        {
-        }
-
-        protected AuditDbContextBase(DbContextOptions dbContextOptions) : base(dbContextOptions)
-        {
-        }
-
         protected List<AuditEntry>? AuditEntries { get; set; }
 
-        protected override Task BeforeSaveChanges()
+        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        {
+            PreSaveChanges(eventData.Context);
+            return base.SavingChanges(eventData, result);
+        }
+
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            PreSaveChanges(eventData.Context);
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+
+        protected virtual void PreSaveChanges(DbContext dbContext)
         {
             if (AuditConfig.AuditConfigOptions.AuditEnabled && AuditConfig.AuditConfigOptions.Stores.Count > 0)
             {
-                AuditEntries = new List<AuditEntry>();
-                foreach (var entityEntry in ChangeTracker.Entries())
+                if (AuditEntries is null)
+                {
+                    AuditEntries = new List<AuditEntry>();
+                }
+                else
+                {
+                    AuditEntries.Clear();
+                }
+
+                foreach (var entityEntry in dbContext.ChangeTracker.Entries())
                 {
                     if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
                     {
                         continue;
                     }
-                    //
                     if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
                         entityFilter.Invoke(entityEntry) == false))
                     {
@@ -40,11 +53,9 @@ namespace WeihanLi.EntityFramework.Audit
                     AuditEntries.Add(new InternalAuditEntry(entityEntry));
                 }
             }
-
-            return Task.CompletedTask;
         }
 
-        protected override async Task AfterSaveChanges()
+        protected virtual async Task PostSaveChanges()
         {
             if (null != AuditEntries && AuditEntries.Count > 0)
             {
@@ -101,67 +112,18 @@ namespace WeihanLi.EntityFramework.Audit
                     );
             }
         }
-    }
 
-    public abstract class AuditDbContext : AuditDbContextBase
-    {
-        protected AuditDbContext()
+        public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
         {
+            PostSaveChanges().ConfigureAwait(false).GetAwaiter().GetResult();
+            return base.SavedChanges(eventData, result);
         }
 
-        protected AuditDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
+            CancellationToken cancellationToken = new CancellationToken())
         {
-        }
-
-        public virtual DbSet<AuditRecord> AuditRecords { get; set; } = null!;
-
-        protected override Task BeforeSaveChanges()
-        {
-            if (AuditConfig.AuditConfigOptions.AuditEnabled)
-            {
-                AuditEntries = new List<AuditEntry>();
-                foreach (var entityEntry in ChangeTracker.Entries())
-                {
-                    if (entityEntry.State == EntityState.Detached
-                        || entityEntry.State == EntityState.Unchanged)
-                    {
-                        continue;
-                    }
-                    if (entityEntry.Entity.GetType() == typeof(AuditRecord))
-                    {
-                        continue;
-                    }
-                    //entityFilters
-                    if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
-                        entityFilter.Invoke(entityEntry) == false))
-                    {
-                        continue;
-                    }
-                    AuditEntries.Add(new InternalAuditEntry(entityEntry));
-                }
-            }
-
-            return Task.CompletedTask;
-        }
-
-        protected override async Task AfterSaveChanges()
-        {
-            if (AuditEntries?.Count > 0)
-            {
-                await base.AfterSaveChanges();
-                AuditRecords.AddRange(AuditEntries.Select(a => new AuditRecord()
-                {
-                    TableName = a.TableName,
-                    OperationType = a.OperationType,
-                    Extra = a.Properties.Count == 0 ? null : a.Properties.ToJson(),
-                    OriginValue = a.OriginalValues?.ToJson(),
-                    NewValue = a.NewValues?.ToJson(),
-                    ObjectId = a.KeyValues.ToJson(),
-                    UpdatedAt = a.UpdatedAt,
-                    UpdatedBy = a.UpdatedBy,
-                }));
-                await base.SaveChangesAsync();
-            }
+            await PostSaveChanges();
+            return await base.SavedChangesAsync(eventData, result, cancellationToken);
         }
     }
 }

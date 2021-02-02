@@ -12,7 +12,7 @@ namespace WeihanLi.EntityFramework
         {
         }
 
-        public DbSet<TestEntity> TestEntities { get; set; }
+        public DbSet<TestEntity> TestEntities { get; set; } = null!;
     }
 
     [Table("tabTestEntities")]
@@ -24,7 +24,7 @@ namespace WeihanLi.EntityFramework
         public int Id { get; set; }
 
         [Column("ExtraSettings")]
-        public string Extra { get; set; }
+        public string? Extra { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
     }

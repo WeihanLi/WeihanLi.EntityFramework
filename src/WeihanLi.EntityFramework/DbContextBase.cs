@@ -24,9 +24,9 @@ namespace WeihanLi.EntityFramework
 
         public override int SaveChanges()
         {
-            BeforeSaveChanges().Wait();
+            BeforeSaveChanges().ConfigureAwait(false).GetAwaiter().GetResult();
             var result = base.SaveChanges();
-            AfterSaveChanges().Wait();
+            AfterSaveChanges().ConfigureAwait(false).GetAwaiter().GetResult();
             return result;
         }
 

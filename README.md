@@ -1,4 +1,8 @@
-# WeihanLi.EntityFramework [![WeihanLi.EntityFramework](https://img.shields.io/nuget/v/WeihanLi.EntityFramework.svg)](https://www.nuget.org/packages/WeihanLi.EntityFramework/)
+# WeihanLi.EntityFramework 
+
+[![WeihanLi.EntityFramework](https://img.shields.io/nuget/v/WeihanLi.EntityFramework.svg)](https://www.nuget.org/packages/WeihanLi.EntityFramework/)
+
+[![WeihanLi.EntityFramework Latest](https://img.shields.io/nuget/vpre/WeihanLi.EntityFramework)](https://www.nuget.org/packages/WeihanLi.EntityFramework/absoluteLatest)
 
 [![Pipeline Build Status](https://weihanli.visualstudio.com/Pipelines/_apis/build/status/WeihanLi.WeihanLi.EntityFramework?branchName=dev)](https://weihanli.visualstudio.com/Pipelines/_build/latest?definitionId=11&branchName=dev)
 
@@ -14,7 +18,7 @@ EntityFramework extensions
 >
 > For EF Core 2.x , use 1.4.x and below
 >
-> For EF Core 3.x, use 1.5.0 and above, and 2.0.0 below
+> For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
 >
 > For EF Core 5.x, use 2.0.0 and above
 
