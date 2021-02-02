@@ -115,7 +115,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
         {
-            PostSaveChanges().Wait();
+            PostSaveChanges().ConfigureAwait(false).GetAwaiter().GetResult();
             return base.SavedChanges(eventData, result);
         }
 

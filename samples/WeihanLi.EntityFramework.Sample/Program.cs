@@ -85,31 +85,27 @@ namespace WeihanLi.EntityFramework.Sample
             Console.ReadLine();
         }
 
-        private class AuditFileStore : IAuditStore
+        private class AuditFileStore : PeriodBatchingAuditStore
         {
             private readonly string _fileName;
 
-            public AuditFileStore()
+            public AuditFileStore() : this(null)
             {
-                _fileName = "audits.log";
             }
 
-            public AuditFileStore(string fileName)
+            public AuditFileStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
             {
                 _fileName = fileName.GetValueOrDefault("audits.log");
             }
 
-            public async Task Save(ICollection<AuditEntry> auditEntries)
+            protected override async Task EmitBatchAsync(IEnumerable<AuditEntry> events)
             {
                 var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
 
                 await using var fileStream = File.Exists(path)
                     ? new FileStream(path, FileMode.Append)
                     : File.Create(path);
-                foreach (var entry in auditEntries)
-                {
-                    await fileStream.WriteAsync(entry.ToJson().GetBytes());
-                }
+                await fileStream.WriteAsync(events.ToJson().GetBytes());
             }
         }
 

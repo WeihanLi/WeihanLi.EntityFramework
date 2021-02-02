@@ -81,20 +81,17 @@ namespace WeihanLi.EntityFramework
         public virtual Task<bool> ExistAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default) =>
             DbContext.Set<TEntity>().AnyAsync(whereExpression, cancellationToken);
 
-
         public virtual TEntity? Fetch(Expression<Func<TEntity, bool>> whereExpression)
         => DbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
 
         public virtual TEntity? Fetch<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> orderByExpression, bool ascending = false)
         {
-            if (orderByExpression == null)
-                return DbContext.Set<TEntity>().AsNoTracking().FirstOrDefault(whereExpression);
-
             return ascending
                 ? DbContext.Set<TEntity>().AsNoTracking().OrderBy(orderByExpression).FirstOrDefault(whereExpression)
                 : DbContext.Set<TEntity>().AsNoTracking().OrderByDescending(orderByExpression).FirstOrDefault(whereExpression)
                 ;
         }
+
 #nullable disable warnings
 
         public virtual Task<TEntity?> FetchAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
