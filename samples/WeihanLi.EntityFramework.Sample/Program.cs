@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WeihanLi.Common;
-using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
 using WeihanLi.Common.Services;
@@ -28,16 +27,28 @@ namespace WeihanLi.EntityFramework.Sample
             loggerFactory.AddLog4Net();
 
             var services = new ServiceCollection();
-            services.AddProxyDbContext<TestDbContext>(options =>
+            services.AddDbContext<TestDbContext>(options =>
             {
                 options
                     .UseLoggerFactory(loggerFactory)
                     //.EnableDetailedErrors()
                     //.EnableSensitiveDataLogging()
                     //.UseInMemoryDatabase("Tests")
-                    .UseSqlServer(DbConnectionString)
+                    .UseSqlite("Data Source=Test.db")
+                    .AddInterceptors(new AuditInterceptor())
+                    //.UseSqlServer(DbConnectionString)
                     ;
             });
+            //services.AddProxyDbContext<TestDbContext>(options =>
+            //{
+            //    options
+            //        .UseLoggerFactory(loggerFactory)
+            //        //.EnableDetailedErrors()
+            //        //.EnableSensitiveDataLogging()
+            //        //.UseInMemoryDatabase("Tests")
+            //        .UseSqlServer(DbConnectionString)
+            //        ;
+            //});
 
             //services.AddProxyDbContextPool<TestDbContext>(options =>
             //{
@@ -51,21 +62,21 @@ namespace WeihanLi.EntityFramework.Sample
             //        ;
             //});
             services.AddEFRepository();
-            services.AddFluentAspects(options =>
-            {
-                //options.InterceptMethod<DbContext>(m =>
-                //        m.Name == nameof(DbContext.SaveChanges)
-                //        || m.Name == nameof(DbContext.SaveChangesAsync))
-                //    .With<AuditDbContextInterceptor>();
+            //services.AddFluentAspects(options =>
+            //{
+            //    //options.InterceptMethod<DbContext>(m =>
+            //    //        m.Name == nameof(DbContext.SaveChanges)
+            //    //        || m.Name == nameof(DbContext.SaveChangesAsync))
+            //    //    .With<AuditDbContextInterceptor>();
 
-                //为所有 DbContext 注册审计拦截器
-                //options.InterceptDbContextSaveWithAudit();
+            //    //为所有 DbContext 注册审计拦截器
+            //    //options.InterceptDbContextSaveWithAudit();
 
-                //options.InterceptDbContextSave<TestDbContext>()
-                //    .With<AuditDbContextInterceptor>();
+            //    //options.InterceptDbContextSave<TestDbContext>()
+            //    //    .With<AuditDbContextInterceptor>();
 
-                options.InterceptDbContextSaveWithAudit<TestDbContext>();
-            });
+            //    options.InterceptDbContextSaveWithAudit<TestDbContext>();
+            //});
             DependencyResolver.SetDependencyResolver(services);
 
             AutoAuditTest();
@@ -92,12 +103,12 @@ namespace WeihanLi.EntityFramework.Sample
             {
                 var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
 
-                using (var fileStream = File.Exists(path)
+                await using var fileStream = File.Exists(path)
                     ? new FileStream(path, FileMode.Append)
-                    : File.Create(path)
-                    )
+                    : File.Create(path);
+                foreach (var entry in auditEntries)
                 {
-                    await fileStream.WriteAsync(auditEntries.ToJson().GetBytes());
+                    await fileStream.WriteAsync(entry.ToJson().GetBytes());
                 }
             }
         }
@@ -159,14 +170,14 @@ namespace WeihanLi.EntityFramework.Sample
                 dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
             });
-            DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
+            DependencyResolver.TryInvokeAsync<TestDbContext>(async dbContext =>
             {
                 dbContext.Remove(new TestEntity()
                 {
                     Id = 2
                 });
-                dbContext.SaveChanges();
-            });
+                await dbContext.SaveChangesAsync();
+            }).Wait();
             // disable audit
             AuditConfig.DisableAudit();
             // enable audit
