@@ -57,7 +57,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         protected virtual async Task PostSaveChanges()
         {
-            if (null != AuditEntries && AuditEntries.Count > 0)
+            if (AuditEntries is { Count: > 0 })
             {
                 foreach (var entry in AuditEntries)
                 {
