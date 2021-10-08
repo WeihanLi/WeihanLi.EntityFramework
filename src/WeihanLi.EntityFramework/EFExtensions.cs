@@ -187,11 +187,15 @@ namespace WeihanLi.EntityFramework
             var type = typeof(TEntity);
 
             var entityType = dbContext.Model.FindEntityType(type);
+            var key = entityType?.FindPrimaryKey();
+            if(key is null)
+            {
+                throw new InvalidOperationException($"Type {type.FullName} had no primark key");
+            }
 
-            var keysGetter = entityType.FindPrimaryKey().Properties
-                .Select(x => x.PropertyInfo.GetValueGetter<TEntity>())
+            var keysGetter = key.Properties
+                .Select(x => x.PropertyInfo!.GetValueGetter<TEntity>())
                 .ToArray();
-
             var keyValues = keysGetter
                 .Select(x => x?.Invoke(entity))
                 .ToArray();
@@ -200,7 +204,7 @@ namespace WeihanLi.EntityFramework
                 .FirstOrDefault(x => GetEntityKeyValues(keysGetter, x).SequenceEqual(keyValues));
 
             EntityEntry<TEntity> entityEntry;
-            if (null == originalEntity)
+            if (originalEntity is null)
             {
                 existBefore = false;
                 entityEntry = dbContext.Attach(entity);

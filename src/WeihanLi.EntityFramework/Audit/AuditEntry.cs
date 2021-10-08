@@ -32,7 +32,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public InternalAuditEntry(EntityEntry entityEntry)
         {
-            TableName = entityEntry.Metadata.GetTableName();
+            TableName = entityEntry.Metadata.GetTableName() ?? entityEntry.Metadata.Name;
 
             if (entityEntry.Properties.Any(x => x.IsTemporary))
             {

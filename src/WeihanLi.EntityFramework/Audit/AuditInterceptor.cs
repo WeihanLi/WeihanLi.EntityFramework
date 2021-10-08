@@ -15,14 +15,14 @@ namespace WeihanLi.EntityFramework.Audit
 
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
-            PreSaveChanges(eventData.Context);
+            PreSaveChanges(eventData.Context!);
             return base.SavingChanges(eventData, result);
         }
 
         public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            PreSaveChanges(eventData.Context);
+            PreSaveChanges(eventData.Context!);
             return base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
@@ -115,7 +115,7 @@ namespace WeihanLi.EntityFramework.Audit
 
         public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
         {
-            PostSaveChanges().ConfigureAwait(false).GetAwaiter().GetResult();
+            PostSaveChanges().GetAwaiter().GetResult();
             return base.SavedChanges(eventData, result);
         }
 

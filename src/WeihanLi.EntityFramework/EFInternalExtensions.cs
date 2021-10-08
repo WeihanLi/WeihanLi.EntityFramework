@@ -10,7 +10,7 @@ namespace WeihanLi.EntityFramework
         {
             var storeObjectId =
                 StoreObjectIdentifier.Create(propertyEntry.Metadata.DeclaringEntityType, StoreObjectType.Table);
-            return propertyEntry.Metadata.GetColumnName(storeObjectId.GetValueOrDefault());
+            return propertyEntry.Metadata.GetColumnName(storeObjectId.GetValueOrDefault()) ?? propertyEntry.Metadata.Name;
         }
     }
 }
