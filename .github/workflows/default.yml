@@ -1,4 +1,4 @@
-name: dotnetcore
+name: default
 
 on: [push]
 
@@ -9,10 +9,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Setup .NET Core
+    - name: Setup .NET 6
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.100
+        dotnet-version: '6.0.x'
+        include-prerelease: true
     - name: dotnet info
       run: dotnet --info
     - name: build

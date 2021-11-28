@@ -1,12 +1,13 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework
 {
     public static class EFRepositoryGeneratorExtensions
     {
-        public static void GenerateRepositoryCodeFor<TDbContext>(this IEFRepositoryGenerator repositoryGenerator, string repositoryNamespace,
-            string outputPath = null) where TDbContext : DbContext
+        public static Task GenerateRepositoryCodeFor<TDbContext>(this IEFRepositoryGenerator repositoryGenerator, string repositoryNamespace,
+            string? outputPath = null) where TDbContext : DbContext
         {
             var repositoryText = repositoryGenerator.GenerateRepositoryCodeTextFor<TDbContext>(repositoryNamespace);
             if (string.IsNullOrEmpty(outputPath))
@@ -17,7 +18,7 @@ namespace WeihanLi.EntityFramework
             {
                 outputPath += ".generated.cs";
             }
-            File.WriteAllText(outputPath, repositoryText);
+            return File.WriteAllTextAsync(outputPath, repositoryText);
         }
     }
 }

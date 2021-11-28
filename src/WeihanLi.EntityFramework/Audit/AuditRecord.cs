@@ -10,21 +10,21 @@ namespace WeihanLi.EntityFramework.Audit
 
         [Required]
         [StringLength(128)]
-        public string TableName { get; set; }
+        public string TableName { get; set; } = null!;
 
         public DataOperationType OperationType { get; set; }
 
         [StringLength(256)]
-        public string ObjectId { get; set; }
+        public string? ObjectId { get; set; }
 
-        public string OriginValue { get; set; }
+        public string? OriginValue { get; set; }
 
-        public string NewValue { get; set; }
+        public string? NewValue { get; set; }
 
-        public string Extra { get; set; }
+        public string? Extra { get; set; }
 
         [StringLength(128)]
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; }
     }

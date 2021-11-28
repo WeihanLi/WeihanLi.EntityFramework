@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
 {
@@ -17,22 +16,15 @@ namespace WeihanLi.EntityFramework
             _dbSet = dbSet;
         }
 
-        private Expression<Func<TEntity, bool>> _whereExpression;
+        private readonly List<Expression<Func<TEntity, bool>>> _whereExpression = new();
 
         public EFRepositoryQueryBuilder<TEntity> WithPredict(Expression<Func<TEntity, bool>> predict)
         {
-            if (null == _whereExpression)
-            {
-                _whereExpression = predict;
-            }
-            else
-            {
-                _whereExpression = _whereExpression.And(predict);
-            }
+            _whereExpression.Add(predict ?? throw new ArgumentNullException(nameof(predict)));
             return this;
         }
 
-        private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> _orderByExpression;
+        private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? _orderByExpression;
 
         public EFRepositoryQueryBuilder<TEntity> WithOrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderByExpression)
         {
@@ -64,9 +56,9 @@ namespace WeihanLi.EntityFramework
             return this;
         }
 
-        private readonly List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> _includeExpressions = new List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>();
+        private readonly List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>> _includeExpressions = new();
 
-        public EFRepositoryQueryBuilder<TEntity> WithInclude(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include)
+        public EFRepositoryQueryBuilder<TEntity> WithInclude(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>> include)
         {
             _includeExpressions.Add(include);
             return this;
@@ -83,9 +75,12 @@ namespace WeihanLi.EntityFramework
             {
                 query = query.IgnoreQueryFilters();
             }
-            if (_whereExpression != null)
+            if (_whereExpression.Count > 0)
             {
-                query = query.Where(_whereExpression);
+                foreach (var expression in _whereExpression)
+                {
+                    query = query.Where(expression);
+                }
             }
             if (_orderByExpression != null)
             {

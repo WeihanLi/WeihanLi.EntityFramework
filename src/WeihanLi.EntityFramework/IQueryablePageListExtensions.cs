@@ -85,7 +85,8 @@ namespace WeihanLi.EntityFramework
             }
             var items = await source
                                     .Take(pageSize)
-                                    .ToArrayAsync(cancellationToken);
+                                    .ToArrayAsync(cancellationToken)
+                                    .ConfigureAwait(false);
             var pagedList = new PagedListResult<T>()
             {
                 PageNumber = pageNumber,

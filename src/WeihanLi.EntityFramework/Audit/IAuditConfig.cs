@@ -9,7 +9,7 @@ namespace WeihanLi.EntityFramework.Audit
     {
         IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider);
 
-        IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true);
+        IAuditConfigBuilder WithUnmodifiedProperty(bool saveUnModifiedProperty = true);
 
         IAuditConfigBuilder WithStore(IAuditStore auditStore);
 
@@ -23,19 +23,19 @@ namespace WeihanLi.EntityFramework.Audit
     internal sealed class AuditConfigBuilder : IAuditConfigBuilder
     {
         private IUserIdProvider _auditUserProvider = EnvironmentUserIdProvider.Instance.Value;
-        private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new List<IAuditPropertyEnricher>(8);
-        private readonly List<Func<EntityEntry, bool>> _entityFilters = new List<Func<EntityEntry, bool>>();
-        private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new List<Func<EntityEntry, PropertyEntry, bool>>();
-        private readonly List<IAuditStore> _auditStores = new List<IAuditStore>(4);
+        private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new(4);
+        private readonly List<Func<EntityEntry, bool>> _entityFilters = new();
+        private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new();
+        private readonly List<IAuditStore> _auditStores = new();
         private bool _saveUnModifiedProperty;
 
         public IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider)
         {
-            _auditUserProvider = auditUserProvider;
+            _auditUserProvider = auditUserProvider ?? throw new ArgumentNullException(nameof(auditUserProvider));
             return this;
         }
 
-        public IAuditConfigBuilder WithUnModifiedProperty(bool saveUnModifiedProperty = true)
+        public IAuditConfigBuilder WithUnmodifiedProperty(bool saveUnModifiedProperty = true)
         {
             _saveUnModifiedProperty = saveUnModifiedProperty;
             return this;
@@ -43,44 +43,49 @@ namespace WeihanLi.EntityFramework.Audit
 
         public IAuditConfigBuilder WithStore(IAuditStore auditStore)
         {
-            if (null != auditStore)
+            if (auditStore is null)
             {
-                _auditStores.Add(auditStore);
+                throw new ArgumentNullException(nameof(auditStore));
             }
-
+            _auditStores.Add(auditStore);
             return this;
         }
 
         public IAuditConfigBuilder WithEntityFilter(Func<EntityEntry, bool> entityFilter)
         {
-            if (null != entityFilter)
+            if (entityFilter is null)
             {
-                _entityFilters.Add(entityFilter);
+                throw new ArgumentNullException(nameof(entityFilter));
             }
+
+            _entityFilters.Add(entityFilter);
             return this;
         }
 
         public IAuditConfigBuilder WithPropertyFilter(Func<EntityEntry, PropertyEntry, bool> propertyFilter)
         {
-            if (null != propertyFilter)
+            if (propertyFilter is null)
             {
-                _propertyFilters.Add(propertyFilter);
+                throw new ArgumentNullException(nameof(propertyFilter));
             }
+
+            _propertyFilters.Add(propertyFilter);
             return this;
         }
 
         public IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher)
         {
-            if (null != enricher)
+            if (enricher is null)
             {
-                _auditPropertyEnrichers.Add(enricher);
+                throw new ArgumentNullException(nameof(enricher));
             }
+            _auditPropertyEnrichers.Add(enricher);
             return this;
         }
 
         public AuditConfigOptions Build()
         {
-            return new AuditConfigOptions()
+            return new()
             {
                 Enrichers = _auditPropertyEnrichers,
                 EntityFilters = _entityFilters,
@@ -98,18 +103,14 @@ namespace WeihanLi.EntityFramework.Audit
 
         public bool SaveUnModifiedProperties { get; set; }
 
-        public IUserIdProvider UserIdProvider { get; set; }
+        public IUserIdProvider UserIdProvider { get; set; } = EnvironmentUserIdProvider.Instance.Value;
 
         private IReadOnlyCollection<IAuditStore> _stores = Array.Empty<IAuditStore>();
 
         public IReadOnlyCollection<IAuditStore> Stores
         {
             get => _stores;
-            set
-            {
-                if (value != null)
-                    _stores = value;
-            }
+            set => _stores = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private IReadOnlyCollection<IAuditPropertyEnricher> _enrichers = Array.Empty<IAuditPropertyEnricher>();
@@ -117,11 +118,7 @@ namespace WeihanLi.EntityFramework.Audit
         public IReadOnlyCollection<IAuditPropertyEnricher> Enrichers
         {
             get => _enrichers;
-            set
-            {
-                if (value != null)
-                    _enrichers = value;
-            }
+            set => _enrichers = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
@@ -129,11 +126,7 @@ namespace WeihanLi.EntityFramework.Audit
         public IReadOnlyCollection<Func<EntityEntry, bool>> EntityFilters
         {
             get => _entityFilters;
-            set
-            {
-                if (value != null)
-                    _entityFilters = value;
-            }
+            set => _entityFilters = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private IReadOnlyCollection<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = Array.Empty<Func<EntityEntry, PropertyEntry, bool>>();
@@ -141,17 +134,13 @@ namespace WeihanLi.EntityFramework.Audit
         public IReadOnlyCollection<Func<EntityEntry, PropertyEntry, bool>> PropertyFilters
         {
             get => _propertyFilters;
-            set
-            {
-                if (value != null)
-                    _propertyFilters = value;
-            }
+            set => _propertyFilters = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 
     public sealed class AuditConfig
     {
-        internal static AuditConfigOptions AuditConfigOptions = new AuditConfigOptions();
+        internal static AuditConfigOptions AuditConfigOptions = new();
 
         public static void EnableAudit()
         {
@@ -163,14 +152,18 @@ namespace WeihanLi.EntityFramework.Audit
             AuditConfigOptions.AuditEnabled = false;
         }
 
+#nullable disable
+
         public static void Configure(Action<IAuditConfigBuilder> configAction)
         {
-            if (null == configAction)
+            if (configAction is null)
                 return;
 
             var builder = new AuditConfigBuilder();
             configAction.Invoke(builder);
             AuditConfigOptions = builder.Build();
         }
+
+#nullable restore
     }
 }

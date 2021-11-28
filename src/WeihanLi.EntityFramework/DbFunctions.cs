@@ -7,7 +7,7 @@ namespace WeihanLi.EntityFramework
     public static class DbFunctions
     {
         [DbFunction("JSON_VALUE", "")]
-        public static string JsonValue(string column, [NotParameterized] string path)
+        public static string? JsonValue(string column, [NotParameterized] string path)
         {
             throw new NotSupportedException();
         }

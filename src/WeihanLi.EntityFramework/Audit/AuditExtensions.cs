@@ -90,14 +90,14 @@ namespace WeihanLi.EntityFramework.Audit
 
         public static IAuditConfigBuilder IgnoreColumn(this IAuditConfigBuilder configBuilder, string columnName)
         {
-            configBuilder.WithPropertyFilter(propertyEntry => propertyEntry.Metadata.GetColumnName() != columnName);
+            configBuilder.WithPropertyFilter(propertyEntry => propertyEntry.GetColumnName() != columnName);
             return configBuilder;
         }
 
         public static IAuditConfigBuilder IgnoreColumn(this IAuditConfigBuilder configBuilder, string tableName, string columnName)
         {
             configBuilder.WithPropertyFilter((entityEntry, propertyEntry) => entityEntry.Metadata.GetTableName() != tableName
-                                                                            && propertyEntry.Metadata.GetColumnName() != columnName);
+                                                                            && propertyEntry.GetColumnName() != columnName);
             return configBuilder;
         }
 

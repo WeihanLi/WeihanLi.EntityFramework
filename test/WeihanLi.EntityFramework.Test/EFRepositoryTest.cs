@@ -21,7 +21,7 @@ namespace WeihanLi.EntityFramework.Test
         {
             using (_lock.Lock())
             {
-                DependencyResolver.TryInvokeService<IEFRepository<TestDbContext, TestEntity>>(repo =>
+                DependencyResolver.TryInvoke<IEFRepository<TestDbContext, TestEntity>>(repo =>
                 {
                     var entity = new TestEntity() { Name = "abc1", CreatedAt = DateTime.UtcNow, Extra = "" };
                     repo.Insert(entity);
@@ -41,7 +41,7 @@ namespace WeihanLi.EntityFramework.Test
         {
             using (await _lock.LockAsync())
             {
-                await DependencyResolver.TryInvokeServiceAsync<IEFRepository<TestDbContext, TestEntity>>(async repo =>
+                await DependencyResolver.TryInvokeAsync<IEFRepository<TestDbContext, TestEntity>>(async repo =>
                 {
                     var entity = new TestEntity() { Name = "abc1", CreatedAt = DateTime.UtcNow, Extra = "" };
                     await repo.InsertAsync(entity);

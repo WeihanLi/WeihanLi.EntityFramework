@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using WeihanLi.Common.Aspect;
@@ -17,7 +16,7 @@ namespace WeihanLi.EntityFramework
         /// <returns></returns>
         public static IEFRepositoryBuilder AddEFRepository(this IServiceCollection services, ServiceLifetime efServiceLifetime = ServiceLifetime.Scoped)
         {
-            if (services == null)
+            if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
@@ -46,27 +45,27 @@ namespace WeihanLi.EntityFramework
             return services;
         }
 
-        /// <summary>
-        /// AddProxyDbContextPool
-        /// </summary>
-        /// <typeparam name="TDbContext">DbContext Type</typeparam>
-        /// <param name="services">services</param>
-        /// <param name="optionsAction">optionsAction</param>
-        /// <param name="poolSize">poolSize</param>
-        /// <param name="serviceLifetime">serviceLifetime</param>
-        /// <returns></returns>
-        public static IServiceCollection AddProxyDbContextPool<TDbContext>(this IServiceCollection services,
-            Action<DbContextOptionsBuilder> optionsAction, int poolSize = 100, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped) where TDbContext : DbContext
-        {
-            services.AddDbContextPool<TDbContext>(optionsAction, poolSize);
-            services.Add(new ServiceDescriptor(typeof(TDbContext), sp =>
-            {
-                var dbContext = sp.GetService<DbContextPool<TDbContext>.Lease>().Context;
-                var proxyFactory = sp.GetRequiredService<IProxyFactory>();
-                return proxyFactory.CreateProxyWithTarget<TDbContext, TDbContext>(dbContext);
-            }, serviceLifetime));
+        ///// <summary>
+        ///// AddProxyDbContextPool
+        ///// </summary>
+        ///// <typeparam name="TDbContext">DbContext Type</typeparam>
+        ///// <param name="services">services</param>
+        ///// <param name="optionsAction">optionsAction</param>
+        ///// <param name="poolSize">poolSize</param>
+        ///// <param name="serviceLifetime">serviceLifetime</param>
+        ///// <returns></returns>
+        //public static IServiceCollection AddProxyDbContextPool<TDbContext>(this IServiceCollection services,
+        //    Action<DbContextOptionsBuilder> optionsAction, int poolSize = 100, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped) where TDbContext : DbContext
+        //{
+        //    services.AddDbContextPool<TDbContext>(optionsAction, poolSize);
+        //    services.Add(new ServiceDescriptor(typeof(TDbContext), sp =>
+        //    {
+        //        var dbContextPool = sp.GetService<DbContextPool<TDbContext>>();
+        //        var proxyFactory = sp.GetRequiredService<IProxyFactory>();
+        //        return proxyFactory.CreateProxyWithTarget<TDbContext, TDbContext>(dbContext);
+        //    }, serviceLifetime));
 
-            return services;
-        }
+        //    return services;
+        //}
     }
 }
