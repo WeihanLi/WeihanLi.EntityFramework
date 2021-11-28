@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EFVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EFVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EFVersion)" />
-    <PackageReference Include="WeihanLi.Common.Logging.Log4Net" Version="1.0.46" />
+    <PackageReference Include="WeihanLi.Common.Logging.Log4Net" Version="$(CommonVersion)" />
   </ItemGroup>
 
   <ItemGroup>

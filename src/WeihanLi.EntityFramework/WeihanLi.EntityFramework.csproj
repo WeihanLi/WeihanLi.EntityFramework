@@ -2,6 +2,6 @@
   <Import Project="../../build/common.props" />
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EFVersion)" />
-    <PackageReference Include="WeihanLi.Common" Version="1.0.46" />  
+    <PackageReference Include="WeihanLi.Common" Version="$(CommonVersion)" />  
   </ItemGroup>
 </Project>

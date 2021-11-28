@@ -1,4 +1,4 @@
-# WeihanLi.EntityFramework 
+# WeihanLi.EntityFramework
 
 [![WeihanLi.EntityFramework](https://img.shields.io/nuget/v/WeihanLi.EntityFramework.svg)](https://www.nuget.org/packages/WeihanLi.EntityFramework/)
 
