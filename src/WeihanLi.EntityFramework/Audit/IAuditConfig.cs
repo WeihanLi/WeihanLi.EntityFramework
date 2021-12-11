@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WeihanLi.Common.Services;
 
 namespace WeihanLi.EntityFramework.Audit

@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using WeihanLi.Common.Data;
 
 namespace WeihanLi.EntityFramework

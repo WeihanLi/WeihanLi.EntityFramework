@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
 using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework

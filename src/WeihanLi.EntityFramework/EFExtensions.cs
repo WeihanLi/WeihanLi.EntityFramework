@@ -1,11 +1,11 @@
-﻿using System;
-using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Data;
+using System.Linq;
+using System.Linq.Expressions;
 using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
@@ -188,7 +188,7 @@ namespace WeihanLi.EntityFramework
 
             var entityType = dbContext.Model.FindEntityType(type);
             var key = entityType?.FindPrimaryKey();
-            if(key is null)
+            if (key is null)
             {
                 throw new InvalidOperationException($"Type {type.FullName} had no primark key");
             }

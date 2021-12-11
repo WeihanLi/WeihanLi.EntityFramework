@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Linq;
+using System.Text;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework
