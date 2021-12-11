@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using Microsoft.EntityFrameworkCore;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework
 {
