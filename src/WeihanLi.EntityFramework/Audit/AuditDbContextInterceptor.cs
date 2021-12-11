@@ -6,90 +6,89 @@ using System.Threading.Tasks;
 using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Models;
 
-namespace WeihanLi.EntityFramework.Audit
+namespace WeihanLi.EntityFramework.Audit;
+
+public sealed class AuditDbContextInterceptor : IInterceptor
 {
-    public sealed class AuditDbContextInterceptor : IInterceptor
+    public async Task Invoke(IInvocation invocation, Func<Task> next)
     {
-        public async Task Invoke(IInvocation invocation, Func<Task> next)
+        if (invocation.Target is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
         {
-            if (invocation.Target is DbContext dbContext && AuditConfig.AuditConfigOptions.AuditEnabled)
+            var auditEntries = new List<AuditEntry>();
+            foreach (var entityEntry in dbContext.ChangeTracker.Entries())
             {
-                var auditEntries = new List<AuditEntry>();
-                foreach (var entityEntry in dbContext.ChangeTracker.Entries())
+                if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
                 {
-                    if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
-                    {
-                        continue;
-                    }
-                    if (AuditConfig.AuditConfigOptions.EntityFilters
-                        .Any(entityFilter =>
-                            entityFilter.Invoke(entityEntry) == false))
-                    {
-                        continue;
-                    }
-                    auditEntries.Add(new InternalAuditEntry(entityEntry));
+                    continue;
                 }
-                await next();
-                //
-                if (auditEntries.Count > 0)
+                if (AuditConfig.AuditConfigOptions.EntityFilters
+                    .Any(entityFilter =>
+                        entityFilter.Invoke(entityEntry) == false))
                 {
-                    foreach (var auditEntry in auditEntries)
+                    continue;
+                }
+                auditEntries.Add(new InternalAuditEntry(entityEntry));
+            }
+            await next();
+            //
+            if (auditEntries.Count > 0)
+            {
+                foreach (var auditEntry in auditEntries)
+                {
+                    if (auditEntry is InternalAuditEntry internalAuditEntry)
                     {
-                        if (auditEntry is InternalAuditEntry internalAuditEntry)
+                        // update TemporaryProperties
+                        if (internalAuditEntry.TemporaryProperties != null && internalAuditEntry.TemporaryProperties.Count > 0)
                         {
-                            // update TemporaryProperties
-                            if (internalAuditEntry.TemporaryProperties != null && internalAuditEntry.TemporaryProperties.Count > 0)
+                            foreach (var temporaryProperty in internalAuditEntry.TemporaryProperties)
                             {
-                                foreach (var temporaryProperty in internalAuditEntry.TemporaryProperties)
+                                var colName = temporaryProperty.GetColumnName();
+                                if (temporaryProperty.Metadata.IsPrimaryKey())
                                 {
-                                    var colName = temporaryProperty.GetColumnName();
-                                    if (temporaryProperty.Metadata.IsPrimaryKey())
-                                    {
-                                        auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
-                                    }
-
-                                    switch (auditEntry.OperationType)
-                                    {
-                                        case DataOperationType.Add:
-                                            auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
-                                            break;
-
-                                        case DataOperationType.Delete:
-                                            auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
-                                            break;
-
-                                        case DataOperationType.Update:
-                                            auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
-                                            auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
-                                            break;
-                                    }
+                                    auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
                                 }
-                                // set to null
-                                internalAuditEntry.TemporaryProperties = null;
+
+                                switch (auditEntry.OperationType)
+                                {
+                                    case DataOperationType.Add:
+                                        auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
+                                        break;
+
+                                    case DataOperationType.Delete:
+                                        auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                        break;
+
+                                    case DataOperationType.Update:
+                                        auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                        auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
+                                        break;
+                                }
                             }
-                        }
-
-                        auditEntry.UpdatedAt = DateTimeOffset.UtcNow;
-                        auditEntry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
-                            ?.GetUserId();
-
-                        // apply enricher
-                        foreach (var enricher in AuditConfig.AuditConfigOptions.Enrichers)
-                        {
-                            enricher.Enrich(auditEntry);
+                            // set to null
+                            internalAuditEntry.TemporaryProperties = null;
                         }
                     }
 
-                    await Task.WhenAll(
-                            AuditConfig.AuditConfigOptions.Stores
-                            .Select(store => store.Save(auditEntries))
-                        ).ConfigureAwait(false);
+                    auditEntry.UpdatedAt = DateTimeOffset.UtcNow;
+                    auditEntry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
+                        ?.GetUserId();
+
+                    // apply enricher
+                    foreach (var enricher in AuditConfig.AuditConfigOptions.Enrichers)
+                    {
+                        enricher.Enrich(auditEntry);
+                    }
                 }
+
+                await Task.WhenAll(
+                        AuditConfig.AuditConfigOptions.Stores
+                        .Select(store => store.Save(auditEntries))
+                    ).ConfigureAwait(false);
             }
-            else
-            {
-                await next();
-            }
+        }
+        else
+        {
+            await next();
         }
     }
 }

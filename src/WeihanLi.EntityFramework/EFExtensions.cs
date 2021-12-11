@@ -10,219 +10,218 @@ using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
-namespace WeihanLi.EntityFramework
+namespace WeihanLi.EntityFramework;
+
+public static class EFExtensions
 {
-    public static class EFExtensions
+    public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
+        where TEntity : class
+        where TDbContext : DbContext
     {
-        public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
-            where TEntity : class
-            where TDbContext : DbContext
+        return new EFRepository<TDbContext, TEntity>(dbContext);
+    }
+
+    public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] this TDbContext dbContext)
+        where TDbContext : DbContext
+    {
+        return new EFUnitOfWork<TDbContext>(dbContext);
+    }
+
+    public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] TDbContext dbContext, IsolationLevel isolationLevel)
+        where TDbContext : DbContext
+    {
+        return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
+    }
+
+    public static EntityEntry<TEntity>? Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
+    {
+        var entity = dbContext.Find<TEntity>(keyValues);
+        if (entity == null)
         {
-            return new EFRepository<TDbContext, TEntity>(dbContext);
+            return null;
         }
 
-        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] this TDbContext dbContext)
-            where TDbContext : DbContext
-        {
-            return new EFUnitOfWork<TDbContext>(dbContext);
-        }
+        return dbContext.Remove(entity);
+    }
 
-        public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] TDbContext dbContext, IsolationLevel isolationLevel)
-            where TDbContext : DbContext
+    public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
+    {
+        if (propNames.IsNullOrEmpty())
         {
-            return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
+            return dbContext.Update(entity);
         }
-
-        public static EntityEntry<TEntity>? Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
+        var entry = dbContext.GetEntityEntry(entity, out var existBefore);
+        if (existBefore)
         {
-            var entity = dbContext.Find<TEntity>(keyValues);
-            if (entity == null)
+            foreach (var propEntry in entry.Properties)
             {
-                return null;
-            }
-
-            return dbContext.Remove(entity);
-        }
-
-        public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
-        {
-            if (propNames.IsNullOrEmpty())
-            {
-                return dbContext.Update(entity);
-            }
-            var entry = dbContext.GetEntityEntry(entity, out var existBefore);
-            if (existBefore)
-            {
-                foreach (var propEntry in entry.Properties)
+                if (!propNames.Contains(propEntry.Metadata.Name))
                 {
-                    if (!propNames.Contains(propEntry.Metadata.Name))
-                    {
-                        propEntry.IsModified = false;
-                    }
+                    propEntry.IsModified = false;
                 }
             }
-            else
+        }
+        else
+        {
+            entry.State = EntityState.Unchanged;
+            foreach (var propName in propNames)
             {
-                entry.State = EntityState.Unchanged;
-                foreach (var propName in propNames)
-                {
-                    entry.Property(propName).IsModified = true;
-                }
+                entry.Property(propName).IsModified = true;
             }
-
-            return entry;
         }
 
-        public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
-        {
-            if (propNames.IsNullOrEmpty())
-            {
-                return dbContext.Update(entity);
-            }
-            var entry = dbContext.GetEntityEntry(entity, out _);
-            entry.State = EntityState.Modified;
-            foreach (var expression in propNames)
-            {
-                entry.Property(expression).IsModified = false;
-            }
+        return entry;
+    }
 
-            return entry;
+    public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
+    {
+        if (propNames.IsNullOrEmpty())
+        {
+            return dbContext.Update(entity);
+        }
+        var entry = dbContext.GetEntityEntry(entity, out _);
+        entry.State = EntityState.Modified;
+        foreach (var expression in propNames)
+        {
+            entry.Property(expression).IsModified = false;
         }
 
-        public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
+        return entry;
+    }
+
+    public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
+    {
+        if (propertyExpressions.IsNullOrEmpty())
         {
-            if (propertyExpressions.IsNullOrEmpty())
-            {
-                return dbContext.Update(entity);
-            }
-
-            var entry = dbContext.GetEntityEntry(entity, out var existBefore);
-
-            if (existBefore)
-            {
-                var propNames = propertyExpressions.Select(x => x.GetMemberName()).ToArray();
-
-                foreach (var propEntry in entry.Properties)
-                {
-                    if (!propNames.Contains(propEntry.Metadata.Name))
-                    {
-                        propEntry.IsModified = false;
-                    }
-                }
-            }
-            else
-            {
-                entry.State = EntityState.Unchanged;
-                foreach (var expression in propertyExpressions)
-                {
-                    entry.Property(expression).IsModified = true;
-                }
-            }
-
-            return entry;
+            return dbContext.Update(entity);
         }
 
-        public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
+        var entry = dbContext.GetEntityEntry(entity, out var existBefore);
+
+        if (existBefore)
         {
-            if (propertyExpressions.IsNullOrEmpty())
+            var propNames = propertyExpressions.Select(x => x.GetMemberName()).ToArray();
+
+            foreach (var propEntry in entry.Properties)
             {
-                return dbContext.Update(entity);
+                if (!propNames.Contains(propEntry.Metadata.Name))
+                {
+                    propEntry.IsModified = false;
+                }
             }
-
-            var entry = dbContext.GetEntityEntry(entity, out _);
-
-            entry.State = EntityState.Modified;
+        }
+        else
+        {
+            entry.State = EntityState.Unchanged;
             foreach (var expression in propertyExpressions)
             {
-                entry.Property(expression).IsModified = false;
+                entry.Property(expression).IsModified = true;
             }
-
-            return entry;
         }
 
-        public static string GetTableName<TEntity>(this DbContext dbContext)
+        return entry;
+    }
+
+    public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
+    {
+        if (propertyExpressions.IsNullOrEmpty())
         {
-            var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
-            return entityType?.GetTableName() ?? throw new ArgumentNullException(nameof(entityType));
+            return dbContext.Update(entity);
         }
 
-        public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
+        var entry = dbContext.GetEntityEntry(entity, out _);
+
+        entry.State = EntityState.Modified;
+        foreach (var expression in propertyExpressions)
         {
-            if (!entityEntry.IsKeySet)
-                return Array.Empty<KeyEntry>();
+            entry.Property(expression).IsModified = false;
+        }
 
-            var keyProps = entityEntry.Properties
-                .Where(p => p.Metadata.IsPrimaryKey())
-                .ToArray();
-            if (keyProps.Length == 0)
-                return Array.Empty<KeyEntry>();
+        return entry;
+    }
 
-            var keyEntries = new KeyEntry[keyProps.Length];
-            for (var i = 0; i < keyProps.Length; i++)
+    public static string GetTableName<TEntity>(this DbContext dbContext)
+    {
+        var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
+        return entityType?.GetTableName() ?? throw new ArgumentNullException(nameof(entityType));
+    }
+
+    public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
+    {
+        if (!entityEntry.IsKeySet)
+            return Array.Empty<KeyEntry>();
+
+        var keyProps = entityEntry.Properties
+            .Where(p => p.Metadata.IsPrimaryKey())
+            .ToArray();
+        if (keyProps.Length == 0)
+            return Array.Empty<KeyEntry>();
+
+        var keyEntries = new KeyEntry[keyProps.Length];
+        for (var i = 0; i < keyProps.Length; i++)
+        {
+            keyEntries[i] = new KeyEntry()
             {
-                keyEntries[i] = new KeyEntry()
-                {
-                    PropertyName = keyProps[i].Metadata.Name,
-                    ColumnName = keyProps[i].GetColumnName(),
-                    Value = keyProps[i].CurrentValue,
-                };
-            }
-
-            return keyEntries;
+                PropertyName = keyProps[i].Metadata.Name,
+                ColumnName = keyProps[i].GetColumnName(),
+                Value = keyProps[i].CurrentValue,
+            };
         }
 
-        public static IServiceCollection AddAutoAudit([NotNull] this IServiceCollection services,
-            Action<IAuditConfigBuilder> configAction)
+        return keyEntries;
+    }
+
+    public static IServiceCollection AddAutoAudit([NotNull] this IServiceCollection services,
+        Action<IAuditConfigBuilder> configAction)
+    {
+        if (configAction is null)
+            throw new ArgumentNullException(nameof(configAction));
+
+        AuditConfig.Configure(configAction);
+        return services;
+    }
+
+    private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)
+  where TEntity : class
+    {
+        var type = typeof(TEntity);
+
+        var entityType = dbContext.Model.FindEntityType(type);
+        var key = entityType?.FindPrimaryKey();
+        if (key is null)
         {
-            if (configAction is null)
-                throw new ArgumentNullException(nameof(configAction));
-
-            AuditConfig.Configure(configAction);
-            return services;
+            throw new InvalidOperationException($"Type {type.FullName} had no primark key");
         }
 
-        private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)
-      where TEntity : class
+        var keysGetter = key.Properties
+            .Select(x => x.PropertyInfo!.GetValueGetter<TEntity>())
+            .ToArray();
+        var keyValues = keysGetter
+            .Select(x => x?.Invoke(entity))
+            .ToArray();
+
+        var originalEntity = dbContext.Set<TEntity>().Local
+            .FirstOrDefault(x => GetEntityKeyValues(keysGetter, x).SequenceEqual(keyValues));
+
+        EntityEntry<TEntity> entityEntry;
+        if (originalEntity is null)
         {
-            var type = typeof(TEntity);
-
-            var entityType = dbContext.Model.FindEntityType(type);
-            var key = entityType?.FindPrimaryKey();
-            if (key is null)
-            {
-                throw new InvalidOperationException($"Type {type.FullName} had no primark key");
-            }
-
-            var keysGetter = key.Properties
-                .Select(x => x.PropertyInfo!.GetValueGetter<TEntity>())
-                .ToArray();
-            var keyValues = keysGetter
-                .Select(x => x?.Invoke(entity))
-                .ToArray();
-
-            var originalEntity = dbContext.Set<TEntity>().Local
-                .FirstOrDefault(x => GetEntityKeyValues(keysGetter, x).SequenceEqual(keyValues));
-
-            EntityEntry<TEntity> entityEntry;
-            if (originalEntity is null)
-            {
-                existBefore = false;
-                entityEntry = dbContext.Attach(entity);
-            }
-            else
-            {
-                existBefore = true;
-                entityEntry = dbContext.Entry(originalEntity);
-                entityEntry.CurrentValues.SetValues(entity);
-            }
-
-            return entityEntry;
+            existBefore = false;
+            entityEntry = dbContext.Attach(entity);
         }
-
-        private static object?[] GetEntityKeyValues<TEntity>(Func<TEntity, object?>?[] keyValueGetter, TEntity entity)
+        else
         {
-            var keyValues = keyValueGetter.Select(x => x?.Invoke(entity)).ToArray();
-            return keyValues;
+            existBefore = true;
+            entityEntry = dbContext.Entry(originalEntity);
+            entityEntry.CurrentValues.SetValues(entity);
         }
+
+        return entityEntry;
+    }
+
+    private static object?[] GetEntityKeyValues<TEntity>(Func<TEntity, object?>?[] keyValueGetter, TEntity entity)
+    {
+        var keyValues = keyValueGetter.Select(x => x?.Invoke(entity)).ToArray();
+        return keyValues;
     }
 }
