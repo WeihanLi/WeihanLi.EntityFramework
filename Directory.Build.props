@@ -5,8 +5,8 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.47</CommonVersion>
-    <EFVersion>6.0.0</EFVersion>
+    <CommonVersion>1.0.53</CommonVersion>
+    <EFVersion>7.0.0-rc.1.22426.7</EFVersion>
 
     <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
