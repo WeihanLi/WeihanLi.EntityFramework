@@ -196,20 +196,20 @@ public class Program
                 Extra = "{\"Name\": \"Tom\"}"
             });
 
-                //                conn.Execute($@"
-                //INSERT INTO {tableName}
-                //(
-                //Extra,
-                //CreatedAt
-                //)
-                //VALUES
-                //(
-                //'{{""Name"":""AA""}}',
-                //GETUTCDATE()
-                //)
-                //");
+            //                conn.Execute($@"
+            //INSERT INTO {tableName}
+            //(
+            //Extra,
+            //CreatedAt
+            //)
+            //VALUES
+            //(
+            //'{{""Name"":""AA""}}',
+            //GETUTCDATE()
+            //)
+            //");
 
-                var abc = db.TestEntities.AsNoTracking().ToArray();
+            var abc = db.TestEntities.AsNoTracking().ToArray();
             Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
         });
 
@@ -256,10 +256,10 @@ public class Program
                 Id = 1
             }, t => t.CreatedAt, t => t.Extra);
 
-                // repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
+            // repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
 
-                repo.Insert(new[]
-            {
+            repo.Insert(new[]
+        {
                     new TestEntity
                     {
                         Extra = new {Name = "Abcdes"}.ToJson(),

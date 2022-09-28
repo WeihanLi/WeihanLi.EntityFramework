@@ -20,8 +20,8 @@ public class EFTestFixture : IDisposable
         IServiceCollection serviceCollection = new ServiceCollection();
         serviceCollection.AddDbContext<TestDbContext>(options =>
         {
-                //options.UseSqlServer(DbConnectionString);
-                options.UseInMemoryDatabase("Tests");
+            //options.UseSqlServer(DbConnectionString);
+            options.UseInMemoryDatabase("Tests");
             options.EnableDetailedErrors();
         });
         serviceCollection.AddEFRepository();
