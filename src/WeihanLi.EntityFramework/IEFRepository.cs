@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -165,7 +164,7 @@ public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
     /// <param name="pageSize">pageSize</param>
     /// <returns>An <see cref="IPagedListResult{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
     /// <remarks>This method default no-tracking query.</remarks>
-    IPagedListResult<TResult> GetPagedListResult<TResult>([NotNull] Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
+    IPagedListResult<TResult> GetPagedListResult<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
                                               int pageNumber = 1, int pageSize = 20);
 
     /// <summary>
@@ -180,6 +179,6 @@ public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
     /// <param name="pageNumber"></param>
     /// <returns>An <see cref="IPagedListResult{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="queryBuilderAction"/>.</returns>
     /// <remarks>This method default no-tracking query.</remarks>
-    Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>([NotNull] Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
+    Task<IPagedListResult<TResult>> GetPagedListResultAsync<TResult>(Expression<Func<TEntity, TResult>> selector, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
                                                          int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 }

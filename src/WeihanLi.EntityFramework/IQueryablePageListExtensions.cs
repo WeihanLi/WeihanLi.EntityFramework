@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ public static class QueryablePageListExtensions
     /// <param name="pageNumber">The number of the page, index from 1.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <returns>An instance of  implements <see cref="IPagedListResult{T}"/> interface.</returns>
-    public static IPagedListResult<T> ToPagedList<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize)
+    public static IPagedListResult<T> ToPagedList<T>(this IQueryable<T> source, int pageNumber, int pageSize)
     {
         if (pageNumber <= 0)
         {
@@ -62,7 +61,7 @@ public static class QueryablePageListExtensions
     ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
     /// </param>
     /// <returns>An instance of  implements  <see cref="IPagedListResult{T}"/> interface.</returns>
-    public static async Task<IPagedListResult<T>> ToPagedListAsync<T>([NotNull] this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public static async Task<IPagedListResult<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         if (pageNumber <= 0)
         {

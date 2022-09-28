@@ -1,11 +1,10 @@
-﻿using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WeihanLi.EntityFramework.Test;
 
 internal static class EFExtensions
 {
-    public static bool CleanData<TDbContext>([NotNull] this TDbContext dbContext) where TDbContext : DbContext
+    public static bool CleanData<TDbContext>(this TDbContext dbContext) where TDbContext : DbContext
     {
         if (dbContext.Database.IsInMemory())
         {

@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,26 +13,26 @@ namespace WeihanLi.EntityFramework;
 
 public static class EFExtensions
 {
-    public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>([NotNull] this TDbContext dbContext)
+    public static IEFRepository<TDbContext, TEntity> GetRepository<TDbContext, TEntity>(this TDbContext dbContext)
         where TEntity : class
         where TDbContext : DbContext
     {
         return new EFRepository<TDbContext, TEntity>(dbContext);
     }
 
-    public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] this TDbContext dbContext)
+    public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>(this TDbContext dbContext)
         where TDbContext : DbContext
     {
         return new EFUnitOfWork<TDbContext>(dbContext);
     }
 
-    public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>([NotNull] TDbContext dbContext, IsolationLevel isolationLevel)
+    public static IEFUnitOfWork<TDbContext> GetUnitOfWork<TDbContext>(TDbContext dbContext, IsolationLevel isolationLevel)
         where TDbContext : DbContext
     {
         return new EFUnitOfWork<TDbContext>(dbContext, isolationLevel);
     }
 
-    public static EntityEntry<TEntity>? Remove<TEntity>([NotNull] this DbContext dbContext, params object[] keyValues) where TEntity : class
+    public static EntityEntry<TEntity>? Remove<TEntity>(this DbContext dbContext, params object[] keyValues) where TEntity : class
     {
         var entity = dbContext.Find<TEntity>(keyValues);
         if (entity == null)
@@ -44,7 +43,7 @@ public static class EFExtensions
         return dbContext.Remove(entity);
     }
 
-    public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
+    public static EntityEntry<TEntity> Update<TEntity>(this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
     {
         if (propNames.IsNullOrEmpty())
         {
@@ -73,7 +72,7 @@ public static class EFExtensions
         return entry;
     }
 
-    public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
+    public static EntityEntry<TEntity> UpdateWithout<TEntity>(this DbContext dbContext, TEntity entity, params string[] propNames) where TEntity : class
     {
         if (propNames.IsNullOrEmpty())
         {
@@ -89,7 +88,7 @@ public static class EFExtensions
         return entry;
     }
 
-    public static EntityEntry<TEntity> Update<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
+    public static EntityEntry<TEntity> Update<TEntity>(this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
     {
         if (propertyExpressions.IsNullOrEmpty())
         {
@@ -122,7 +121,7 @@ public static class EFExtensions
         return entry;
     }
 
-    public static EntityEntry<TEntity> UpdateWithout<TEntity>([NotNull] this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
+    public static EntityEntry<TEntity> UpdateWithout<TEntity>(this DbContext dbContext, TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions) where TEntity : class
     {
         if (propertyExpressions.IsNullOrEmpty())
         {
@@ -146,7 +145,7 @@ public static class EFExtensions
         return entityType?.GetTableName() ?? throw new ArgumentNullException(nameof(entityType));
     }
 
-    public static KeyEntry[] GetKeyValues([NotNull] this EntityEntry entityEntry)
+    public static KeyEntry[] GetKeyValues(this EntityEntry entityEntry)
     {
         if (!entityEntry.IsKeySet)
             return Array.Empty<KeyEntry>();
@@ -171,7 +170,7 @@ public static class EFExtensions
         return keyEntries;
     }
 
-    public static IServiceCollection AddAutoAudit([NotNull] this IServiceCollection services,
+    public static IServiceCollection AddAutoAudit(this IServiceCollection services,
         Action<IAuditConfigBuilder> configAction)
     {
         if (configAction is null)
@@ -181,7 +180,7 @@ public static class EFExtensions
         return services;
     }
 
-    private static EntityEntry<TEntity> GetEntityEntry<TEntity>([NotNull] this DbContext dbContext, TEntity entity, out bool existBefore)
+    private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity, out bool existBefore)
   where TEntity : class
     {
         var type = typeof(TEntity);
