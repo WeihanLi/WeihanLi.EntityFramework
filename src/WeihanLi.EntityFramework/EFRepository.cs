@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,14 +66,12 @@ public class EFRepository<TDbContext, TEntity> :
 
     public virtual int Delete(Expression<Func<TEntity, bool>> whereExpression)
     {
-        DbContext.Set<TEntity>().RemoveRange(DbContext.Set<TEntity>().Where(whereExpression));
-        return DbContext.SaveChanges();
+        return DbContext.Set<TEntity>().Where(whereExpression).ExecuteDelete();
     }
 
     public virtual Task<int> DeleteAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
     {
-        DbContext.Set<TEntity>().RemoveRange(DbContext.Set<TEntity>().Where(whereExpression));
-        return DbContext.SaveChangesAsync(cancellationToken);
+        return DbContext.Set<TEntity>().Where(whereExpression).ExecuteDeleteAsync(cancellationToken);
     }
 
     public virtual bool Exist(Expression<Func<TEntity, bool>> whereExpression) =>
@@ -232,56 +231,77 @@ public class EFRepository<TDbContext, TEntity> :
 
     public virtual int Update<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object? value)
     {
-        foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
-        {
-            entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
-        }
-
-        return DbContext.SaveChanges();
+        ArgumentNullException.ThrowIfNull(propertyExpression);
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> expression = c =>
+            c.SetProperty(propertyExpression, _ => (TProperty)value!);
+        return DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdate(expression);
     }
 
     public virtual int Update(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object?>? propertyValues)
     {
-        if (propertyValues is null)
+        if (propertyValues.IsNullOrEmpty())
         {
             return 0;
         }
-        foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
-        {
-            foreach (var propertyValue in propertyValues)
-            {
-                entity.SetPropertyValue(propertyValue.Key, propertyValue.Value);
-            }
-        }
 
-        return DbContext.SaveChanges();
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
+        foreach (var propertyValue in propertyValues)
+        {
+            var propertyExp = GetPropertyExpression(propertyValue.Key);
+            setExpression = c => c.SetProperty(propertyExp, _ => propertyValue.Value);
+        }
+        
+        return DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdate(setExpression);
     }
 
+    private Expression<Func<TEntity, object?>> GetPropertyExpression(string propertyName)
+    {
+        var parameterExpression = Expression.Parameter(typeof(TEntity), "x");
+        var memberExpression = Expression.PropertyOrField(parameterExpression, propertyName);
+        var memberExpressionConversion = Expression.Convert(memberExpression, typeof(object));
+        var lambda = Expression.Lambda<Func<TEntity, object?>>(memberExpressionConversion, parameterExpression);
+        return lambda;
+    }
+
+    public int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression, 
+        Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
+    {
+        var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
+        queryBuilderAction?.Invoke(queryBuilder);
+        return queryBuilder.Build().ExecuteUpdate(setExpression);
+    }
+
+    public Task<int> UpdateAsync(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
+        Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
+        CancellationToken cancellationToken = default)
+    {
+        var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
+        queryBuilderAction?.Invoke(queryBuilder);
+        return queryBuilder.Build().ExecuteUpdateAsync(setExpression, cancellationToken);
+    }
     public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object? value, CancellationToken cancellationToken = default)
     {
-        foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
-        {
-            entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
-        }
-
-        return DbContext.SaveChangesAsync(cancellationToken);
+        ArgumentNullException.ThrowIfNull(propertyExpression);
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> expression = c =>
+            c.SetProperty(propertyExpression, _ => (TProperty)value!);
+        return DbContext.Set<TEntity>().ExecuteUpdateAsync(expression, cancellationToken);
     }
 
     public virtual async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> whereExpression, IDictionary<string, object?>? propertyValues, CancellationToken cancellationToken = default)
     {
-        if (propertyValues is null)
+        if (propertyValues.IsNullOrEmpty())
         {
             return 0;
         }
-        foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
+        
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
+        foreach (var propertyValue in propertyValues)
         {
-            foreach (var propertyValue in propertyValues)
-            {
-                entity.SetPropertyValue(propertyValue.Key, propertyValue.Value);
-            }
+            var propertyExp = GetPropertyExpression(propertyValue.Key);
+            setExpression = c => c.SetProperty(propertyExp, _ => propertyValue.Value);
         }
-
-        return await DbContext.SaveChangesAsync(cancellationToken);
+        
+        return await DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdateAsync(setExpression, cancellationToken);
     }
 
     public virtual int Update(TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions)

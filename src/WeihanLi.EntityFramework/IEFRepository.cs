@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,13 @@ public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
     /// <returns>the entity founded, if not found, null returned</returns>
     ValueTask<TEntity?> FindAsync(object[] keyValues, CancellationToken cancellationToken);
 
+    int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null);
+
+    Task<int> UpdateAsync(
+        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
+        Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
+        CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Delete a entity
     /// </summary>
