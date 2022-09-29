@@ -38,7 +38,7 @@ public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
         Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Delete a entity
     /// </summary>

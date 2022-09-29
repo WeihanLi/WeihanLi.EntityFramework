@@ -250,7 +250,7 @@ public class EFRepository<TDbContext, TEntity> :
             var propertyExp = GetPropertyExpression(propertyValue.Key);
             setExpression = c => c.SetProperty(propertyExp, _ => propertyValue.Value);
         }
-        
+
         return DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdate(setExpression);
     }
 
@@ -263,7 +263,7 @@ public class EFRepository<TDbContext, TEntity> :
         return lambda;
     }
 
-    public int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression, 
+    public int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
         Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
     {
         var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
@@ -293,14 +293,14 @@ public class EFRepository<TDbContext, TEntity> :
         {
             return 0;
         }
-        
+
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
         foreach (var propertyValue in propertyValues)
         {
             var propertyExp = GetPropertyExpression(propertyValue.Key);
             setExpression = c => c.SetProperty(propertyExp, _ => propertyValue.Value);
         }
-        
+
         return await DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdateAsync(setExpression, cancellationToken);
     }
 
