@@ -188,12 +188,12 @@ public class Program
             db.Database.EnsureCreated();
             var tableName = db.GetTableName<TestEntity>();
 
-            if(db.Database.IsSqlServer())
+            if (db.Database.IsSqlServer())
             {
                 var conn = db.Database.GetDbConnection();
                 conn.Execute($@"TRUNCATE TABLE {tableName}");
             }
-            
+
             var repo = db.GetRepository<TestDbContext, TestEntity>();
             repo.Insert(new TestEntity()
             {
@@ -201,16 +201,16 @@ public class Program
                 Extra = "{\"Name\": \"Tom\"}"
             });
 
-            repo.Update(x => x.Extra != null, x => x.Extra ,  new{ Date= DateTimeOffset.Now }.ToJson());
-            
+            repo.Update(x => x.Extra != null, x => x.Extra, new { Date = DateTimeOffset.Now }.ToJson());
+
             // TODO: this is not working for now
             // repo.Update(x => x.Extra != null, new Dictionary<string, object?>()
             // {
             //     { "Extra", "12345"}
             // });
 
-            repo.Update(x => x.SetProperty(_ => _.Extra, _ => "{}"), q=>q.IgnoreQueryFilters());
-            
+            repo.Update(x => x.SetProperty(_ => _.Extra, _ => "{}"), q => q.IgnoreQueryFilters());
+
             var abc = db.TestEntities.AsNoTracking().ToArray();
             Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
 
