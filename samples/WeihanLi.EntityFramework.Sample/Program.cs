@@ -79,7 +79,8 @@ public class Program
         //});
         DependencyResolver.SetDependencyResolver(services);
 
-        AutoAuditTest();
+        RepositoryTest();
+        // AutoAuditTest();
 
         Console.WriteLine("completed");
         Console.ReadLine();
@@ -187,30 +188,33 @@ public class Program
             db.Database.EnsureCreated();
             var tableName = db.GetTableName<TestEntity>();
 
-            var conn = db.Database.GetDbConnection();
-            conn.Execute($@"TRUNCATE TABLE {tableName}");
-
-            db.GetRepository<TestDbContext, TestEntity>().Insert(new TestEntity()
+            if(db.Database.IsSqlServer())
+            {
+                var conn = db.Database.GetDbConnection();
+                conn.Execute($@"TRUNCATE TABLE {tableName}");
+            }
+            
+            var repo = db.GetRepository<TestDbContext, TestEntity>();
+            repo.Insert(new TestEntity()
             {
                 CreatedAt = DateTimeOffset.UtcNow,
                 Extra = "{\"Name\": \"Tom\"}"
             });
 
-            //                conn.Execute($@"
-            //INSERT INTO {tableName}
-            //(
-            //Extra,
-            //CreatedAt
-            //)
-            //VALUES
-            //(
-            //'{{""Name"":""AA""}}',
-            //GETUTCDATE()
-            //)
-            //");
+            repo.Update(x => x.Extra != null, x => x.Extra ,  new{ Date= DateTimeOffset.Now }.ToJson());
+            
+            // TODO: this is not working for now
+            // repo.Update(x => x.Extra != null, new Dictionary<string, object?>()
+            // {
+            //     { "Extra", "12345"}
+            // });
 
+            repo.Update(x => x.SetProperty(_ => _.Extra, _ => "{}"), q=>q.IgnoreQueryFilters());
+            
             var abc = db.TestEntities.AsNoTracking().ToArray();
             Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
+
+            repo.Delete(x => x.Id > 0);
         });
 
         DependencyResolver.Current.TryInvokeService<IEFRepositoryFactory<TestDbContext>>(repoFactory =>

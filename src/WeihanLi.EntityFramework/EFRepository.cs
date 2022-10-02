@@ -257,9 +257,8 @@ public class EFRepository<TDbContext, TEntity> :
     private Expression<Func<TEntity, object?>> GetPropertyExpression(string propertyName)
     {
         var parameterExpression = Expression.Parameter(typeof(TEntity), "x");
-        var memberExpression = Expression.PropertyOrField(parameterExpression, propertyName);
-        var memberExpressionConversion = Expression.Convert(memberExpression, typeof(object));
-        var lambda = Expression.Lambda<Func<TEntity, object?>>(memberExpressionConversion, parameterExpression);
+        var memberExpression = Expression.Property(parameterExpression, propertyName);
+        var lambda = Expression.Lambda<Func<TEntity, object?>>(memberExpression, parameterExpression);
         return lambda;
     }
 
