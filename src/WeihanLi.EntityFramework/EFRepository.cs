@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using WeihanLi.Common.Helpers;
 using WeihanLi.Common.Models;
 using WeihanLi.Extensions;
 
@@ -233,7 +234,7 @@ public class EFRepository<TDbContext, TEntity> :
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> expression = c =>
-            c.SetProperty(propertyExpression, _ => (TProperty)value!);
+            c.SetProperty(propertyExpression.Compile(), _ => (TProperty)value!);
         return DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdate(expression);
     }
 
@@ -247,19 +248,11 @@ public class EFRepository<TDbContext, TEntity> :
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
         foreach (var propertyValue in propertyValues)
         {
-            var propertyExp = GetPropertyExpression(propertyValue.Key);
-            setExpression = c => c.SetProperty(propertyExp, _ => propertyValue.Value);
+            var propertyExp = ExpressionHelper.GetPropertySelector<TEntity, object>(propertyValue.Key);
+            setExpression = c => c.SetProperty(propertyExp.Compile(), _ => propertyValue.Value);
         }
 
         return DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdate(setExpression);
-    }
-
-    private Expression<Func<TEntity, object?>> GetPropertyExpression(string propertyName)
-    {
-        var parameterExpression = Expression.Parameter(typeof(TEntity), "x");
-        var memberExpression = Expression.Property(parameterExpression, propertyName);
-        var lambda = Expression.Lambda<Func<TEntity, object?>>(memberExpression, parameterExpression);
-        return lambda;
     }
 
     public int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
@@ -282,7 +275,7 @@ public class EFRepository<TDbContext, TEntity> :
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> expression = c =>
-            c.SetProperty(propertyExpression, _ => (TProperty)value!);
+            c.SetProperty(propertyExpression.Compile(), _ => (TProperty)value!);
         return DbContext.Set<TEntity>().ExecuteUpdateAsync(expression, cancellationToken);
     }
 
@@ -296,8 +289,8 @@ public class EFRepository<TDbContext, TEntity> :
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
         foreach (var propertyValue in propertyValues)
         {
-            var propertyExp = GetPropertyExpression(propertyValue.Key);
-            setExpression = c => c.SetProperty(propertyExp, _ => propertyValue.Value);
+            var propertyExp = ExpressionHelper.GetPropertySelector<TEntity, object>(propertyValue.Key);
+            setExpression = c => c.SetProperty(propertyExp.Compile(), _ => propertyValue.Value);
         }
 
         return await DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdateAsync(setExpression, cancellationToken);
