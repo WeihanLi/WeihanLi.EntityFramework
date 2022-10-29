@@ -245,14 +245,14 @@ public class EFRepository<TDbContext, TEntity> :
             return 0;
         }
 
-        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
-        foreach (var propertyValue in propertyValues)
+        foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
         {
-            var propertyExp = ExpressionHelper.GetPropertySelector<TEntity, object>(propertyValue.Key);
-            setExpression = c => c.SetProperty(propertyExp.Compile(), _ => propertyValue.Value);
+            foreach (var propertyValue in propertyValues)
+            {
+                entity.SetPropertyValue(propertyValue.Key, propertyValue.Value);
+            }
         }
-
-        return DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdate(setExpression);
+        return DbContext.SaveChanges();
     }
 
     public int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
@@ -286,14 +286,14 @@ public class EFRepository<TDbContext, TEntity> :
             return 0;
         }
 
-        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression = _ => _;
-        foreach (var propertyValue in propertyValues)
+        foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
         {
-            var propertyExp = ExpressionHelper.GetPropertySelector<TEntity, object>(propertyValue.Key);
-            setExpression = c => c.SetProperty(propertyExp.Compile(), _ => propertyValue.Value);
+            foreach (var propertyValue in propertyValues)
+            {
+                entity.SetPropertyValue(propertyValue.Key, propertyValue.Value);
+            }
         }
-
-        return await DbContext.Set<TEntity>().Where(whereExpression).ExecuteUpdateAsync(setExpression, cancellationToken);
+        return await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     public virtual int Update(TEntity entity, params Expression<Func<TEntity, object?>>[] propertyExpressions)

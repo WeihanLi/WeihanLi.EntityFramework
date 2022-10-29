@@ -202,12 +202,13 @@ public class Program
             });
 
             repo.Update(x => x.Extra != null, x => x.Extra, new { Date = DateTimeOffset.Now }.ToJson());
+            System.Console.WriteLine("Extra updated");
 
             // TODO: this is not working for now
-            // repo.Update(x => x.Extra != null, new Dictionary<string, object?>()
-            // {
-            //     { "Extra", "12345"}
-            // });
+            repo.Update(x => x.Extra != null, new Dictionary<string, object?>()
+            {
+                { "Extra", "12345"}
+            });
 
             repo.Update(x => x.SetProperty(_ => _.Extra, _ => "{}"), q => q.IgnoreQueryFilters());
 
