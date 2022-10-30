@@ -1,4 +1,4 @@
-# WeihanLi.EntityFramework 
+# WeihanLi.EntityFramework
 
 [![WeihanLi.EntityFramework](https://img.shields.io/nuget/v/WeihanLi.EntityFramework.svg)](https://www.nuget.org/packages/WeihanLi.EntityFramework/)
 
@@ -20,7 +20,9 @@ EntityFramework extensions
 >
 > For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
 >
-> For EF Core 5.x, use 2.0.0 and above
+> For EF Core 5/6, use 2.x
+>
+> For EF 7, use 3.0.0 and above
 
 for more package version details, see package release notes details [here](./docs/ReleaseNotes.md)
 

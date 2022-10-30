@@ -330,3 +330,5 @@ ASALocalRun/
 
 # sqlite db file
 *.db
+*.db-shm
+*.db-wal

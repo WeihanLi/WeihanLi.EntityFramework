@@ -4,56 +4,55 @@ using WeihanLi.Common;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace WeihanLi.EntityFramework.Test
+namespace WeihanLi.EntityFramework.Test;
+
+public class EFRepositoryTest : EFTestBase
 {
-    public class EFRepositoryTest : EFTestBase
+    private readonly ITestOutputHelper _outputHelper;
+    private readonly AsyncLock _lock = new AsyncLock();
+
+    public EFRepositoryTest(EFTestFixture fixture, ITestOutputHelper outputHelper) : base(fixture)
     {
-        private readonly ITestOutputHelper _outputHelper;
-        private readonly AsyncLock _lock = new AsyncLock();
+        _outputHelper = outputHelper;
+    }
 
-        public EFRepositoryTest(EFTestFixture fixture, ITestOutputHelper outputHelper) : base(fixture)
+    [Fact]
+    public void InsertTest()
+    {
+        using (_lock.Lock())
         {
-            _outputHelper = outputHelper;
-        }
-
-        [Fact]
-        public void InsertTest()
-        {
-            using (_lock.Lock())
+            DependencyResolver.TryInvoke<IEFRepository<TestDbContext, TestEntity>>(repo =>
             {
-                DependencyResolver.TryInvoke<IEFRepository<TestDbContext, TestEntity>>(repo =>
-                {
-                    var entity = new TestEntity() { Name = "abc1", CreatedAt = DateTime.UtcNow, Extra = "" };
-                    repo.Insert(entity);
+                var entity = new TestEntity() { Name = "abc1", CreatedAt = DateTime.UtcNow, Extra = "" };
+                repo.Insert(entity);
 
-                    var entities = new[]
-                    {
+                var entities = new[]
+                {
                         new TestEntity() {Name = "abc2", CreatedAt = DateTime.UtcNow, Extra = ""},
                         new TestEntity() {Name = "abc3", CreatedAt = DateTime.UtcNow, Extra = ""}
-                    };
-                    repo.Insert(entities);
-                });
-            }
+                };
+                repo.Insert(entities);
+            });
         }
+    }
 
-        [Fact]
-        public async Task InsertAsyncTest()
+    [Fact]
+    public async Task InsertAsyncTest()
+    {
+        using (await _lock.LockAsync())
         {
-            using (await _lock.LockAsync())
+            await DependencyResolver.TryInvokeAsync<IEFRepository<TestDbContext, TestEntity>>(async repo =>
             {
-                await DependencyResolver.TryInvokeAsync<IEFRepository<TestDbContext, TestEntity>>(async repo =>
-                {
-                    var entity = new TestEntity() { Name = "abc1", CreatedAt = DateTime.UtcNow, Extra = "" };
-                    await repo.InsertAsync(entity);
+                var entity = new TestEntity() { Name = "abc1", CreatedAt = DateTime.UtcNow, Extra = "" };
+                await repo.InsertAsync(entity);
 
-                    var entities = new[]
-                    {
+                var entities = new[]
+                {
                         new TestEntity() {Name = "abc2", CreatedAt = DateTime.UtcNow, Extra = ""},
                         new TestEntity() {Name = "abc3", CreatedAt = DateTime.UtcNow, Extra = ""}
-                    };
-                    await repo.InsertAsync(entities);
-                });
-            }
+                };
+                await repo.InsertAsync(entities);
+            });
         }
     }
 }
