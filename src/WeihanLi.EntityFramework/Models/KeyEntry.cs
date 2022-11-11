@@ -1,11 +1,10 @@
-﻿namespace WeihanLi.EntityFramework.Models
+﻿namespace WeihanLi.EntityFramework.Models;
+
+public class KeyEntry
 {
-    public class KeyEntry
-    {
-        public string PropertyName { get; set; } = null!;
+    public string PropertyName { get; set; } = null!;
 
-        public string ColumnName { get; set; } = null!;
+    public string ColumnName { get; set; } = null!;
 
-        public object? Value { get; set; }
-    }
+    public object? Value { get; set; }
 }

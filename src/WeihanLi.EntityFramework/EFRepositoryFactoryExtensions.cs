@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
-namespace WeihanLi.EntityFramework
+namespace WeihanLi.EntityFramework;
+
+public static class EFRepositoryFactoryExtensions
 {
-    public static class EFRepositoryFactoryExtensions
-    {
-    }
 }
