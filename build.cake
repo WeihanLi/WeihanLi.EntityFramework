@@ -61,7 +61,7 @@ Task("restore")
     .Description("Restore")
     .Does(() => 
     {
-      DotNetCoreRestore(solutionPath);
+      DotNetRestore(solutionPath);
     });
 
 Task("build")    
@@ -70,11 +70,11 @@ Task("build")
     .IsDependentOn("restore")
     .Does(() =>
     {
-      var buildSetting = new DotNetCoreBuildSettings{
+      var buildSetting = new DotNetBuildSettings{
          NoRestore = true,
          Configuration = configuration
       };
-      DotNetCoreBuild(solutionPath, buildSetting);
+      DotNetBuild(solutionPath, buildSetting);
     });
 
 Task("pack")
@@ -82,7 +82,7 @@ Task("pack")
     .IsDependentOn("build")
     .Does(() =>
     {
-      var settings = new DotNetCorePackSettings
+      var settings = new DotNetPackSettings
       {
          Configuration = configuration,
          OutputDirectory = artifacts,
@@ -95,7 +95,7 @@ Task("pack")
       }
       foreach (var project in packProjects)
       {
-         DotNetCorePack(project.FullPath, settings);
+         DotNetPack(project.FullPath, settings);
       }
       PublishArtifacts();
     });
@@ -106,7 +106,7 @@ bool PublishArtifacts(){
    }
    if(branchName == "master" || branchName == "preview" || !string.IsNullOrEmpty(apiKey))
    {
-      var pushSetting =new DotNetCoreNuGetPushSettings
+      var pushSetting =new DotNetNuGetPushSettings
       {
          Source = EnvironmentVariable("Nuget__SourceUrl") ?? "https://api.nuget.org/v3/index.json",
          ApiKey = EnvironmentVariable("Nuget__ApiKey") ?? apiKey
@@ -114,7 +114,7 @@ bool PublishArtifacts(){
       var packages = GetFiles($"{artifacts}/*.nupkg");
       foreach(var package in packages)
       {
-         DotNetCoreNuGetPush(package.FullPath, pushSetting);
+         DotNetNuGetPush(package.FullPath, pushSetting);
       }
       return true;
    }

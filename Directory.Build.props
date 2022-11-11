@@ -5,12 +5,11 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.55</CommonVersion>
-    <EFVersion>7.0.0-rc.2.22472.11</EFVersion>
+    <CommonVersion>1.0.56</CommonVersion>
+    <EFVersion>7.0.0</EFVersion>
 
-    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
