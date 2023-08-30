@@ -188,10 +188,17 @@ public class Program
             db.Database.EnsureCreated();
             var tableName = db.GetTableName<TestEntity>();
 
-            if (db.Database.IsSqlServer())
+            if (db.Database.IsRelational())
             {
                 var conn = db.Database.GetDbConnection();
-                conn.Execute($@"TRUNCATE TABLE {tableName}");
+                try
+                {
+                    conn.Execute($@"TRUNCATE TABLE {tableName}");   
+                }
+                catch
+                {
+                    db.Set<TestEntity>().ExecuteDelete();
+                }
             }
 
             var repo = db.GetRepository<TestDbContext, TestEntity>();
@@ -258,13 +265,13 @@ public class Program
             {
                 Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
                 CreatedAt = DateTime.UtcNow,
-                Id = 1
+                Id = list00[0]
             }, t => t.CreatedAt, t => t.Extra);
 
-            // repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
+            repo.UpdateWithout(new TestEntity() { Id = list00[1], Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
 
             repo.Insert(new[]
-        {
+            {
                     new TestEntity
                     {
                         Extra = new {Name = "Abcdes"}.ToJson(),
@@ -328,10 +335,18 @@ public class Program
         DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
         {
             var tableName = db.GetTableName<TestEntity>();
-            var conn = db.Database.GetDbConnection();
-            conn.Execute($@"
-TRUNCATE TABLE {tableName}
-");
+            if (db.Database.IsRelational())
+            {
+                var conn = db.Database.GetDbConnection();
+                try
+                {
+                    conn.Execute($@"TRUNCATE TABLE {tableName}");   
+                }
+                catch
+                {
+                    db.Set<TestEntity>().ExecuteDelete();
+                }
+            }
         });
     }
 }
