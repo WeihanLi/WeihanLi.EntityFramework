@@ -98,7 +98,7 @@ public class EFUnitOfWorkTest : EFTestBase
                 entity = repo.Find(2);
                 Assert.Equal(new string('2', 6), entity.Name);
 
-                Assert.Equal(1, repo.Delete(1));
+                Assert.Equal(1, repo.Delete(new object[]{1}));
             }
         }
         finally
