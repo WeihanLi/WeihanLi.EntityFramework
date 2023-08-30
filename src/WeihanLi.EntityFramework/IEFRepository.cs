@@ -44,7 +44,7 @@ public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
     /// </summary>
     /// <param name="keyValues">keyValues</param>
     /// <returns>affected rows</returns>
-    int Delete(params object[] keyValues);
+    int Delete(object[] keyValues);
 
     /// <summary>
     /// Delete a entity

@@ -34,7 +34,7 @@ public class EFRepository<TDbContext, TEntity> :
         return await DbContext.FindAsync<TEntity>(keyValues);
     }
 
-    public int Delete(params object[] keyValues)
+    public int Delete(object[] keyValues)
     {
         var entity = DbContext.Find<TEntity>(keyValues);
         if (null == entity)
