@@ -194,7 +194,7 @@ public class Program
                 var conn = db.Database.GetDbConnection();
                 try
                 {
-                    conn.Execute($@"TRUNCATE TABLE {tableName}");   
+                    conn.Execute($@"TRUNCATE TABLE {tableName}");
                 }
                 catch
                 {
@@ -341,7 +341,7 @@ public class Program
                 var conn = db.Database.GetDbConnection();
                 try
                 {
-                    conn.Execute($@"TRUNCATE TABLE {tableName}");   
+                    conn.Execute($@"TRUNCATE TABLE {tableName}");
                 }
                 catch
                 {
