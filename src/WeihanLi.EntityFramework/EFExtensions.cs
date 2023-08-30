@@ -181,7 +181,7 @@ public static class EFExtensions
         return services;
     }
 
-    public static EntityTypeBuilder<TEntity> WithSoftDeleteFilter<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder) 
+    public static EntityTypeBuilder<TEntity> WithSoftDeleteFilter<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder)
         where TEntity : class, ISoftDeleteEntityWithDeleted
     {
         ArgumentNullException.ThrowIfNull(entityTypeBuilder);
