@@ -12,31 +12,32 @@ using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
 using WeihanLi.Common.Services;
 using WeihanLi.EntityFramework.Audit;
+using WeihanLi.EntityFramework.Interceptors;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Sample;
 
 public class Program
 {
-    private const string DbConnectionString =
-            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
-
     public static void Main(string[] args)
     {
-        var loggerFactory = new LoggerFactory();
-        loggerFactory.AddLog4Net();
+        SoftDeleteTest();
+        Console.ReadLine();
 
         var services = new ServiceCollection();
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddConsole();
+        });
         services.AddDbContext<TestDbContext>(options =>
         {
             options
-                .UseLoggerFactory(loggerFactory)
                 //.EnableDetailedErrors()
                 //.EnableSensitiveDataLogging()
                 //.UseInMemoryDatabase("Tests")
                 .UseSqlite("Data Source=Test.db")
                 .AddInterceptors(new AuditInterceptor())
-                //.UseSqlServer(DbConnectionString)
+                //.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;")
                 ;
         });
         //services.AddProxyDbContext<TestDbContext>(options =>
@@ -79,7 +80,7 @@ public class Program
         //});
         DependencyResolver.SetDependencyResolver(services);
 
-        RepositoryTest();
+        // RepositoryTest();
         // AutoAuditTest();
 
         Console.WriteLine("completed");
@@ -188,10 +189,17 @@ public class Program
             db.Database.EnsureCreated();
             var tableName = db.GetTableName<TestEntity>();
 
-            if (db.Database.IsSqlServer())
+            if (db.Database.IsRelational())
             {
                 var conn = db.Database.GetDbConnection();
-                conn.Execute($@"TRUNCATE TABLE {tableName}");
+                try
+                {
+                    conn.Execute($@"TRUNCATE TABLE {tableName}");
+                }
+                catch
+                {
+                    db.Set<TestEntity>().ExecuteDelete();
+                }
             }
 
             var repo = db.GetRepository<TestDbContext, TestEntity>();
@@ -258,13 +266,13 @@ public class Program
             {
                 Extra = new { Name = "Abcde", Count = 4 }.ToJson(),
                 CreatedAt = DateTime.UtcNow,
-                Id = 1
+                Id = list00[0]
             }, t => t.CreatedAt, t => t.Extra);
 
-            // repo.UpdateWithout(new TestEntity() { Id = 2, Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
+            repo.UpdateWithout(new TestEntity() { Id = list00[1], Extra = new { Name = "ADDDDD" }.ToJson() }, x => x.CreatedAt);
 
             repo.Insert(new[]
-        {
+            {
                     new TestEntity
                     {
                         Extra = new {Name = "Abcdes"}.ToJson(),
@@ -328,10 +336,55 @@ public class Program
         DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
         {
             var tableName = db.GetTableName<TestEntity>();
-            var conn = db.Database.GetDbConnection();
-            conn.Execute($@"
-TRUNCATE TABLE {tableName}
-");
+            if (db.Database.IsRelational())
+            {
+                var conn = db.Database.GetDbConnection();
+                try
+                {
+                    conn.Execute($@"TRUNCATE TABLE {tableName}");
+                }
+                catch
+                {
+                    db.Set<TestEntity>().ExecuteDelete();
+                }
+            }
         });
+    }
+
+    private static void SoftDeleteTest()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddConsole();
+        });
+        services.AddDbContext<SoftDeleteSampleContext>(options =>
+        {
+            options
+                .UseSqlite("Data Source=SoftDeleteTest.db")
+                .AddInterceptors(new SoftDeleteInterceptor());
+        });
+        using var serviceProvider = services.BuildServiceProvider();
+        var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SoftDeleteSampleContext>();
+        context.Database.EnsureCreated();
+        context.TestEntities.IgnoreQueryFilters().ExecuteDelete();
+        context.SaveChanges();
+        context.TestEntities.Add(new SoftDeleteEntity()
+        {
+            Id = 1,
+            Name = "test"
+        });
+        context.SaveChanges();
+
+        var testEntity = context.TestEntities.Find(1);
+        ArgumentNullException.ThrowIfNull(testEntity);
+        context.TestEntities.Remove(testEntity);
+        context.SaveChanges();
+
+        var entities = context.TestEntities.AsNoTracking().ToArray();
+        Console.WriteLine(entities.ToJson());
+
+        context.Database.EnsureDeleted();
     }
 }

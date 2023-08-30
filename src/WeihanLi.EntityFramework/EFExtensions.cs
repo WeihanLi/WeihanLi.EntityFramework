@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using WeihanLi.Common.Models;
 using WeihanLi.EntityFramework.Audit;
-using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework;
@@ -180,6 +181,13 @@ public static class EFExtensions
         return services;
     }
 
+    public static EntityTypeBuilder<TEntity> WithSoftDeleteFilter<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder)
+        where TEntity : class, ISoftDeleteEntityWithDeleted
+    {
+        ArgumentNullException.ThrowIfNull(entityTypeBuilder);
+        return entityTypeBuilder.HasQueryFilter(x => x.IsDeleted == false);
+    }
+
     private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity, out bool existBefore)
   where TEntity : class
     {
@@ -189,7 +197,7 @@ public static class EFExtensions
         var key = entityType?.FindPrimaryKey();
         if (key is null)
         {
-            throw new InvalidOperationException($"Type {type.FullName} had no primark key");
+            throw new InvalidOperationException($"Type {type.FullName} had no primary key");
         }
 
         var keysGetter = key.Properties

@@ -1,6 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../../build/common.props" />
-  <PropertyGroup>
+  <PropertyGroup>        
+    <TargetFramework>net6.0</TargetFramework>
+    <Title>WeihanLi.EntityFramework</Title>
+    <PackageId>WeihanLi.EntityFramework</PackageId>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>    
+    <PackageProjectUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</PackageProjectUrl>
+    <PackageTags>ef efcore entityframework entityframeworkcore</PackageTags>
+    <Description>EntityFramework Extensions</Description>
+    <PackageReleaseNotes>
+        https://github.com/WeihanLi/WeihanLi.EntityFramework/tree/dev/docs/ReleaseNotes.md
+    </PackageReleaseNotes>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
   <ItemGroup>
