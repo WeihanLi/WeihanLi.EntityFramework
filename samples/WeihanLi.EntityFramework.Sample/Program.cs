@@ -23,14 +23,14 @@ public class Program
 
     public static void Main(string[] args)
     {
-        var loggerFactory = new LoggerFactory();
-        loggerFactory.AddLog4Net();
-
         var services = new ServiceCollection();
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddConsole();
+        });
         services.AddDbContext<TestDbContext>(options =>
         {
             options
-                .UseLoggerFactory(loggerFactory)
                 //.EnableDetailedErrors()
                 //.EnableSensitiveDataLogging()
                 //.UseInMemoryDatabase("Tests")
