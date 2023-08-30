@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Data;
@@ -178,6 +179,13 @@ public static class EFExtensions
 
         AuditConfig.Configure(configAction);
         return services;
+    }
+
+    public static EntityTypeBuilder<TEntity> WithSoftDeleteFilter<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder) 
+        where TEntity : class, ISoftDeleteEntityWithDeleted
+    {
+        ArgumentNullException.ThrowIfNull(entityTypeBuilder);
+        return entityTypeBuilder.HasQueryFilter(x => x.IsDeleted == false);
     }
 
     private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity, out bool existBefore)
