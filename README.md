@@ -6,7 +6,7 @@
 
 [![Pipeline Build Status](https://weihanli.visualstudio.com/Pipelines/_apis/build/status/WeihanLi.WeihanLi.EntityFramework?branchName=dev)](https://weihanli.visualstudio.com/Pipelines/_build/latest?definitionId=11&branchName=dev)
 
-![Github Build Status](https://github.com/WeihanLi/WeihanLi.EntityFramework/workflows/dotnetcore/badge.svg)
+![Github Build Status](https://github.com/WeihanLi/WeihanLi.EntityFramework/workflows/default/badge.svg)
 
 ## Intro
 
