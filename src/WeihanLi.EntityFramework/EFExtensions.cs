@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using WeihanLi.Common.Models;
 using WeihanLi.EntityFramework.Audit;
-using WeihanLi.EntityFramework.Models;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework;
@@ -189,7 +189,7 @@ public static class EFExtensions
         var key = entityType?.FindPrimaryKey();
         if (key is null)
         {
-            throw new InvalidOperationException($"Type {type.FullName} had no primark key");
+            throw new InvalidOperationException($"Type {type.FullName} had no primary key");
         }
 
         var keysGetter = key.Properties
