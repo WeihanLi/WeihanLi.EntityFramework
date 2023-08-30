@@ -7,7 +7,7 @@ using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Interceptors;
 
-public sealed class SoftDeleteInterceptor: SaveChangesInterceptor
+public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
