@@ -9,9 +9,9 @@ using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Audit;
 
-public class AuditInterceptor : SaveChangesInterceptor
+public sealed class AuditInterceptor : SaveChangesInterceptor
 {
-    protected List<AuditEntry>? AuditEntries { get; set; }
+    private List<AuditEntry>? AuditEntries { get; set; }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -26,7 +26,7 @@ public class AuditInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    protected virtual void PreSaveChanges(DbContext dbContext)
+    private void PreSaveChanges(DbContext dbContext)
     {
         if (AuditConfig.AuditConfigOptions.AuditEnabled && AuditConfig.AuditConfigOptions.Stores.Count > 0)
         {
@@ -55,7 +55,7 @@ public class AuditInterceptor : SaveChangesInterceptor
         }
     }
 
-    protected virtual async Task PostSaveChanges()
+    private async Task PostSaveChanges()
     {
         if (AuditEntries is { Count: > 0 })
         {
@@ -64,7 +64,7 @@ public class AuditInterceptor : SaveChangesInterceptor
                 if (entry is InternalAuditEntry auditEntry)
                 {
                     // update TemporaryProperties
-                    if (auditEntry.TemporaryProperties != null && auditEntry.TemporaryProperties.Count > 0)
+                    if (auditEntry.TemporaryProperties is { Count: > 0 })
                     {
                         foreach (var temporaryProperty in auditEntry.TemporaryProperties)
                         {
