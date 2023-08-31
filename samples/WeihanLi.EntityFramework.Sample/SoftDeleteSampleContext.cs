@@ -13,7 +13,7 @@ public class SoftDeleteSampleContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SoftDeleteEntity>().WithSoftDeleteFilter();
+        modelBuilder.Entity<SoftDeleteEntity>().HasQueryFilter(x => x.IsDeleted == false);
         base.OnModelCreating(modelBuilder);
     }
 }
