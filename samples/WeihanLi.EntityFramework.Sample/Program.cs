@@ -23,7 +23,7 @@ public class Program
     {
         SoftDeleteTest();
         Console.ReadLine();
-        
+
         var services = new ServiceCollection();
         services.AddLogging(loggingBuilder =>
         {
@@ -377,7 +377,7 @@ public class Program
         context.TestEntities.Add(new SoftDeleteEntity()
         {
             Id = 1,
-            Name = "test" 
+            Name = "test"
         });
         context.SaveChanges();
 
