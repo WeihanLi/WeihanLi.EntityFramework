@@ -372,7 +372,7 @@ public class Program
         // delete all in case of before db not got clean up
         context.TestEntities.IgnoreQueryFilters().ExecuteDelete();
         context.SaveChanges();
-        
+
         // add test data
         context.TestEntities.Add(new SoftDeleteEntity()
         {
@@ -390,7 +390,7 @@ public class Program
         // get all data
         var entities = context.TestEntities.AsNoTracking().ToArray();
         Console.WriteLine(entities.ToJson());
-        
+
         // get all data without global query filter
         entities = context.TestEntities.AsNoTracking().IgnoreQueryFilters().ToArray();
         Console.WriteLine(entities.ToJson());
