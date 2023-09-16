@@ -18,10 +18,7 @@ internal sealed class EFRepositoryGenerator : IEFRepositoryGenerator
     public string GenerateRepositoryCodeTextFor<TDbContext>(string repositoryNamespace) where TDbContext : DbContext
     {
         var dbContextType = typeof(TDbContext);
-        var entities = dbContextType.GetProperties()
-            .Where(p => p.PropertyType.IsGenericType && typeof(DbSet<>) == p.PropertyType.GetGenericTypeDefinition())
-            .ToArray()
-            ;
+        var entities = InternalHelper.GetDbContextSets(dbContextType);
 
         var modelNamespaces = entities.Select(p => p.PropertyType.GetGenericArguments()[0].Namespace).Distinct().ToList();
         modelNamespaces.AddIfNotContains(dbContextType.Namespace);
