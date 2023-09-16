@@ -44,6 +44,10 @@ EntityFramework extensions
 - Audit
 
   - Auto auditing for entity changes
+ 
+- Soft Delete
+
+  - Soft delete for specific entity
 
 - Extensions
 
