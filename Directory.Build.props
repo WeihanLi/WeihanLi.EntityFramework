@@ -5,8 +5,8 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.60-preview-20230913-003854</CommonVersion>
-    <EFVersion>8.0.0-rc.1.23419.6</EFVersion>
+    <CommonVersion>1.0.60-preview-20231011-104232</CommonVersion>
+    <EFVersion>8.0.0-rc.2.23480.1</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
