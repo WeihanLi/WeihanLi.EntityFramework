@@ -233,9 +233,10 @@ public class EFRepository<TDbContext, TEntity> :
     public virtual int Update<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object? value)
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
+        var entityType = typeof(TEntity);
         foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
         {
-            entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
+            entityType.GetProperty(propertyExpression.GetMemberName())?.GetValueSetter<TEntity>()?.Invoke(entity, value);
         }
         return DbContext.SaveChanges();
     }
@@ -247,11 +248,13 @@ public class EFRepository<TDbContext, TEntity> :
             return 0;
         }
 
+        var entityType = typeof(TEntity);
+
         foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
         {
             foreach (var propertyValue in propertyValues)
             {
-                entity.SetPropertyValue(propertyValue.Key, propertyValue.Value);
+                entityType.GetProperty(propertyValue.Key)?.GetValueSetter<TEntity>()?.Invoke(entity, propertyValue.Value);
             }
         }
         return DbContext.SaveChanges();
@@ -275,9 +278,10 @@ public class EFRepository<TDbContext, TEntity> :
     }
     public virtual Task<int> UpdateAsync<TProperty>(Expression<Func<TEntity, bool>> whereExpression, Expression<Func<TEntity, TProperty>> propertyExpression, object? value, CancellationToken cancellationToken = default)
     {
+        var entityType = typeof(TEntity);
         foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
         {
-            entity.SetPropertyValue(propertyExpression.GetMemberName(), value);
+            entityType.GetProperty(propertyExpression.GetMemberName())?.GetValueSetter<TEntity>()?.Invoke(entity, value);
         }
         return DbContext.SaveChangesAsync(cancellationToken);
     }
@@ -289,11 +293,12 @@ public class EFRepository<TDbContext, TEntity> :
             return 0;
         }
 
+        var entityType = typeof(TEntity);
         foreach (var entity in DbContext.Set<TEntity>().Where(whereExpression))
         {
             foreach (var propertyValue in propertyValues)
             {
-                entity.SetPropertyValue(propertyValue.Key, propertyValue.Value);
+                entityType.GetProperty(propertyValue.Key)?.GetValueSetter<TEntity>()?.Invoke(entity, propertyValue.Value);
             }
         }
         return await DbContext.SaveChangesAsync(cancellationToken);

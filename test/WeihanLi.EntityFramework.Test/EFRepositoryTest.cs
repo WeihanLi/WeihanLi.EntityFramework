@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using WeihanLi.Common;
+using WeihanLi.Common.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 

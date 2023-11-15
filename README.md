@@ -23,8 +23,8 @@ EntityFramework extensions
 > For EF Core 5/6, use 2.x
 >
 > For EF 7, use 3.0.0 and above
-
-for more package version details, see package release notes details [here](./docs/ReleaseNotes.md)
+>
+> For EF 8 and above, use 8.x or above major-version match versions
 
 ## Features
 
@@ -43,12 +43,16 @@ for more package version details, see package release notes details [here](./doc
 
 - Audit
 
-  - auto audit for entity change
+  - Auto auditing for entity changes
+ 
+- Soft Delete
+
+  - Soft delete for specific entity
 
 - Extensions
 
-  - Update specific column `Update`
-  - Update without specific column `UpdateWithout`
+  - Update specific column(s) `Update`
+  - Update without specific column(s) `UpdateWithout`
 
 ## Contact
 

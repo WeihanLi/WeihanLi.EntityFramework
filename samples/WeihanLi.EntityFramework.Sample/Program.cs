@@ -367,9 +367,13 @@ public class Program
         using var serviceProvider = services.BuildServiceProvider();
         var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SoftDeleteSampleContext>();
+        // initialize
         context.Database.EnsureCreated();
+        // delete all in case of before db not got clean up
         context.TestEntities.IgnoreQueryFilters().ExecuteDelete();
         context.SaveChanges();
+
+        // add test data
         context.TestEntities.Add(new SoftDeleteEntity()
         {
             Id = 1,
@@ -377,12 +381,18 @@ public class Program
         });
         context.SaveChanges();
 
+        // remove data test
         var testEntity = context.TestEntities.Find(1);
         ArgumentNullException.ThrowIfNull(testEntity);
         context.TestEntities.Remove(testEntity);
         context.SaveChanges();
 
+        // get all data
         var entities = context.TestEntities.AsNoTracking().ToArray();
+        Console.WriteLine(entities.ToJson());
+
+        // get all data without global query filter
+        entities = context.TestEntities.AsNoTracking().IgnoreQueryFilters().ToArray();
         Console.WriteLine(entities.ToJson());
 
         context.Database.EnsureDeleted();
