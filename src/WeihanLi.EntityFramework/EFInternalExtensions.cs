@@ -9,7 +9,7 @@ public static class EFInternalExtensions
     public static string GetColumnName(this PropertyEntry propertyEntry)
     {
         var storeObjectId =
-            StoreObjectIdentifier.Create(propertyEntry.Metadata.DeclaringEntityType, StoreObjectType.Table);
+            StoreObjectIdentifier.Create(propertyEntry.Metadata.DeclaringType, StoreObjectType.Table);
         return propertyEntry.Metadata.GetColumnName(storeObjectId.GetValueOrDefault()) ?? propertyEntry.Metadata.Name;
     }
 }

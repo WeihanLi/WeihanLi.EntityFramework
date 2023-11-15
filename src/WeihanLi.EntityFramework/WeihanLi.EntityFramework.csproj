@@ -5,7 +5,7 @@
     <PackageId>WeihanLi.EntityFramework</PackageId>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>    
     <PackageProjectUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</PackageProjectUrl>
-    <PackageTags>ef efcore entityframework entityframeworkcore</PackageTags>
+    <PackageTags>WeihanLi;ef;efcore;entityframework;entityframeworkcore</PackageTags>
     <Description>EntityFramework Extensions</Description>
     <PackageReleaseNotes>
         https://github.com/WeihanLi/WeihanLi.EntityFramework/tree/dev/docs/ReleaseNotes.md
