@@ -24,7 +24,7 @@ public class EFRepositoryQueryBuilder<TEntity> where TEntity : class
         _whereExpression.Add(Guard.NotNull(predict));
         return this;
     }
-    
+
     public EFRepositoryQueryBuilder<TEntity> WithPredictIf(Expression<Func<TEntity, bool>> predict, bool condition)
     {
         if (condition)
