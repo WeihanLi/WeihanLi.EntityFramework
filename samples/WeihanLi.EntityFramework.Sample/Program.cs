@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WeihanLi.Common;
 using WeihanLi.Common.Data;
@@ -222,6 +223,9 @@ public class Program
 
             var abc = db.TestEntities.AsNoTracking().ToArray();
             Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
+
+            var data = repo.Query(q => q.WithPredictIf(f => f.Id > 0, false)).ToArray();
+            Console.WriteLine(JsonSerializer.Serialize(data));
 
             repo.Delete(x => x.Id > 0);
         });
