@@ -14,6 +14,10 @@ EntityFramework extensions
 
 ## Package Release Notes
 
+See PRs for details
+
+https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged+base%3Amaster
+
 > Package Versions
 >
 > For EF Core 2.x , use 1.4.x and below
