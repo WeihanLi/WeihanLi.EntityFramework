@@ -30,7 +30,7 @@ public class Program
         {
             loggingBuilder.AddConsole();
         });
-        services.AddDbContext<TestDbContext>(options =>
+        services.AddDbContext<TestDbContext>((provider, options) =>
         {
             options
                 //.EnableDetailedErrors()
@@ -362,15 +362,23 @@ public class Program
         {
             loggingBuilder.AddConsole();
         });
-        services.AddDbContext<SoftDeleteSampleContext>(options =>
+        
+        services.AddSingleton<IUserIdProvider, EnvironmentUserIdProvider>();
+        services.AddSingleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>();
+        services.AddSingleton<IEntitySavingHandler, UpdatedAtEntityFieldSavingHandler>();
+        services.AddSingleton<IEntitySavingHandler, UpdatedByEntityFieldSavingHandler>();
+        services.AddScoped<AutoUpdateInterceptor>();
+        
+        services.AddDbContext<SoftDeleteSampleContext>((provider, options) =>
         {
             options
                 .UseSqlite("Data Source=SoftDeleteTest.db")
-                .AddInterceptors(new SoftDeleteInterceptor());
+                .AddInterceptors(provider.GetRequiredService<AutoUpdateInterceptor>());
         });
         using var serviceProvider = services.BuildServiceProvider();
         var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SoftDeleteSampleContext>();
+        context.Database.EnsureDeleted();
         // initialize
         context.Database.EnsureCreated();
         // delete all in case of before db not got clean up
@@ -390,7 +398,20 @@ public class Program
         ArgumentNullException.ThrowIfNull(testEntity);
         context.TestEntities.Remove(testEntity);
         context.SaveChanges();
-
+        
+        
+        context.TestEntities2.Add(new SoftDeleteEntity2()
+        {
+            Id = 1,
+            Name = "test"
+        });
+        context.SaveChanges();
+        var testEntities = context.TestEntities2.AsNoTracking().ToArray();
+        var testEntity2 = context.TestEntities2.Find(1);
+        ArgumentNullException.ThrowIfNull(testEntity2);
+        context.TestEntities2.Remove(testEntity2);
+        context.SaveChanges();
+        
         // get all data
         var entities = context.TestEntities.AsNoTracking().ToArray();
         Console.WriteLine(entities.ToJson());
