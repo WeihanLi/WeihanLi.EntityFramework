@@ -362,13 +362,13 @@ public class Program
         {
             loggingBuilder.AddConsole();
         });
-        
+
         services.AddSingleton<IUserIdProvider, EnvironmentUserIdProvider>();
         services.AddSingleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>();
         services.AddSingleton<IEntitySavingHandler, UpdatedAtEntityFieldSavingHandler>();
         services.AddSingleton<IEntitySavingHandler, UpdatedByEntityFieldSavingHandler>();
         services.AddScoped<AutoUpdateInterceptor>();
-        
+
         services.AddDbContext<SoftDeleteSampleContext>((provider, options) =>
         {
             options
@@ -398,8 +398,8 @@ public class Program
         ArgumentNullException.ThrowIfNull(testEntity);
         context.TestEntities.Remove(testEntity);
         context.SaveChanges();
-        
-        
+
+
         context.TestEntities2.Add(new SoftDeleteEntity2()
         {
             Id = 1,
@@ -411,7 +411,7 @@ public class Program
         ArgumentNullException.ThrowIfNull(testEntity2);
         context.TestEntities2.Remove(testEntity2);
         context.SaveChanges();
-        
+
         // get all data
         var entities = context.TestEntities.AsNoTracking().ToArray();
         Console.WriteLine(entities.ToJson());
