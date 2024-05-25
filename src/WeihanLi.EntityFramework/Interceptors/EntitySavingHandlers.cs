@@ -14,7 +14,7 @@ public sealed class SoftDeleteEntitySavingHandler : IEntitySavingHandler
     public const string DefaultIsDeletedPropertyName = "IsDeleted";
     public void Handle(EntityEntry entityEntry)
     {
-        if (entityEntry is not { State: EntityState.Deleted, Entity: ISoftDeleteEntity }) 
+        if (entityEntry is not { State: EntityState.Deleted, Entity: ISoftDeleteEntity })
             return;
 
         if (entityEntry.Entity is ISoftDeleteEntityWithDeleted softDeleteEntityWithDeleted)
