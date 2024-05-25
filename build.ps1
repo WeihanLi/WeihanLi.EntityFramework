@@ -3,6 +3,6 @@
 # Install dotnet tool
 dotnet tool install --global dotnet-execute
 
-Write-Host "dotnet-exec $SCRIPT $ARGS --debug" -ForegroundColor GREEN
+Write-Host "dotnet-exec $SCRIPT --args $ARGS" -ForegroundColor GREEN
  
-dotnet-exec $SCRIPT $ARGS
+dotnet-exec $SCRIPT --args $ARGS
