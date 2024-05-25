@@ -1,11 +1,8 @@
-[string]$SCRIPT       = '.\build.cake'
+[string]$SCRIPT = '.\build\build.cs'
  
-# Install cake.tool
-dotnet tool install --global cake.tool
+# Install dotnet tool
+dotnet tool install --global dotnet-execute
 
-# Start Cake
-[string]$CAKE_ARGS = "--verbosity=diagnostic"
-
-Write-Host "dotnet cake $SCRIPT $CAKE_ARGS $ARGS" -ForegroundColor GREEN
+Write-Host "dotnet-exec $SCRIPT $ARGS --debug" -ForegroundColor GREEN
  
-dotnet cake $SCRIPT $CAKE_ARGS $ARGS
+dotnet-exec $SCRIPT $ARGS
