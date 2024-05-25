@@ -28,7 +28,7 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
 >
 > For EF 7, use 3.0.0 and above
 >
-> For EF 8 and above, use 8.x or above major-version match versions
+> For EF 8 and above, use 8.x or above major-version matched versions
 
 ## Features
 
@@ -49,9 +49,10 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
 
   - Auto auditing for entity changes
  
-- Soft Delete
+- AutoUpdate
 
   - Soft delete for specific entity
+  - Auto update CreatedAt/UpdatedAt/CreatedBy/UpdatedBy
 
 - Extensions
 
