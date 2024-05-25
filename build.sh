@@ -5,6 +5,6 @@ SCRIPT='./build/build.cs'
 dotnet tool install --global dotnet-execute
 export PATH="$PATH:$HOME/.dotnet/tools"
 
-echo "dotnet-exec $SCRIPT --args $@"
+echo "dotnet-exec $SCRIPT --args=$@"
 
-dotnet-exec $EXEC_ARGS --args "$@"
+dotnet-exec $SCRIPT --args="$@"
