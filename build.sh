@@ -1,13 +1,10 @@
 #!/bin/sh
-SCRIPT='./build.cake'
+SCRIPT='./build/build.cs'
 
-# Install  cake.tool
-dotnet tool install --global cake.tool
+# Install tool
+dotnet tool install --global dotnet-execute
 export PATH="$PATH:$HOME/.dotnet/tools"
 
-# Start Cake
-CAKE_ARGS="$SCRIPT --verbosity=diagnostic"
+echo "dotnet-exec $SCRIPT --args=$@"
 
-echo "dotnet cake $CAKE_ARGS $@"
-
-dotnet cake $CAKE_ARGS "$@"
+dotnet-exec $SCRIPT --args="$@"

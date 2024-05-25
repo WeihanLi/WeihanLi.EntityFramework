@@ -1,14 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Interceptors;
 
-public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
+public interface IEntitySavingHandler
 {
+    void Handle(EntityEntry entityEntry);
+}
+
+public sealed class AutoUpdateInterceptor(IEnumerable<IEntitySavingHandler> handlers) : SaveChangesInterceptor
+{
+    private readonly IEntitySavingHandler[] _handlers = handlers.ToArray();
+
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         OnSavingChanges(eventData);
@@ -22,24 +30,15 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private static void OnSavingChanges(DbContextEventData eventData)
+    private void OnSavingChanges(DbContextEventData eventData)
     {
         ArgumentNullException.ThrowIfNull(eventData.Context);
         eventData.Context.ChangeTracker.DetectChanges();
         foreach (var entityEntry in eventData.Context.ChangeTracker.Entries())
         {
-            if (entityEntry is { State: EntityState.Deleted, Entity: ISoftDeleteEntityWithDeleted softDeleteEntity })
+            foreach (var handler in _handlers)
             {
-                foreach (var property in entityEntry.Properties)
-                {
-                    property.IsModified = false;
-                }
-                softDeleteEntity.IsDeleted = true;
-                entityEntry.State = EntityState.Modified;
-                foreach (var property in entityEntry.Properties)
-                {
-                    property.IsModified = property.Metadata.Name == SoftDeleteEntitySavingHandler.DefaultIsDeletedPropertyName;
-                }
+                handler.Handle(entityEntry);
             }
         }
     }

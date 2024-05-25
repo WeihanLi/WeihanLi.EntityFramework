@@ -4,9 +4,10 @@
   
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.63</CommonVersion>
-    <EFVersion>8.0.3</EFVersion>
+    <CommonVersion>1.0.65</CommonVersion>
+    <EFVersion>8.0.5</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
