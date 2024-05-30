@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CommonVersion>1.0.65</CommonVersion>
-    <EFVersion>8.0.5</EFVersion>
+    <EFVersion>8.0.6</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
