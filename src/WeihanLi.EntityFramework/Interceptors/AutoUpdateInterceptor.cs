@@ -33,7 +33,6 @@ public sealed class AutoUpdateInterceptor(IEnumerable<IEntitySavingHandler> hand
     private void OnSavingChanges(DbContextEventData eventData)
     {
         ArgumentNullException.ThrowIfNull(eventData.Context);
-        eventData.Context.ChangeTracker.DetectChanges();
         foreach (var entityEntry in eventData.Context.ChangeTracker.Entries())
         {
             foreach (var handler in _handlers)
