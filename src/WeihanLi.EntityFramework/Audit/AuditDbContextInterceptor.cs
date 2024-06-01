@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Models;
 
@@ -17,16 +13,18 @@ public sealed class AuditDbContextInterceptor : IInterceptor
             var auditEntries = new List<AuditEntry>();
             foreach (var entityEntry in dbContext.ChangeTracker.Entries())
             {
-                if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
+                if (entityEntry.State is EntityState.Detached or EntityState.Unchanged)
                 {
                     continue;
                 }
+                
                 if (AuditConfig.AuditConfigOptions.EntityFilters
                     .Any(entityFilter =>
                         entityFilter.Invoke(entityEntry) == false))
                 {
                     continue;
                 }
+                
                 auditEntries.Add(new InternalAuditEntry(entityEntry));
             }
             await next();

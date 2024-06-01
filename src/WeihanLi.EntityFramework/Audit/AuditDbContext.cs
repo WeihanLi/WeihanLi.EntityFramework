@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WeihanLi.Common.Models;
 using WeihanLi.Extensions;
 
@@ -46,42 +42,39 @@ public abstract class AuditDbContextBase : DbContextBase
 
     protected override async Task AfterSaveChanges()
     {
-        if (null != AuditEntries && AuditEntries.Count > 0)
+        if (AuditEntries is { Count: > 0 })
         {
             foreach (var entry in AuditEntries)
             {
-                if (entry is InternalAuditEntry auditEntry)
-                {
+                if (entry is InternalAuditEntry { TemporaryProperties.Count: > 0 } auditEntry)
                     // update TemporaryProperties
-                    if (auditEntry.TemporaryProperties != null && auditEntry.TemporaryProperties.Count > 0)
+                {
+                    foreach (var temporaryProperty in auditEntry.TemporaryProperties)
                     {
-                        foreach (var temporaryProperty in auditEntry.TemporaryProperties)
+                        var colName = temporaryProperty.GetColumnName();
+                        if (temporaryProperty.Metadata.IsPrimaryKey())
                         {
-                            var colName = temporaryProperty.GetColumnName();
-                            if (temporaryProperty.Metadata.IsPrimaryKey())
-                            {
-                                auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
-                            }
-
-                            switch (auditEntry.OperationType)
-                            {
-                                case DataOperationType.Add:
-                                    auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
-                                    break;
-
-                                case DataOperationType.Delete:
-                                    auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
-                                    break;
-
-                                case DataOperationType.Update:
-                                    auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
-                                    auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
-                                    break;
-                            }
+                            auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
                         }
-                        // set to null
-                        auditEntry.TemporaryProperties = null;
+
+                        switch (auditEntry.OperationType)
+                        {
+                            case DataOperationType.Add:
+                                auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
+                                break;
+
+                            case DataOperationType.Delete:
+                                auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                break;
+
+                            case DataOperationType.Update:
+                                auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
+                                break;
+                        }
                     }
+                    // set to null
+                    auditEntry.TemporaryProperties = null;
                 }
 
                 // apply enricher
@@ -90,7 +83,7 @@ public abstract class AuditDbContextBase : DbContextBase
                     enricher.Enrich(entry);
                 }
 
-                entry.UpdatedAt = DateTimeOffset.UtcNow;
+                entry.UpdatedAt = DateTimeOffset.Now;
                 entry.UpdatedBy = AuditConfig.AuditConfigOptions.UserIdProvider
                     ?.GetUserId();
             }
@@ -117,28 +110,29 @@ public abstract class AuditDbContext : AuditDbContextBase
 
     protected override Task BeforeSaveChanges()
     {
-        if (AuditConfig.AuditConfigOptions.AuditEnabled)
+        if (!AuditConfig.AuditConfigOptions.AuditEnabled) return Task.CompletedTask;
+        
+        AuditEntries = new List<AuditEntry>();
+        foreach (var entityEntry in ChangeTracker.Entries())
         {
-            AuditEntries = new List<AuditEntry>();
-            foreach (var entityEntry in ChangeTracker.Entries())
+            if (entityEntry.State is EntityState.Detached or EntityState.Unchanged)
             {
-                if (entityEntry.State == EntityState.Detached
-                    || entityEntry.State == EntityState.Unchanged)
-                {
-                    continue;
-                }
-                if (entityEntry.Entity.GetType() == typeof(AuditRecord))
-                {
-                    continue;
-                }
-                //entityFilters
-                if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
-                    entityFilter.Invoke(entityEntry) == false))
-                {
-                    continue;
-                }
-                AuditEntries.Add(new InternalAuditEntry(entityEntry));
+                continue;
             }
+            
+            if (entityEntry.Entity is AuditRecord)
+            {
+                continue;
+            }
+            
+            //entityFilters
+            if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
+                    entityFilter.Invoke(entityEntry) == false))
+            {
+                continue;
+            }
+            
+            AuditEntries.Add(new InternalAuditEntry(entityEntry));
         }
 
         return Task.CompletedTask;
