@@ -47,7 +47,7 @@ public abstract class AuditDbContextBase : DbContextBase
             foreach (var entry in AuditEntries)
             {
                 if (entry is InternalAuditEntry { TemporaryProperties.Count: > 0 } auditEntry)
-                    // update TemporaryProperties
+                // update TemporaryProperties
                 {
                     foreach (var temporaryProperty in auditEntry.TemporaryProperties)
                     {
@@ -111,7 +111,7 @@ public abstract class AuditDbContext : AuditDbContextBase
     protected override Task BeforeSaveChanges()
     {
         if (!AuditConfig.AuditConfigOptions.AuditEnabled) return Task.CompletedTask;
-        
+
         AuditEntries = new List<AuditEntry>();
         foreach (var entityEntry in ChangeTracker.Entries())
         {
@@ -119,19 +119,19 @@ public abstract class AuditDbContext : AuditDbContextBase
             {
                 continue;
             }
-            
+
             if (entityEntry.Entity is AuditRecord)
             {
                 continue;
             }
-            
+
             //entityFilters
             if (AuditConfig.AuditConfigOptions.EntityFilters.Any(entityFilter =>
                     entityFilter.Invoke(entityEntry) == false))
             {
                 continue;
             }
-            
+
             AuditEntries.Add(new InternalAuditEntry(entityEntry));
         }
 

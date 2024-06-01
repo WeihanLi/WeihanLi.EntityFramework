@@ -17,14 +17,14 @@ public sealed class AuditDbContextInterceptor : IInterceptor
                 {
                     continue;
                 }
-                
+
                 if (AuditConfig.AuditConfigOptions.EntityFilters
                     .Any(entityFilter =>
                         entityFilter.Invoke(entityEntry) == false))
                 {
                     continue;
                 }
-                
+
                 auditEntries.Add(new InternalAuditEntry(entityEntry));
             }
             await next();
