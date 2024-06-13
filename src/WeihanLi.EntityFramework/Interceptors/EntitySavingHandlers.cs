@@ -48,15 +48,15 @@ public sealed class UpdatedAtEntityFieldSavingHandler : IEntitySavingHandler
         {
             return;
         }
-
-        if (entityEntry.Entity is not IEntityWithCreatedUpdatedAt updatedAtEntity)
+        
+        if (entityEntry.Entity is not IEntityWithUpdatedAt updatedAtEntity)
         {
             return;
         }
 
-        if (entityEntry.State is EntityState.Added)
+        if (entityEntry.State is EntityState.Added && entityEntry.Entity is IEntityWithCreatedUpdatedAt createdUpdatedAtEntity)
         {
-            updatedAtEntity.CreatedAt = DateTimeOffset.Now;
+            createdUpdatedAtEntity.CreatedAt = DateTimeOffset.Now;
         }
 
         updatedAtEntity.UpdatedAt = DateTimeOffset.Now;
@@ -79,16 +79,16 @@ public sealed class UpdatedByEntityFieldSavingHandler(IUserIdProvider userIdProv
             return;
         }
 
-        if (entityEntry.Entity is not IEntityWithCreatedUpdatedBy updatedByEntity)
+        if (entityEntry.Entity is not IEntityWithUpdatedBy updatedByEntity)
         {
             return;
         }
 
         var userId = userIdProvider.GetUserId() ?? DefaultUserId;
 
-        if (entityEntry.State is EntityState.Added)
+        if (entityEntry.State is EntityState.Added && entityEntry.Entity is IEntityWithCreatedUpdatedBy createdUpdatedBy)
         {
-            updatedByEntity.CreatedBy = userId;
+            createdUpdatedBy.CreatedBy = userId;
         }
 
         updatedByEntity.UpdatedBy = userId;
