@@ -48,7 +48,7 @@ public sealed class UpdatedAtEntityFieldSavingHandler : IEntitySavingHandler
         {
             return;
         }
-        
+
         if (entityEntry.Entity is not IEntityWithUpdatedAt updatedAtEntity)
         {
             return;
