@@ -17,7 +17,7 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
     protected override Task BeforeSaveChanges()
     {
         if (!AuditConfig.Options.AuditEnabled || _auditStores.Length <= 0) return Task.CompletedTask;
-        
+
         AuditEntries = new List<AuditEntry>();
         foreach (var entityEntry in ChangeTracker.Entries())
         {
@@ -89,7 +89,7 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
     }
 }
 
-public abstract class AuditDbContext(DbContextOptions dbContextOptions, IServiceProvider serviceProvider) 
+public abstract class AuditDbContext(DbContextOptions dbContextOptions, IServiceProvider serviceProvider)
     : AuditDbContextBase(dbContextOptions, serviceProvider)
 {
     public virtual DbSet<AuditRecord> AuditRecords { get; set; } = null!;

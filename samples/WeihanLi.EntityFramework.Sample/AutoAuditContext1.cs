@@ -3,14 +3,14 @@ using WeihanLi.EntityFramework.Audit;
 
 namespace WeihanLi.EntityFramework.Sample;
 
-public class AutoAuditContext1(DbContextOptions dbContextOptions, IServiceProvider serviceProvider) 
+public class AutoAuditContext1(DbContextOptions dbContextOptions, IServiceProvider serviceProvider)
     : AuditDbContext(dbContextOptions, serviceProvider)
 {
     public DbSet<TestJobEntity> Jobs { get; set; }
 }
 
 
-public class AutoAuditContext2(DbContextOptions<AutoAuditContext2> options): DbContext(options)
+public class AutoAuditContext2(DbContextOptions<AutoAuditContext2> options) : DbContext(options)
 {
     public DbSet<TestJobEntity> Jobs { get; set; }
 }

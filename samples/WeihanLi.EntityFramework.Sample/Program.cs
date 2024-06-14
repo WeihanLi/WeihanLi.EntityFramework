@@ -25,7 +25,7 @@ public class Program
         // SoftDeleteTest();
         // RepositoryTest();
         AutoAuditTest();
-        
+
         Console.WriteLine("completed");
         Console.ReadLine();
     }
@@ -53,8 +53,8 @@ public class Program
             await fileStream.WriteAsync(events.ToJson().GetBytes());
         }
     }
-    
-    
+
+
     private static void AutoAuditTest()
     {
         {
@@ -88,11 +88,11 @@ public class Program
                 context.Jobs.Remove(job);
                 context.SaveChanges();
             }
-            
+
             var auditRecords = context.AuditRecords.AsNoTracking().ToArray();
             Console.WriteLine(auditRecords.ToJson());
         }
-        
+
         {
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.AddSimpleConsole());
@@ -129,7 +129,7 @@ public class Program
             var auditRecords = auditRecordsContext.AuditRecords.AsNoTracking().ToArray();
             Console.WriteLine(auditRecords.ToJson());
         }
-        
+
         {
             var services = new ServiceCollection();
             services.AddLogging(loggingBuilder =>
@@ -170,7 +170,8 @@ public class Program
                 dbContext.Database.EnsureCreated();
                 var testEntity = new TestEntity()
                 {
-                    Extra = new { Name = "Tom" }.ToJson(), CreatedAt = DateTimeOffset.UtcNow,
+                    Extra = new { Name = "Tom" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
                 };
                 dbContext.TestEntities.Add(testEntity);
                 dbContext.SaveChanges();
@@ -184,12 +185,14 @@ public class Program
 
                 var testEntity1 = new TestEntity()
                 {
-                    Extra = new { Name = "Tom1" }.ToJson(), CreatedAt = DateTimeOffset.UtcNow,
+                    Extra = new { Name = "Tom1" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
                 };
                 dbContext.TestEntities.Add(testEntity1);
                 var testEntity2 = new TestEntity()
                 {
-                    Extra = new { Name = "Tom2" }.ToJson(), CreatedAt = DateTimeOffset.UtcNow,
+                    Extra = new { Name = "Tom2" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
                 };
                 dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
@@ -222,7 +225,7 @@ public class Program
         });
         services.AddEFRepository();
         DependencyResolver.SetDependencyResolver(services);
-        
+
         DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
         {
             db.Database.EnsureCreated();

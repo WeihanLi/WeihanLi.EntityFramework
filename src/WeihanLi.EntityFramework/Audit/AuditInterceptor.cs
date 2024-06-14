@@ -27,10 +27,10 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
     {
         if (!AuditConfig.Options.AuditEnabled)
             return;
-        
+
         if (!serviceProvider.GetServices<IAuditStore>().Any())
             return;
-        
+
         if (AuditEntries is null)
         {
             AuditEntries = new List<AuditEntry>();
@@ -60,7 +60,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
         if (AuditEntries is { Count: > 0 })
         {
             var auditUserIdProvider = AuditConfig.Options.UserIdProviderFactory?.Invoke(serviceProvider);
-            
+
             foreach (var entry in AuditEntries)
             {
                 if (entry is InternalAuditEntry auditEntry)
@@ -106,7 +106,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
                 entry.UpdatedAt = DateTimeOffset.UtcNow;
                 entry.UpdatedBy = auditUserIdProvider?.GetUserId();
             }
-            
+
             await Task.WhenAll(
                     serviceProvider.GetServices<IAuditStore>()
                     .Select(store => store.Save(AuditEntries))

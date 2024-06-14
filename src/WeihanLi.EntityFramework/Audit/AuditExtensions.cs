@@ -131,7 +131,7 @@ object propertyValue, bool overwrite = false)
         configBuilder.WithStore<AuditRecordsDbContextStore>();
         return configBuilder;
     }
-    
+
     public static IAuditConfigBuilder EnrichWithProperty(this IAuditConfigBuilder configBuilder, string propertyName, object value, bool overwrite = false)
     {
         configBuilder.WithEnricher(new AuditPropertyEnricher(propertyName, value, overwrite));
@@ -155,7 +155,7 @@ object propertyValue, bool overwrite = false)
         configBuilder.WithEnricher(new AuditPropertyEnricher(propertyName, valueFactory, predict, overwrite));
         return configBuilder;
     }
-    
+
     #endregion IAuditConfigBuilder
 
     #region FluentAspectOptions
@@ -176,6 +176,6 @@ object propertyValue, bool overwrite = false)
                                )
         );
     }
-    
+
     #endregion FluentAspectOptions
 }

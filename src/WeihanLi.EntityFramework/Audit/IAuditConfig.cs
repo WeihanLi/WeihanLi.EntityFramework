@@ -8,16 +8,16 @@ namespace WeihanLi.EntityFramework.Audit;
 public interface IAuditConfigBuilder
 {
     IServiceCollection Services { get; }
-    
+
     IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider) =>
         WithUserIdProvider(_ => auditUserProvider);
-    
+
     IAuditConfigBuilder WithUserIdProvider(Func<IServiceProvider, IUserIdProvider> auditUserProviderFactory);
 
     IAuditConfigBuilder WithUnmodifiedProperty(bool saveUnModifiedProperty = true);
 
     IAuditConfigBuilder WithStore(IAuditStore auditStore);
-    IAuditConfigBuilder WithStore<TStore>() where TStore: class, IAuditStore;
+    IAuditConfigBuilder WithStore<TStore>() where TStore : class, IAuditStore;
 
     IAuditConfigBuilder WithEntityFilter(Func<EntityEntry, bool> entityFilter);
 
@@ -28,7 +28,7 @@ public interface IAuditConfigBuilder
 
 internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditConfigBuilder
 {
-    private Func<IServiceProvider, IUserIdProvider>? _auditUserProviderFactory  =
+    private Func<IServiceProvider, IUserIdProvider>? _auditUserProviderFactory =
         sp =>
         {
             var userIdProvider = sp.GetService<IUserIdProvider>();
@@ -40,7 +40,7 @@ internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditCo
     private bool _saveUnModifiedProperty;
 
     public IServiceCollection Services => services;
-    
+
     public IAuditConfigBuilder WithUserIdProvider(Func<IServiceProvider, IUserIdProvider>? auditUserProviderFactory)
     {
         _auditUserProviderFactory = auditUserProviderFactory;
