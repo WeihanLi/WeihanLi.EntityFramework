@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using WeihanLi.Common.Models;
+using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Audit;
 
@@ -24,6 +22,21 @@ public class AuditEntry
     public DateTimeOffset UpdatedAt { get; set; }
 
     public string? UpdatedBy { get; set; }
+
+    internal AuditRecord ToAuditRecord()
+    {
+        return new AuditRecord()
+        {
+            TableName = TableName,
+            OperationType = OperationType,
+            Extra = Properties.Count == 0 ? null : Properties.ToJson(),
+            OriginValue = OriginalValues?.ToJson(),
+            NewValue = NewValues?.ToJson(),
+            ObjectId = KeyValues.ToJson(),
+            UpdatedAt = UpdatedAt,
+            UpdatedBy = UpdatedBy
+        };
+    }
 }
 
 internal sealed class InternalAuditEntry : AuditEntry
@@ -57,7 +70,7 @@ internal sealed class InternalAuditEntry : AuditEntry
         }
         foreach (var propertyEntry in entityEntry.Properties)
         {
-            if (AuditConfig.AuditConfigOptions.PropertyFilters.Any(f => f.Invoke(entityEntry, propertyEntry) == false))
+            if (AuditConfig.Options.PropertyFilters.Any(f => f.Invoke(entityEntry, propertyEntry) == false))
             {
                 continue;
             }
@@ -84,7 +97,7 @@ internal sealed class InternalAuditEntry : AuditEntry
                     break;
 
                 case EntityState.Modified:
-                    if (propertyEntry.IsModified || AuditConfig.AuditConfigOptions.SaveUnModifiedProperties)
+                    if (propertyEntry.IsModified || AuditConfig.Options.SaveUnModifiedProperties)
                     {
                         OriginalValues![columnName] = propertyEntry.OriginalValue;
                         NewValues![columnName] = propertyEntry.CurrentValue;
