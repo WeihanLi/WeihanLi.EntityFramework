@@ -9,6 +9,7 @@ using WeihanLi.Common.Helpers;
 using WeihanLi.Common.Services;
 using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Interceptors;
+using WeihanLi.EntityFramework.Services;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Sample;

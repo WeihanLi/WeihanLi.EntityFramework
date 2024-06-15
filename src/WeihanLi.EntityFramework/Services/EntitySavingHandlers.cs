@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
 using WeihanLi.Common.Models;
 using WeihanLi.Common.Services;
+using WeihanLi.EntityFramework.Interceptors;
 
-namespace WeihanLi.EntityFramework.Interceptors;
+namespace WeihanLi.EntityFramework.Services;
 
 /// <summary>
 /// Handle soft delete
