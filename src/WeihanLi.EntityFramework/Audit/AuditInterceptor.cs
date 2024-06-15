@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using WeihanLi.Common;
 using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Audit;
@@ -42,20 +41,22 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
 
         foreach (var entityEntry in dbContext.ChangeTracker.Entries())
         {
-            if (entityEntry.State == EntityState.Detached || entityEntry.State == EntityState.Unchanged)
+            if (entityEntry.State is EntityState.Detached or EntityState.Unchanged)
             {
                 continue;
             }
+
             if (AuditConfig.Options.EntityFilters.Any(entityFilter =>
                     entityFilter.Invoke(entityEntry) == false))
             {
                 continue;
             }
+
             AuditEntries.Add(new InternalAuditEntry(entityEntry));
         }
     }
 
-    private async Task PostSaveChanges(DbContext dbContext)
+    private async Task PostSaveChanges()
     {
         if (AuditEntries is { Count: > 0 })
         {
@@ -116,14 +117,14 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
 
     public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
     {
-        PostSaveChanges(Guard.NotNull(eventData.Context)).GetAwaiter().GetResult();
+        PostSaveChanges().GetAwaiter().GetResult();
         return base.SavedChanges(eventData, result);
     }
 
     public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        await PostSaveChanges(Guard.NotNull(eventData.Context));
+        await PostSaveChanges();
         return await base.SavedChangesAsync(eventData, result, cancellationToken);
     }
 }

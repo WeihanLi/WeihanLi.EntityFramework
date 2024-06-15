@@ -375,7 +375,7 @@ public class Program
         });
 
         services.AddSingleton<IUserIdProvider, EnvironmentUserIdProvider>();
-        services.AddAutoUpdateInterceptor();
+        services.AddEFAutoUpdateInterceptor();
 
         services.AddDbContext<SoftDeleteSampleContext>((provider, options) =>
         {
