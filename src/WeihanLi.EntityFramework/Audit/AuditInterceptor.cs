@@ -45,13 +45,13 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
             {
                 continue;
             }
-            
+
             if (AuditConfig.Options.EntityFilters.Any(entityFilter =>
                     entityFilter.Invoke(entityEntry) == false))
             {
                 continue;
             }
-            
+
             AuditEntries.Add(new InternalAuditEntry(entityEntry));
         }
     }
