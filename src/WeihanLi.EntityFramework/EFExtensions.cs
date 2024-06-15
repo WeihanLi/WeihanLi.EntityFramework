@@ -176,8 +176,8 @@ public static class EFExtensions
 
     public static IServiceCollection AddEFAutoUpdateInterceptor(this IServiceCollection services)
         => services.AddEFAutoUpdateInterceptor(ServiceLifetime.Scoped);
-    
-    public static IServiceCollection AddEFAutoUpdateInterceptor(this IServiceCollection services, 
+
+    public static IServiceCollection AddEFAutoUpdateInterceptor(this IServiceCollection services,
         ServiceLifetime userProviderLifetime)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -189,8 +189,8 @@ public static class EFExtensions
 
         return services;
     }
-    
-    public static IServiceCollection AddEFAutoUpdateInterceptor<TUserProvider>(this IServiceCollection services, 
+
+    public static IServiceCollection AddEFAutoUpdateInterceptor<TUserProvider>(this IServiceCollection services,
         ServiceLifetime userProviderLifetime = ServiceLifetime.Scoped)
         where TUserProvider : class, IUserIdProvider
     {
