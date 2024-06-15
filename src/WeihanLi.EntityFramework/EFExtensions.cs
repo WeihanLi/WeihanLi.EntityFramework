@@ -2,12 +2,13 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
-using System;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data;
-using System.Linq;
 using System.Linq.Expressions;
 using WeihanLi.Common.Models;
 using WeihanLi.EntityFramework.Audit;
+using WeihanLi.EntityFramework.Interceptors;
+using WeihanLi.EntityFramework.Services;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework;
@@ -143,19 +144,20 @@ public static class EFExtensions
     public static string GetTableName<TEntity>(this DbContext dbContext)
     {
         var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
-        return entityType?.GetTableName() ?? throw new ArgumentNullException(nameof(entityType));
+        ArgumentNullException.ThrowIfNull(entityType);
+        return entityType.GetTableName()!;
     }
 
     public static KeyEntry[] GetKeyValues(this EntityEntry entityEntry)
     {
         if (!entityEntry.IsKeySet)
-            return Array.Empty<KeyEntry>();
+            return [];
 
         var keyProps = entityEntry.Properties
             .Where(p => p.Metadata.IsPrimaryKey())
             .ToArray();
         if (keyProps.Length == 0)
-            return Array.Empty<KeyEntry>();
+            return [];
 
         var keyEntries = new KeyEntry[keyProps.Length];
         for (var i = 0; i < keyProps.Length; i++)
@@ -171,13 +173,24 @@ public static class EFExtensions
         return keyEntries;
     }
 
-    public static IServiceCollection AddAutoAudit(this IServiceCollection services,
+    public static IServiceCollection AddAutoUpdateInterceptor(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddScoped<AutoUpdateInterceptor>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, UpdatedAtEntitySavingHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<IEntitySavingHandler, UpdatedBySavingHandler>());
+
+        return services;
+    }
+
+    public static IServiceCollection AddEFAutoAudit(this IServiceCollection services,
         Action<IAuditConfigBuilder> configAction)
     {
-        if (configAction is null)
-            throw new ArgumentNullException(nameof(configAction));
+        ArgumentNullException.ThrowIfNull(configAction);
 
-        AuditConfig.Configure(configAction);
+        AuditConfig.Configure(services, configAction);
         return services;
     }
 

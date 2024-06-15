@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using WeihanLi.Common.Models;
 
 namespace WeihanLi.EntityFramework.Sample;

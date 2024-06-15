@@ -1,13 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
-using System.Threading.Tasks;
 using WeihanLi.Common;
 using WeihanLi.Common.Data;
 using WeihanLi.Common.Helpers;
@@ -23,8 +18,165 @@ public class Program
     public static void Main(string[] args)
     {
         SoftDeleteTest();
-        Console.ReadLine();
+        // RepositoryTest();
+        // AutoAuditTest();
 
+        Console.WriteLine("completed");
+        Console.ReadLine();
+    }
+
+    private static void AutoAuditTest()
+    {
+        {
+            var services = new ServiceCollection();
+            services.AddLogging(builder => builder.AddSimpleConsole());
+            services.AddDbContext<AutoAuditContext1>(options =>
+            {
+                options.UseSqlite("Data Source=AutoAuditTest1.db");
+            });
+            services.AddEFAutoAudit(builder =>
+            {
+                builder
+                    .WithUserIdProvider(new DelegateUserIdProvider(() => "AutoAuditTest1"))
+                    .EnrichWithProperty("MachineName", Environment.MachineName)
+                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    // 保存到自定义的存储
+                    .WithStore<AuditFileStore>("logs0.log")
+                    // 忽略指定实体
+                    .IgnoreEntity<AuditRecord>();
+            });
+            using var serviceProvider = services.BuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AutoAuditContext1>();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            context.Jobs.Add(new TestJobEntity() { Name = "test1" });
+            context.SaveChanges();
+            var job = context.Jobs.Find(1);
+            if (job is not null)
+            {
+                context.Jobs.Remove(job);
+                context.SaveChanges();
+            }
+
+            var auditRecords = context.AuditRecords.AsNoTracking().ToArray();
+            Console.WriteLine(auditRecords.ToJson());
+        }
+
+        {
+            var services = new ServiceCollection();
+            services.AddLogging(builder => builder.AddSimpleConsole());
+            services.AddDbContext<AutoAuditContext2>((provider, options) =>
+            {
+                options.UseSqlite("Data Source=AutoAuditTest2.db");
+                options.AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider));
+            });
+            services.AddEFAutoAudit(builder =>
+            {
+                builder.EnrichWithProperty("AutoAudit", "EntityFramework")
+                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    .WithStore<AuditFileStore>()
+                    .WithAuditRecordsDbContextStore(options =>
+                    {
+                        options.UseSqlite("Data Source=AutoAuditAuditRecords.db");
+                    });
+            });
+            using var serviceProvider = services.BuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AutoAuditContext2>();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            context.Jobs.Add(new TestJobEntity() { Name = "test1" });
+            context.SaveChanges();
+            var job = context.Jobs.Find(1);
+            if (job is not null)
+            {
+                context.Jobs.Remove(job);
+                context.SaveChanges();
+            }
+
+            var auditRecordsContext = scope.ServiceProvider.GetRequiredService<AuditRecordsDbContext>();
+            var auditRecords = auditRecordsContext.AuditRecords.AsNoTracking().ToArray();
+            Console.WriteLine(auditRecords.ToJson());
+        }
+
+        {
+            var services = new ServiceCollection();
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConsole();
+            });
+            services.AddDbContext<TestDbContext>((provider, options) =>
+            {
+                options
+                    .UseSqlite("Data Source=Test.db")
+                    .AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider))
+                    ;
+            });
+            services.AddEFAutoAudit(builder =>
+            {
+                builder
+                    // 配置操作用户获取方式
+                    .WithUserIdProvider(new DelegateUserIdProvider(() => "EFTest"))
+                    //.WithUnModifiedProperty() // 保存未修改的属性,默认只保存发生修改的属性
+                    // 保存更多属性
+                    .EnrichWithProperty("MachineName", Environment.MachineName)
+                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+                    // 保存到自定义的存储
+                    .WithStore<AuditFileStore>()
+                    .WithStore<AuditFileStore>("logs0.log")
+                    // 忽略指定实体
+                    .IgnoreEntity<AuditRecord>()
+                    // 忽略指定实体的某个属性
+                    .IgnoreProperty<TestEntity>(t => t.CreatedAt)
+                    // 忽略所有属性名称为 CreatedAt 的属性
+                    .IgnoreProperty("CreatedAt")
+                    ;
+            });
+
+            DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+                var testEntity = new TestEntity()
+                {
+                    Extra = new { Name = "Tom" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity);
+                dbContext.SaveChanges();
+
+                testEntity.CreatedAt = DateTimeOffset.Now;
+                testEntity.Extra = new { Name = "Jerry" }.ToJson();
+                dbContext.SaveChanges();
+
+                dbContext.Remove(testEntity);
+                dbContext.SaveChanges();
+
+                var testEntity1 = new TestEntity()
+                {
+                    Extra = new { Name = "Tom1" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity1);
+                var testEntity2 = new TestEntity()
+                {
+                    Extra = new { Name = "Tom2" }.ToJson(),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                };
+                dbContext.TestEntities.Add(testEntity2);
+                dbContext.SaveChanges();
+            });
+            DependencyResolver.TryInvokeAsync<TestDbContext>(async dbContext =>
+            {
+                dbContext.Remove(new TestEntity() { Id = 2 });
+                await dbContext.SaveChangesAsync();
+            }).Wait();
+        }
+    }
+
+    private static void RepositoryTest()
+    {
         var services = new ServiceCollection();
         services.AddLogging(loggingBuilder =>
         {
@@ -37,154 +189,13 @@ public class Program
                 //.EnableSensitiveDataLogging()
                 //.UseInMemoryDatabase("Tests")
                 .UseSqlite("Data Source=Test.db")
-                .AddInterceptors(new AuditInterceptor())
+                .AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider))
                 //.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;")
                 ;
         });
-        //services.AddProxyDbContext<TestDbContext>(options =>
-        //{
-        //    options
-        //        .UseLoggerFactory(loggerFactory)
-        //        //.EnableDetailedErrors()
-        //        //.EnableSensitiveDataLogging()
-        //        //.UseInMemoryDatabase("Tests")
-        //        .UseSqlServer(DbConnectionString)
-        //        ;
-        //});
-
-        //services.AddProxyDbContextPool<TestDbContext>(options =>
-        //{
-        //    options
-        //        .UseLoggerFactory(loggerFactory)
-        //        //.EnableDetailedErrors()
-        //        //.EnableSensitiveDataLogging()
-        //        // .UseInMemoryDatabase("Tests")
-        //        .UseSqlServer(DbConnectionString)
-        //        //.AddInterceptors(new QueryWithNoLockDbCommandInterceptor())
-        //        ;
-        //});
         services.AddEFRepository();
-        //services.AddFluentAspects(options =>
-        //{
-        //    //options.InterceptMethod<DbContext>(m =>
-        //    //        m.Name == nameof(DbContext.SaveChanges)
-        //    //        || m.Name == nameof(DbContext.SaveChangesAsync))
-        //    //    .With<AuditDbContextInterceptor>();
-
-        //    //为所有 DbContext 注册审计拦截器
-        //    //options.InterceptDbContextSaveWithAudit();
-
-        //    //options.InterceptDbContextSave<TestDbContext>()
-        //    //    .With<AuditDbContextInterceptor>();
-
-        //    options.InterceptDbContextSaveWithAudit<TestDbContext>();
-        //});
         DependencyResolver.SetDependencyResolver(services);
 
-        // RepositoryTest();
-        // AutoAuditTest();
-
-        Console.WriteLine("completed");
-        Console.ReadLine();
-    }
-
-    private class AuditFileStore : PeriodBatchingAuditStore
-    {
-        private readonly string _fileName;
-
-        public AuditFileStore() : this(null)
-        {
-        }
-
-        public AuditFileStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
-        {
-            _fileName = fileName.GetValueOrDefault("audits.log");
-        }
-
-        protected override async Task EmitBatchAsync(IEnumerable<AuditEntry> events)
-        {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
-
-            await using var fileStream = File.Exists(path)
-                ? new FileStream(path, FileMode.Append)
-                : File.Create(path);
-            await fileStream.WriteAsync(events.ToJson().GetBytes());
-        }
-    }
-
-    private static void AutoAuditTest()
-    {
-        // 审计配置
-        AuditConfig.Configure(builder =>
-        {
-            builder
-                // 配置操作用户获取方式
-                .WithUserIdProvider(EnvironmentUserIdProvider.Instance.Value)
-                //.WithUnModifiedProperty() // 保存未修改的属性,默认只保存发生修改的属性
-                // 保存更多属性
-                .EnrichWithProperty("MachineName", Environment.MachineName)
-                .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
-                // 保存到自定义的存储
-                .WithStore<AuditFileStore>()
-                .WithStore<AuditFileStore>("logs0.log")
-                // 忽略指定实体
-                .IgnoreEntity<AuditRecord>()
-                // 忽略指定实体的某个属性
-                .IgnoreProperty<TestEntity>(t => t.CreatedAt)
-                // 忽略所有属性名称为 CreatedAt 的属性
-                .IgnoreProperty("CreatedAt")
-                ;
-        });
-
-        DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
-        {
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
-            var testEntity = new TestEntity()
-            {
-                Extra = new { Name = "Tom" }.ToJson(),
-                CreatedAt = DateTimeOffset.UtcNow,
-            };
-            dbContext.TestEntities.Add(testEntity);
-            dbContext.SaveChanges();
-
-            testEntity.CreatedAt = DateTimeOffset.Now;
-            testEntity.Extra = new { Name = "Jerry" }.ToJson();
-            dbContext.SaveChanges();
-
-            dbContext.Remove(testEntity);
-            dbContext.SaveChanges();
-
-            var testEntity1 = new TestEntity()
-            {
-                Extra = new { Name = "Tom1" }.ToJson(),
-                CreatedAt = DateTimeOffset.UtcNow,
-            };
-            dbContext.TestEntities.Add(testEntity1);
-            var testEntity2 = new TestEntity()
-            {
-                Extra = new { Name = "Tom2" }.ToJson(),
-                CreatedAt = DateTimeOffset.UtcNow,
-            };
-            dbContext.TestEntities.Add(testEntity2);
-            dbContext.SaveChanges();
-        });
-        DependencyResolver.TryInvokeAsync<TestDbContext>(async dbContext =>
-        {
-            dbContext.Remove(new TestEntity()
-            {
-                Id = 2
-            });
-            await dbContext.SaveChangesAsync();
-        }).Wait();
-        // disable audit
-        AuditConfig.DisableAudit();
-        // enable audit
-        // AuditConfig.EnableAudit();
-    }
-
-    private static void RepositoryTest()
-    {
         DependencyResolver.Current.TryInvokeService<TestDbContext>(db =>
         {
             db.Database.EnsureCreated();
@@ -364,10 +375,7 @@ public class Program
         });
 
         services.AddSingleton<IUserIdProvider, EnvironmentUserIdProvider>();
-        services.AddSingleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>();
-        services.AddSingleton<IEntitySavingHandler, UpdatedAtEntityFieldSavingHandler>();
-        services.AddSingleton<IEntitySavingHandler, UpdatedByEntityFieldSavingHandler>();
-        services.AddScoped<AutoUpdateInterceptor>();
+        services.AddAutoUpdateInterceptor();
 
         services.AddDbContext<SoftDeleteSampleContext>((provider, options) =>
         {
@@ -421,5 +429,30 @@ public class Program
         Console.WriteLine(entities.ToJson());
 
         context.Database.EnsureDeleted();
+    }
+}
+
+
+file sealed class AuditFileStore : PeriodBatchingAuditStore
+{
+    private readonly string _fileName;
+
+    public AuditFileStore() : this(null)
+    {
+    }
+
+    public AuditFileStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
+    {
+        _fileName = fileName.GetValueOrDefault("audits.log");
+    }
+
+    protected override async Task EmitBatchAsync(IEnumerable<AuditEntry> events)
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
+
+        await using var fileStream = File.Exists(path)
+            ? new FileStream(path, FileMode.Append)
+            : File.Create(path);
+        await fileStream.WriteAsync(events.ToJson().GetBytes());
     }
 }

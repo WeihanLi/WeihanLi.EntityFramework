@@ -1,17 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using WeihanLi.EntityFramework.Services;
 
 namespace WeihanLi.EntityFramework.Interceptors;
-
-public interface IEntitySavingHandler
-{
-    void Handle(EntityEntry entityEntry);
-}
 
 public sealed class AutoUpdateInterceptor(IEnumerable<IEntitySavingHandler> handlers) : SaveChangesInterceptor
 {
@@ -24,7 +14,7 @@ public sealed class AutoUpdateInterceptor(IEnumerable<IEntitySavingHandler> hand
     }
 
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         OnSavingChanges(eventData);
         return base.SavingChangesAsync(eventData, result, cancellationToken);
@@ -33,7 +23,6 @@ public sealed class AutoUpdateInterceptor(IEnumerable<IEntitySavingHandler> hand
     private void OnSavingChanges(DbContextEventData eventData)
     {
         ArgumentNullException.ThrowIfNull(eventData.Context);
-        eventData.Context.ChangeTracker.DetectChanges();
         foreach (var entityEntry in eventData.Context.ChangeTracker.Entries())
         {
             foreach (var handler in _handlers)
