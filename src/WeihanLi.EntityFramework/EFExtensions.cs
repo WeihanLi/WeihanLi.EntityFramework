@@ -181,10 +181,10 @@ public static class EFExtensions
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, UpdatedAtEntitySavingHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IEntitySavingHandler, UpdatedBySavingHandler>());
-        
+
         return services;
     }
-    
+
     public static IServiceCollection AddEFAutoAudit(this IServiceCollection services,
         Action<IAuditConfigBuilder> configAction)
     {
