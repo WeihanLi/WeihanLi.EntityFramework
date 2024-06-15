@@ -173,15 +173,28 @@ public static class EFExtensions
         return keyEntries;
     }
 
-    public static IServiceCollection AddAutoUpdateInterceptor(this IServiceCollection services)
+    public static IServiceCollection AddEFAutoUpdateInterceptor(this IServiceCollection services)
+        => services.AddEFAutoUpdateInterceptor(ServiceLifetime.Scoped);
+    
+    public static IServiceCollection AddEFAutoUpdateInterceptor(this IServiceCollection services, 
+        ServiceLifetime userProviderLifetime)
     {
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddScoped<AutoUpdateInterceptor>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, UpdatedAtEntitySavingHandler>());
-        services.TryAddEnumerable(ServiceDescriptor.Scoped<IEntitySavingHandler, UpdatedBySavingHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Describe(typeof(IEntitySavingHandler), typeof(UpdatedBySavingHandler), userProviderLifetime));
 
+        return services;
+    }
+    
+    public static IServiceCollection AddEFAutoUpdateInterceptor<TUserProvider>(this IServiceCollection services, 
+        ServiceLifetime userProviderLifetime = ServiceLifetime.Scoped)
+        where TUserProvider : class, IUserIdProvider
+    {
+        services.AddEFAutoUpdateInterceptor(userProviderLifetime)
+            .TryAdd(ServiceDescriptor.Describe(typeof(IUserIdProvider), typeof(TUserProvider), userProviderLifetime));
         return services;
     }
 
