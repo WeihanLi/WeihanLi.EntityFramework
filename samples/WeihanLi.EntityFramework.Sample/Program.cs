@@ -459,9 +459,3 @@ public class Program
         context.Database.EnsureDeleted();
     }
 }
-
-
-file sealed class DelegateUserIdProvider(Func<string?> factory) : IUserIdProvider
-{
-    public string? GetUserId() => factory();
-}

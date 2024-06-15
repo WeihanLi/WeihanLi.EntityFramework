@@ -32,7 +32,7 @@ internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditCo
         sp =>
         {
             var userIdProvider = sp.GetService<IUserIdProvider>();
-            return userIdProvider ?? EnvironmentUserIdProvider.Instance.Value;
+            return userIdProvider ?? EnvironmentUserIdProvider.Instance;
         };
     private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new();
     private readonly List<Func<EntityEntry, bool>> _entityFilters = new();
