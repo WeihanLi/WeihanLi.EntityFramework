@@ -9,7 +9,6 @@ using WeihanLi.Common.Helpers;
 using WeihanLi.Common.Services;
 using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Interceptors;
-using WeihanLi.EntityFramework.Services;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Sample;
@@ -18,39 +17,14 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // SoftDeleteTest();
+        SoftDeleteTest();
         // RepositoryTest();
-        AutoAuditTest();
+        // AutoAuditTest();
 
         Console.WriteLine("completed");
         Console.ReadLine();
     }
-
-    private class AuditFileStore : PeriodBatchingAuditStore
-    {
-        private readonly string _fileName;
-
-        public AuditFileStore() : this(null)
-        {
-        }
-
-        public AuditFileStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
-        {
-            _fileName = fileName.GetValueOrDefault("audits.log");
-        }
-
-        protected override async Task EmitBatchAsync(IEnumerable<AuditEntry> events)
-        {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
-
-            await using var fileStream = File.Exists(path)
-                ? new FileStream(path, FileMode.Append)
-                : File.Create(path);
-            await fileStream.WriteAsync(events.ToJson().GetBytes());
-        }
-    }
-
-
+ 
     private static void AutoAuditTest()
     {
         {
@@ -401,10 +375,7 @@ public class Program
         });
 
         services.AddSingleton<IUserIdProvider, EnvironmentUserIdProvider>();
-        services.AddSingleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>();
-        services.AddSingleton<IEntitySavingHandler, UpdatedAtEntityFieldSavingHandler>();
-        services.AddSingleton<IEntitySavingHandler, UpdatedByEntityFieldSavingHandler>();
-        services.AddScoped<AutoUpdateInterceptor>();
+        services.AddAutoUpdateInterceptor();
 
         services.AddDbContext<SoftDeleteSampleContext>((provider, options) =>
         {
@@ -458,5 +429,30 @@ public class Program
         Console.WriteLine(entities.ToJson());
 
         context.Database.EnsureDeleted();
+    }
+}
+
+
+file sealed class AuditFileStore : PeriodBatchingAuditStore
+{
+    private readonly string _fileName;
+
+    public AuditFileStore() : this(null)
+    {
+    }
+
+    public AuditFileStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
+    {
+        _fileName = fileName.GetValueOrDefault("audits.log");
+    }
+
+    protected override async Task EmitBatchAsync(IEnumerable<AuditEntry> events)
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), _fileName);
+
+        await using var fileStream = File.Exists(path)
+            ? new FileStream(path, FileMode.Append)
+            : File.Create(path);
+        await fileStream.WriteAsync(events.ToJson().GetBytes());
     }
 }

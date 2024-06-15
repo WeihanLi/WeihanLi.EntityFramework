@@ -2,10 +2,13 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data;
 using System.Linq.Expressions;
 using WeihanLi.Common.Models;
 using WeihanLi.EntityFramework.Audit;
+using WeihanLi.EntityFramework.Interceptors;
+using WeihanLi.EntityFramework.Services;
 using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework;
@@ -170,6 +173,18 @@ public static class EFExtensions
         return keyEntries;
     }
 
+    public static IServiceCollection AddAutoUpdateInterceptor(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddScoped<AutoUpdateInterceptor>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, SoftDeleteEntitySavingHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IEntitySavingHandler, UpdatedAtEntitySavingHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<IEntitySavingHandler, UpdatedBySavingHandler>());
+        
+        return services;
+    }
+    
     public static IServiceCollection AddEFAutoAudit(this IServiceCollection services,
         Action<IAuditConfigBuilder> configAction)
     {
