@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data;
 using System.Linq.Expressions;
 using WeihanLi.Common.Models;
+using WeihanLi.Common.Services;
 using WeihanLi.EntityFramework.Audit;
 using WeihanLi.EntityFramework.Interceptors;
 using WeihanLi.EntityFramework.Services;
@@ -203,6 +204,7 @@ public static class EFExtensions
     {
         ArgumentNullException.ThrowIfNull(configAction);
 
+        services.TryAddScoped<AuditInterceptor>();
         AuditConfig.Configure(services, configAction);
         return services;
     }
