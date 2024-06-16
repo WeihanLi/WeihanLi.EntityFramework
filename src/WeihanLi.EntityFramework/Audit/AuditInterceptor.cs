@@ -104,7 +104,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
                     enricher.Enrich(entry);
                 }
 
-                entry.UpdatedAt = DateTimeOffset.UtcNow;
+                entry.UpdatedAt = DateTimeOffset.Now;
                 entry.UpdatedBy = auditUserIdProvider?.GetUserId();
             }
 

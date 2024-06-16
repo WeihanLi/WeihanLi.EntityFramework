@@ -141,7 +141,7 @@ public class Program
                 var testEntity = new TestEntity()
                 {
                     Extra = new { Name = "Tom" }.ToJson(),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTimeOffset.Now,
                 };
                 dbContext.TestEntities.Add(testEntity);
                 dbContext.SaveChanges();
@@ -156,13 +156,13 @@ public class Program
                 var testEntity1 = new TestEntity()
                 {
                     Extra = new { Name = "Tom1" }.ToJson(),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTimeOffset.Now,
                 };
                 dbContext.TestEntities.Add(testEntity1);
                 var testEntity2 = new TestEntity()
                 {
                     Extra = new { Name = "Tom2" }.ToJson(),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTimeOffset.Now,
                 };
                 dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
@@ -217,7 +217,7 @@ public class Program
             var repo = db.GetRepository<TestDbContext, TestEntity>();
             repo.Insert(new TestEntity()
             {
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTimeOffset.Now,
                 Extra = "{\"Name\": \"Tom\"}"
             });
 
