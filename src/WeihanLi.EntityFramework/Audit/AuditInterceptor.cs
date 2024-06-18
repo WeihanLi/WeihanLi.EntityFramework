@@ -22,6 +22,22 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
+
+    public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
+    {
+        var savedChanges = base.SavedChanges(eventData, result);
+        PostSaveChanges().GetAwaiter().GetResult();
+        return savedChanges;
+    }
+
+    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
+        CancellationToken cancellationToken = default)
+    {
+        var savedChanges = await base.SavedChangesAsync(eventData, result, cancellationToken);
+        await PostSaveChanges();
+        return savedChanges;
+    }
+    
     private void PreSaveChanges(DbContext dbContext)
     {
         if (!AuditConfig.Options.AuditEnabled)
@@ -60,52 +76,54 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
     {
         if (AuditEntries is { Count: > 0 })
         {
+            var now = DateTimeOffset.Now;
+
             var auditUserIdProvider = AuditConfig.Options.UserIdProviderFactory?.Invoke(serviceProvider);
+            var auditUser =  auditUserIdProvider?.GetUserId();
+            var enrichers = serviceProvider.GetServices<IAuditPropertyEnricher>().ToArray();
 
             foreach (var entry in AuditEntries)
             {
-                if (entry is InternalAuditEntry auditEntry)
+                // update TemporaryProperties
+                if (entry is InternalAuditEntry { TemporaryProperties.Count: > 0 } auditEntry)
                 {
-                    // update TemporaryProperties
-                    if (auditEntry.TemporaryProperties is { Count: > 0 })
+                    foreach (var temporaryProperty in auditEntry.TemporaryProperties)
                     {
-                        foreach (var temporaryProperty in auditEntry.TemporaryProperties)
+                        var colName = temporaryProperty.GetColumnName();
+                        if (temporaryProperty.Metadata.IsPrimaryKey())
                         {
-                            var colName = temporaryProperty.GetColumnName();
-                            if (temporaryProperty.Metadata.IsPrimaryKey())
-                            {
-                                auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
-                            }
-
-                            switch (auditEntry.OperationType)
-                            {
-                                case DataOperationType.Add:
-                                    auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
-                                    break;
-
-                                case DataOperationType.Delete:
-                                    auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
-                                    break;
-
-                                case DataOperationType.Update:
-                                    auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
-                                    auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
-                                    break;
-                            }
+                            auditEntry.KeyValues[colName] = temporaryProperty.CurrentValue;
                         }
-                        // set to null
-                        auditEntry.TemporaryProperties = null;
+
+                        switch (auditEntry.OperationType)
+                        {
+                            case DataOperationType.Add:
+                                auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
+                                break;
+
+                            case DataOperationType.Delete:
+                                auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                break;
+
+                            case DataOperationType.Update:
+                                auditEntry.OriginalValues![colName] = temporaryProperty.OriginalValue;
+                                auditEntry.NewValues![colName] = temporaryProperty.CurrentValue;
+                                break;
+                        }
                     }
+                    
+                    // set TemporaryProperties to null
+                    auditEntry.TemporaryProperties = null;
                 }
 
                 // apply enricher
-                foreach (var enricher in AuditConfig.Options.Enrichers)
+                foreach (var enricher in enrichers)
                 {
                     enricher.Enrich(entry);
                 }
-
-                entry.UpdatedAt = DateTimeOffset.Now;
-                entry.UpdatedBy = auditUserIdProvider?.GetUserId();
+                
+                entry.UpdatedBy = auditUser;
+                entry.UpdatedAt = now;
             }
 
             await Task.WhenAll(
@@ -113,18 +131,5 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
                     .Select(store => store.Save(AuditEntries))
                 );
         }
-    }
-
-    public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
-    {
-        PostSaveChanges().GetAwaiter().GetResult();
-        return base.SavedChanges(eventData, result);
-    }
-
-    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
-        CancellationToken cancellationToken = new CancellationToken())
-    {
-        await PostSaveChanges();
-        return await base.SavedChangesAsync(eventData, result, cancellationToken);
     }
 }
