@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WeihanLi.Common.Models;
-using WeihanLi.Common.Services;
 
 namespace WeihanLi.EntityFramework.Audit;
 
@@ -9,8 +8,10 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
     : DbContextBase(dbContextOptions)
 {
     private readonly IAuditStore[] _auditStores = serviceProvider.GetServices<IAuditStore>().ToArray();
-    private readonly IUserIdProvider? _auditUserIdProvider =
-        AuditConfig.Options.UserIdProviderFactory?.Invoke(serviceProvider);
+    private readonly IAuditPropertyEnricher[] _auditPropertyEnrichers =
+        serviceProvider.GetServices<IAuditPropertyEnricher>().ToArray();
+    private readonly string? _auditUser =
+        AuditConfig.Options.UserIdProviderFactory?.Invoke(serviceProvider)?.GetUserId();
 
     protected List<AuditEntry>? AuditEntries { get; set; }
 
@@ -31,6 +32,7 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
             {
                 continue;
             }
+            
             AuditEntries.Add(new InternalAuditEntry(entityEntry));
         }
 
@@ -41,6 +43,8 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
     {
         if (AuditEntries is { Count: > 0 })
         {
+            var now = DateTimeOffset.Now;
+            
             foreach (var entry in AuditEntries)
             {
                 if (entry is InternalAuditEntry { TemporaryProperties.Count: > 0 } auditEntry)
@@ -75,13 +79,13 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
                 }
 
                 // apply enricher
-                foreach (var enricher in AuditConfig.Options.Enrichers)
+                foreach (var enricher in _auditPropertyEnrichers)
                 {
                     enricher.Enrich(entry);
                 }
 
-                entry.UpdatedAt = DateTimeOffset.Now;
-                entry.UpdatedBy = _auditUserIdProvider?.GetUserId();
+                entry.UpdatedAt = now;
+                entry.UpdatedBy = _auditUser;
             }
 
             await Task.WhenAll(_auditStores.Select(store => store.Save(AuditEntries)));
