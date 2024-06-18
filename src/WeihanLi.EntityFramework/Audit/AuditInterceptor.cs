@@ -36,7 +36,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
         var savedChanges = await base.SavedChangesAsync(eventData, result, cancellationToken);
         return savedChanges;
     }
-    
+
     private void PreSaveChanges(DbContext dbContext)
     {
         if (!AuditConfig.Options.AuditEnabled)
@@ -78,7 +78,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
             var now = DateTimeOffset.Now;
 
             var auditUserIdProvider = AuditConfig.Options.UserIdProviderFactory?.Invoke(serviceProvider);
-            var auditUser =  auditUserIdProvider?.GetUserId();
+            var auditUser = auditUserIdProvider?.GetUserId();
             var enrichers = serviceProvider.GetServices<IAuditPropertyEnricher>().ToArray();
 
             foreach (var entry in AuditEntries)
@@ -110,7 +110,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
                                 break;
                         }
                     }
-                    
+
                     // set TemporaryProperties to null
                     auditEntry.TemporaryProperties = null;
                 }
@@ -120,7 +120,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
                 {
                     enricher.Enrich(entry);
                 }
-                
+
                 entry.UpdatedBy = auditUser;
                 entry.UpdatedAt = now;
             }
