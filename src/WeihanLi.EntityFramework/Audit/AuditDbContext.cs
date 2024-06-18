@@ -32,7 +32,7 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
             {
                 continue;
             }
-            
+
             AuditEntries.Add(new InternalAuditEntry(entityEntry));
         }
 
@@ -44,7 +44,7 @@ public abstract class AuditDbContextBase(DbContextOptions dbContextOptions, ISer
         if (AuditEntries is { Count: > 0 })
         {
             var now = DateTimeOffset.Now;
-            
+
             foreach (var entry in AuditEntries)
             {
                 if (entry is InternalAuditEntry { TemporaryProperties.Count: > 0 } auditEntry)

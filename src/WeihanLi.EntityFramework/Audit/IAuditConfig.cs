@@ -90,7 +90,7 @@ internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditCo
         services.AddSingleton(enricher);
         return this;
     }
-    
+
     public IAuditConfigBuilder WithEnricher<TEnricher>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
       where TEnricher : IAuditPropertyEnricher
     {
@@ -117,7 +117,7 @@ internal sealed class AuditConfigOptions
     public bool SaveUnModifiedProperties { get; set; }
 
     public Func<IServiceProvider, IUserIdProvider>? UserIdProviderFactory { get; set; }
-    
+
     private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
 
     public IReadOnlyCollection<Func<EntityEntry, bool>> EntityFilters

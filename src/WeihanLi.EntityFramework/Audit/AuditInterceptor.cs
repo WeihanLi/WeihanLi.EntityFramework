@@ -21,7 +21,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider) : SaveCha
         PreSaveChanges(eventData.Context!);
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
-    
+
     public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
     {
         PostSaveChanges().GetAwaiter().GetResult();
