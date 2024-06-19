@@ -17,9 +17,9 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        SoftDeleteTest();
+        // SoftDeleteTest();
         // RepositoryTest();
-        // AutoAuditTest();
+        AutoAuditTest();
 
         Console.WriteLine("completed");
         Console.ReadLine();
@@ -62,7 +62,7 @@ public class Program
             var auditRecords = context.AuditRecords.AsNoTracking().ToArray();
             Console.WriteLine(auditRecords.ToJson());
         }
-
+        ConsoleHelper.ReadLineWithPrompt();
         {
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.AddSimpleConsole());
