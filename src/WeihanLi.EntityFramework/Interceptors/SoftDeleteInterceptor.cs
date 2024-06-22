@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WeihanLi.Common.Models;
+using WeihanLi.EntityFramework.Services;
 
 namespace WeihanLi.EntityFramework.Interceptors;
 
@@ -30,8 +31,16 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
         {
             if (entityEntry is { State: EntityState.Deleted, Entity: ISoftDeleteEntityWithDeleted softDeleteEntity })
             {
+                foreach (var property in entityEntry.Properties)
+                {
+                    property.IsModified = false;
+                }
                 softDeleteEntity.IsDeleted = true;
                 entityEntry.State = EntityState.Modified;
+                foreach (var property in entityEntry.Properties)
+                {
+                    property.IsModified = property.Metadata.Name == SoftDeleteEntitySavingHandler.DefaultIsDeletedPropertyName;
+                }
             }
         }
     }

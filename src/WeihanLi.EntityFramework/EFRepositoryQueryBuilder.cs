@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using WeihanLi.Common;
 
 namespace WeihanLi.EntityFramework;
 
@@ -20,7 +21,14 @@ public class EFRepositoryQueryBuilder<TEntity> where TEntity : class
 
     public EFRepositoryQueryBuilder<TEntity> WithPredict(Expression<Func<TEntity, bool>> predict)
     {
-        _whereExpression.Add(predict ?? throw new ArgumentNullException(nameof(predict)));
+        _whereExpression.Add(Guard.NotNull(predict));
+        return this;
+    }
+
+    public EFRepositoryQueryBuilder<TEntity> WithPredictIf(Expression<Func<TEntity, bool>> predict, bool condition)
+    {
+        if (condition)
+            _whereExpression.Add(Guard.NotNull(predict));
         return this;
     }
 
@@ -99,22 +107,14 @@ public class EFRepositoryQueryBuilder<TEntity> where TEntity : class
 
     public IQueryable<TResult> Build<TResult>(Expression<Func<TEntity, TResult>> selector)
     {
-        if (null == selector)
-        {
-            throw new ArgumentNullException(nameof(selector));
-        }
-
+        ArgumentNullException.ThrowIfNull(selector);
         var query = Build();
         return query.Select(selector);
     }
 
     public IQueryable<TResult> Build<TResult>(Expression<Func<TEntity, int, TResult>> selector)
     {
-        if (null == selector)
-        {
-            throw new ArgumentNullException(nameof(selector));
-        }
-
+        ArgumentNullException.ThrowIfNull(selector);
         var query = Build();
         return query.Select(selector);
     }

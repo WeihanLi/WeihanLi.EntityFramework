@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using WeihanLi.Common.Aspect;
 using WeihanLi.Common.Helpers;
@@ -16,10 +16,7 @@ public static class AuditExtensions
     public static bool WithProperty(this AuditEntry auditEntry, string propertyName,
 object propertyValue, bool overwrite = false)
     {
-        if (null == auditEntry)
-        {
-            throw new ArgumentNullException(nameof(auditEntry));
-        }
+        ArgumentNullException.ThrowIfNull(auditEntry);
 
         if (auditEntry.Properties.ContainsKey(propertyName) && overwrite == false)
         {
@@ -33,10 +30,7 @@ object propertyValue, bool overwrite = false)
     public static bool WithProperty(this AuditEntry auditEntry, string propertyName,
         Func<AuditEntry, object> propertyValueFactory, bool overwrite = false)
     {
-        if (null == auditEntry)
-        {
-            throw new ArgumentNullException(nameof(auditEntry));
-        }
+        ArgumentNullException.ThrowIfNull(auditEntry);
 
         if (auditEntry.Properties.ContainsKey(propertyName) && overwrite == false)
         {
@@ -125,15 +119,16 @@ object propertyValue, bool overwrite = false)
         return configBuilder;
     }
 
-    public static IAuditConfigBuilder WithStore<TAuditStore>(this IAuditConfigBuilder configBuilder) where TAuditStore : IAuditStore, new()
-    {
-        configBuilder.WithStore(new TAuditStore());
-        return configBuilder;
-    }
-
     public static IAuditConfigBuilder WithStore<TAuditStore>(this IAuditConfigBuilder configBuilder, params object[] parameters) where TAuditStore : IAuditStore
     {
         configBuilder.WithStore(ActivatorHelper.CreateInstance<TAuditStore>(parameters));
+        return configBuilder;
+    }
+
+    public static IAuditConfigBuilder WithAuditRecordsDbContextStore(this IAuditConfigBuilder configBuilder, Action<DbContextOptionsBuilder> optionsConfigure)
+    {
+        configBuilder.Services.AddDbContext<AuditRecordsDbContext>(optionsConfigure);
+        configBuilder.WithStore<AuditRecordsDbContextStore>();
         return configBuilder;
     }
 
@@ -180,22 +175,6 @@ object propertyValue, bool overwrite = false)
                                 || c.ProxyMethod.Name == nameof(DbContext.SaveChangesAsync)
                                )
         );
-    }
-
-    public static FluentAspectOptions InterceptDbContextSaveWithAudit(this FluentAspectOptions options)
-    {
-        options.InterceptMethod<DbContext>(m =>
-                m.Name == nameof(DbContext.SaveChanges)
-                || m.Name == nameof(DbContext.SaveChangesAsync))
-            .With<AuditDbContextInterceptor>();
-        return options;
-    }
-
-    public static FluentAspectOptions InterceptDbContextSaveWithAudit<TDbContext>(this FluentAspectOptions options) where TDbContext : DbContext
-    {
-        options.InterceptDbContextSave<TDbContext>()
-            .With<AuditDbContextInterceptor>();
-        return options;
     }
 
     #endregion FluentAspectOptions

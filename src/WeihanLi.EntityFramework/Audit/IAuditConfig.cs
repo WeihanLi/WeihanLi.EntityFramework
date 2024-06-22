@@ -1,37 +1,52 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using WeihanLi.Common;
 using WeihanLi.Common.Services;
 
 namespace WeihanLi.EntityFramework.Audit;
 
 public interface IAuditConfigBuilder
 {
-    IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider);
+    IServiceCollection Services { get; }
+
+    IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider) =>
+        WithUserIdProvider(_ => auditUserProvider);
+
+    IAuditConfigBuilder WithUserIdProvider(Func<IServiceProvider, IUserIdProvider> auditUserProviderFactory);
 
     IAuditConfigBuilder WithUnmodifiedProperty(bool saveUnModifiedProperty = true);
 
     IAuditConfigBuilder WithStore(IAuditStore auditStore);
+    IAuditConfigBuilder WithStore<TStore>() where TStore : class, IAuditStore;
 
     IAuditConfigBuilder WithEntityFilter(Func<EntityEntry, bool> entityFilter);
 
     IAuditConfigBuilder WithPropertyFilter(Func<EntityEntry, PropertyEntry, bool> propertyFilter);
 
     IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher);
+
+    IAuditConfigBuilder WithEnricher<TEnricher>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+        where TEnricher : IAuditPropertyEnricher;
 }
 
-internal sealed class AuditConfigBuilder : IAuditConfigBuilder
+internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditConfigBuilder
 {
-    private IUserIdProvider _auditUserProvider = EnvironmentUserIdProvider.Instance.Value;
-    private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new(4);
+    private Func<IServiceProvider, IUserIdProvider>? _auditUserProviderFactory =
+        sp =>
+        {
+            var userIdProvider = sp.GetService<IUserIdProvider>();
+            return userIdProvider ?? EnvironmentUserIdProvider.Instance;
+        };
     private readonly List<Func<EntityEntry, bool>> _entityFilters = new();
     private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new();
-    private readonly List<IAuditStore> _auditStores = new();
     private bool _saveUnModifiedProperty;
 
-    public IAuditConfigBuilder WithUserIdProvider(IUserIdProvider auditUserProvider)
+    public IServiceCollection Services => services;
+
+    public IAuditConfigBuilder WithUserIdProvider(Func<IServiceProvider, IUserIdProvider>? auditUserProviderFactory)
     {
-        _auditUserProvider = auditUserProvider ?? throw new ArgumentNullException(nameof(auditUserProvider));
+        _auditUserProviderFactory = auditUserProviderFactory;
         return this;
     }
 
@@ -43,43 +58,43 @@ internal sealed class AuditConfigBuilder : IAuditConfigBuilder
 
     public IAuditConfigBuilder WithStore(IAuditStore auditStore)
     {
-        if (auditStore is null)
-        {
-            throw new ArgumentNullException(nameof(auditStore));
-        }
-        _auditStores.Add(auditStore);
+        ArgumentNullException.ThrowIfNull(auditStore);
+
+        services.AddSingleton(auditStore);
+        return this;
+    }
+
+    public IAuditConfigBuilder WithStore<TStore>() where TStore : class, IAuditStore
+    {
+        services.AddScoped<IAuditStore, TStore>();
         return this;
     }
 
     public IAuditConfigBuilder WithEntityFilter(Func<EntityEntry, bool> entityFilter)
     {
-        if (entityFilter is null)
-        {
-            throw new ArgumentNullException(nameof(entityFilter));
-        }
-
+        ArgumentNullException.ThrowIfNull(entityFilter);
         _entityFilters.Add(entityFilter);
         return this;
     }
 
     public IAuditConfigBuilder WithPropertyFilter(Func<EntityEntry, PropertyEntry, bool> propertyFilter)
     {
-        if (propertyFilter is null)
-        {
-            throw new ArgumentNullException(nameof(propertyFilter));
-        }
-
+        ArgumentNullException.ThrowIfNull(propertyFilter);
         _propertyFilters.Add(propertyFilter);
         return this;
     }
 
     public IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher)
     {
-        if (enricher is null)
-        {
-            throw new ArgumentNullException(nameof(enricher));
-        }
-        _auditPropertyEnrichers.Add(enricher);
+        ArgumentNullException.ThrowIfNull(enricher);
+        services.AddSingleton(enricher);
+        return this;
+    }
+
+    public IAuditConfigBuilder WithEnricher<TEnricher>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+      where TEnricher : IAuditPropertyEnricher
+    {
+        services.TryAddEnumerable(new ServiceDescriptor(typeof(IAuditPropertyEnricher), typeof(TEnricher), serviceLifetime));
         return this;
     }
 
@@ -87,11 +102,9 @@ internal sealed class AuditConfigBuilder : IAuditConfigBuilder
     {
         return new()
         {
-            Enrichers = _auditPropertyEnrichers,
             EntityFilters = _entityFilters,
             PropertyFilters = _propertyFilters,
-            UserIdProvider = _auditUserProvider,
-            Stores = _auditStores,
+            UserIdProviderFactory = _auditUserProviderFactory,
             SaveUnModifiedProperties = _saveUnModifiedProperty,
         };
     }
@@ -103,30 +116,14 @@ internal sealed class AuditConfigOptions
 
     public bool SaveUnModifiedProperties { get; set; }
 
-    public IUserIdProvider UserIdProvider { get; set; } = EnvironmentUserIdProvider.Instance.Value;
-
-    private IReadOnlyCollection<IAuditStore> _stores = Array.Empty<IAuditStore>();
-
-    public IReadOnlyCollection<IAuditStore> Stores
-    {
-        get => _stores;
-        set => _stores = value ?? throw new ArgumentNullException(nameof(value));
-    }
-
-    private IReadOnlyCollection<IAuditPropertyEnricher> _enrichers = Array.Empty<IAuditPropertyEnricher>();
-
-    public IReadOnlyCollection<IAuditPropertyEnricher> Enrichers
-    {
-        get => _enrichers;
-        set => _enrichers = value ?? throw new ArgumentNullException(nameof(value));
-    }
+    public Func<IServiceProvider, IUserIdProvider>? UserIdProviderFactory { get; set; }
 
     private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
 
     public IReadOnlyCollection<Func<EntityEntry, bool>> EntityFilters
     {
         get => _entityFilters;
-        set => _entityFilters = value ?? throw new ArgumentNullException(nameof(value));
+        set => _entityFilters = Guard.NotNull(value);
     }
 
     private IReadOnlyCollection<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = Array.Empty<Func<EntityEntry, PropertyEntry, bool>>();
@@ -134,35 +131,36 @@ internal sealed class AuditConfigOptions
     public IReadOnlyCollection<Func<EntityEntry, PropertyEntry, bool>> PropertyFilters
     {
         get => _propertyFilters;
-        set => _propertyFilters = value ?? throw new ArgumentNullException(nameof(value));
+        set => _propertyFilters = Guard.NotNull(value);
     }
 }
 
-public sealed class AuditConfig
+public static class AuditConfig
 {
-    internal static AuditConfigOptions AuditConfigOptions = new();
+    internal static AuditConfigOptions Options = new();
 
     public static void EnableAudit()
     {
-        AuditConfigOptions.AuditEnabled = true;
+        Options.AuditEnabled = true;
     }
 
     public static void DisableAudit()
     {
-        AuditConfigOptions.AuditEnabled = false;
+        Options.AuditEnabled = false;
     }
 
 #nullable disable
 
-    public static void Configure(Action<IAuditConfigBuilder> configAction)
+    public static void Configure(IServiceCollection services, Action<IAuditConfigBuilder> configAction)
     {
+        ArgumentNullException.ThrowIfNull(services);
         if (configAction is null)
             return;
+#nullable restore
 
-        var builder = new AuditConfigBuilder();
+        var builder = new AuditConfigBuilder(services);
         configAction.Invoke(builder);
-        AuditConfigOptions = builder.Build();
+        Options = builder.Build();
     }
 
-#nullable restore
 }
