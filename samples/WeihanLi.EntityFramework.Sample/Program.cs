@@ -69,7 +69,7 @@ public class Program
             services.AddDbContext<AutoAuditContext2>((provider, options) =>
             {
                 options.UseSqlite("Data Source=AutoAuditTest2.db");
-                options.AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider));
+                options.AddInterceptors(provider.GetRequiredService<AuditInterceptor>());
             });
             services.AddEFAutoAudit(builder =>
             {
