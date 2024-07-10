@@ -2,7 +2,7 @@
 SCRIPT='./build/build.cs'
 
 # Install tool
-dotnet tool install --global dotnet-execute
+dotnet tool update --global dotnet-execute
 export PATH="$PATH:$HOME/.dotnet/tools"
 
 echo "dotnet-exec $SCRIPT --args=$@"

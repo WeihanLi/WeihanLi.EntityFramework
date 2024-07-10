@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using WeihanLi.Common;
 using WeihanLi.Common.Services;
 
@@ -24,6 +25,9 @@ public interface IAuditConfigBuilder
     IAuditConfigBuilder WithPropertyFilter(Func<EntityEntry, PropertyEntry, bool> propertyFilter);
 
     IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher);
+
+    IAuditConfigBuilder WithEnricher<TEnricher>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+        where TEnricher : IAuditPropertyEnricher;
 }
 
 internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditConfigBuilder
@@ -34,7 +38,6 @@ internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditCo
             var userIdProvider = sp.GetService<IUserIdProvider>();
             return userIdProvider ?? EnvironmentUserIdProvider.Instance;
         };
-    private readonly List<IAuditPropertyEnricher> _auditPropertyEnrichers = new();
     private readonly List<Func<EntityEntry, bool>> _entityFilters = new();
     private readonly List<Func<EntityEntry, PropertyEntry, bool>> _propertyFilters = new();
     private bool _saveUnModifiedProperty;
@@ -84,7 +87,14 @@ internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditCo
     public IAuditConfigBuilder WithEnricher(IAuditPropertyEnricher enricher)
     {
         ArgumentNullException.ThrowIfNull(enricher);
-        _auditPropertyEnrichers.Add(enricher);
+        services.AddSingleton(enricher);
+        return this;
+    }
+
+    public IAuditConfigBuilder WithEnricher<TEnricher>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+      where TEnricher : IAuditPropertyEnricher
+    {
+        services.TryAddEnumerable(new ServiceDescriptor(typeof(IAuditPropertyEnricher), typeof(TEnricher), serviceLifetime));
         return this;
     }
 
@@ -92,7 +102,6 @@ internal sealed class AuditConfigBuilder(IServiceCollection services) : IAuditCo
     {
         return new()
         {
-            Enrichers = _auditPropertyEnrichers,
             EntityFilters = _entityFilters,
             PropertyFilters = _propertyFilters,
             UserIdProviderFactory = _auditUserProviderFactory,
@@ -108,14 +117,6 @@ internal sealed class AuditConfigOptions
     public bool SaveUnModifiedProperties { get; set; }
 
     public Func<IServiceProvider, IUserIdProvider>? UserIdProviderFactory { get; set; }
-
-    private IReadOnlyCollection<IAuditPropertyEnricher> _enrichers = Array.Empty<IAuditPropertyEnricher>();
-
-    public IReadOnlyCollection<IAuditPropertyEnricher> Enrichers
-    {
-        get => _enrichers;
-        set => _enrichers = Guard.NotNull(value);
-    }
 
     private IReadOnlyCollection<Func<EntityEntry, bool>> _entityFilters = Array.Empty<Func<EntityEntry, bool>>();
 

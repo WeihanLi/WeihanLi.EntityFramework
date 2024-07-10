@@ -17,9 +17,9 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        SoftDeleteTest();
+        // SoftDeleteTest();
         // RepositoryTest();
-        // AutoAuditTest();
+        AutoAuditTest();
 
         Console.WriteLine("completed");
         Console.ReadLine();
@@ -62,14 +62,14 @@ public class Program
             var auditRecords = context.AuditRecords.AsNoTracking().ToArray();
             Console.WriteLine(auditRecords.ToJson());
         }
-
+        ConsoleHelper.ReadLineWithPrompt();
         {
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.AddSimpleConsole());
             services.AddDbContext<AutoAuditContext2>((provider, options) =>
             {
                 options.UseSqlite("Data Source=AutoAuditTest2.db");
-                options.AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider));
+                options.AddInterceptors(provider.GetRequiredService<AuditInterceptor>());
             });
             services.AddEFAutoAudit(builder =>
             {
@@ -141,7 +141,7 @@ public class Program
                 var testEntity = new TestEntity()
                 {
                     Extra = new { Name = "Tom" }.ToJson(),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTimeOffset.Now,
                 };
                 dbContext.TestEntities.Add(testEntity);
                 dbContext.SaveChanges();
@@ -156,13 +156,13 @@ public class Program
                 var testEntity1 = new TestEntity()
                 {
                     Extra = new { Name = "Tom1" }.ToJson(),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTimeOffset.Now,
                 };
                 dbContext.TestEntities.Add(testEntity1);
                 var testEntity2 = new TestEntity()
                 {
                     Extra = new { Name = "Tom2" }.ToJson(),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTimeOffset.Now,
                 };
                 dbContext.TestEntities.Add(testEntity2);
                 dbContext.SaveChanges();
@@ -217,7 +217,7 @@ public class Program
             var repo = db.GetRepository<TestDbContext, TestEntity>();
             repo.Insert(new TestEntity()
             {
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTimeOffset.Now,
                 Extra = "{\"Name\": \"Tom\"}"
             });
 
