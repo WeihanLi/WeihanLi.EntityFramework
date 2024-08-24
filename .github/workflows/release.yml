@@ -1,0 +1,27 @@
+name: Release
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    name: Release
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Build
+      shell: pwsh
+      run: .\build.ps1 --stable=true
+    - name: Get Release Version
+      shell: pwsh
+      run: dotnet-exec https://github.com/OpenReservation/scripts/blob/main/build/export-gh-release-version.cs
+    - name: create release
+      shell: pwsh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{ env.ReleaseVersion }} --generate-notes --target master (Get-Item ./artifacts/packages/*.nupkg)
