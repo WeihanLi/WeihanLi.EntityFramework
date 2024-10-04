@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.69</CommonVersion>
+    <CommonVersion>1.0.70</CommonVersion>
     <EFVersion>8.0.8</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
