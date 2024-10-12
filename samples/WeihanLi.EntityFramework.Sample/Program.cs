@@ -29,7 +29,7 @@ public class Program
     {
         {
             var services = new ServiceCollection();
-            services.AddLogging(builder => builder.AddSimpleConsole());
+            services.AddLogging(builder => builder.AddDefaultDelegateLogger());
             services.AddDbContext<AutoAuditContext1>(options =>
             {
                 options.UseSqlite("Data Source=AutoAuditTest1.db");
@@ -65,7 +65,7 @@ public class Program
         ConsoleHelper.ReadLineWithPrompt();
         {
             var services = new ServiceCollection();
-            services.AddLogging(builder => builder.AddSimpleConsole());
+            services.AddLogging(builder => builder.AddDefaultDelegateLogger());
             services.AddDbContext<AutoAuditContext2>((provider, options) =>
             {
                 options.UseSqlite("Data Source=AutoAuditTest2.db");
@@ -104,7 +104,7 @@ public class Program
             var services = new ServiceCollection();
             services.AddLogging(loggingBuilder =>
             {
-                loggingBuilder.AddConsole();
+                loggingBuilder.AddDefaultDelegateLogger();
             });
             services.AddDbContext<TestDbContext>((provider, options) =>
             {
@@ -180,7 +180,7 @@ public class Program
         var services = new ServiceCollection();
         services.AddLogging(loggingBuilder =>
         {
-            loggingBuilder.AddConsole();
+            loggingBuilder.AddDefaultDelegateLogger();
         });
         services.AddDbContext<TestDbContext>((provider, options) =>
         {
@@ -371,7 +371,7 @@ public class Program
         var services = new ServiceCollection();
         services.AddLogging(loggingBuilder =>
         {
-            loggingBuilder.AddConsole();
+            loggingBuilder.AddDefaultDelegateLogger();
         });
 
         services.AddSingleton<IUserIdProvider, EnvironmentUserIdProvider>();
