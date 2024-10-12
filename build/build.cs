@@ -1,7 +1,7 @@
-var target = CommandLineParser.Val("target", "Default", args);
-var apiKey = CommandLineParser.Val("apiKey", "", args);
-var stable = CommandLineParser.BooleanVal("stable", args: args);
-var noPush = CommandLineParser.BooleanVal("noPush", args: args);
+var target = CommandLineParser.Val("target", args, "Default");
+var apiKey = CommandLineParser.Val("apiKey", args);
+var stable = CommandLineParser.BooleanVal("stable", args);
+var noPush = CommandLineParser.BooleanVal("noPush", args);
 var branchName = EnvHelper.Val("BUILD_SOURCEBRANCHNAME", "local");
 
 var solutionPath = "./WeihanLi.EntityFramework.sln";

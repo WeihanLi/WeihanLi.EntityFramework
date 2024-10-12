@@ -1,5 +1,7 @@
 # Release Notes
 
+More changes: https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
+
 ## WeihanLi.EntityFramework
 
 ### [WeihanLi.EntityFramework 1.8.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.8.0)
