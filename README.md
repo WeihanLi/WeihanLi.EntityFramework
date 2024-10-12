@@ -10,7 +10,7 @@
 
 ## Intro
 
-EntityFramework extensions
+[EntityFrameworkCore](https://github.com/dotnet/efcore) extensions
 
 ## Package Release Notes
 
@@ -26,7 +26,7 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
 >
 > For EF Core 5/6, use 2.x
 >
-> For EF 7, use 3.0.0 and above
+> For EF 7, use 3.x
 >
 > For EF 8 and above, use 8.x or above major-version matched versions
 
@@ -51,7 +51,7 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
  
 - AutoUpdate
 
-  - Soft delete for specific entity
+  - Soft delete for the specific entity
   - Auto update CreatedAt/UpdatedAt/CreatedBy/UpdatedBy
 
 - Extensions
@@ -59,6 +59,6 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
   - Update specific column(s) `Update`
   - Update without specific column(s) `UpdateWithout`
 
-## Contact
+## Support
 
-contact me <weihanli@outlook.com> if you need
+Feel free to try and [create issues](https://github.com/WeihanLi/WeihanLi.EntityFramework/issues/new) if you have any questions or integration issues
