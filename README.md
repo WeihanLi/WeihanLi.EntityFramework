@@ -14,21 +14,22 @@
 
 ## Package Release Notes
 
-See PRs for details
+See Releases/PRs for details
 
-https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged+base%3Amaster
+- Releases: https://github.com/WeihanLi/WeihanLi.EntityFramework/releases
+- PRs: https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged+base%3Amaster
 
 > Package Versions
 >
-> For EF Core 2.x , use 1.4.x and below
->
-> For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
->
-> For EF Core 5/6, use 2.x
+> For EF 8 and above, use 8.x or above major-version matched versions
 >
 > For EF 7, use 3.x
 >
-> For EF 8 and above, use 8.x or above major-version matched versions
+> For EF Core 5/6, use 2.x
+>
+> For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
+>
+> For EF Core 2.x , use 1.4.x and below
 
 ## Features
 
