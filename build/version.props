@@ -2,7 +2,7 @@
   <PropertyGroup>
     <VersionMajor>8</VersionMajor>
     <VersionMinor>0</VersionMinor>
-    <VersionPatch>10</VersionPatch>
+    <VersionPatch>11</VersionPatch>
     <VersionRevision>0</VersionRevision>
     <VersionPrefix Condition="'$(VersionRevision)'=='0' or '$(VersionRevision)'==''">$(VersionMajor).$(VersionMinor).$(VersionPatch)</VersionPrefix>
     <VersionPrefix Condition="'$(VersionRevision)'!='0'">$(VersionMajor).$(VersionMinor).$(VersionPatch).$(VersionRevision)</VersionPrefix>
