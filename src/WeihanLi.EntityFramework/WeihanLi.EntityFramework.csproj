@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>        
-    <TargetFramework>net8.0</TargetFramework>
     <Title>WeihanLi.EntityFramework</Title>
     <PackageId>WeihanLi.EntityFramework</PackageId>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/7604648</PackageIconUrl>    

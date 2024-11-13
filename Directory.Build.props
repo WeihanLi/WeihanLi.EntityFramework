@@ -3,11 +3,12 @@
   <Import Project="./build/version.props" />
   
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CommonVersion>1.0.71</CommonVersion>
-    <EFVersion>8.0.11</EFVersion>
+    <EFVersion>9.0.0</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
