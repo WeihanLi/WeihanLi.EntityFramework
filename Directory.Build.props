@@ -7,7 +7,7 @@
     <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.71</CommonVersion>
+    <CommonVersion>1.0.72</CommonVersion>
     <EFVersion>9.0.0</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
