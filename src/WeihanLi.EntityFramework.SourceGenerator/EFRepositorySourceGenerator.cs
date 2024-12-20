@@ -1,13 +1,13 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using System.Text;
 
 namespace WeihanLi.EntityFramework.SourceGenerator;
 
 [Generator]
-public class EFRepositorySourceGenerator : IIncrementalGenerator
+public sealed class EFRepositorySourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -28,7 +28,7 @@ public class EFRepositorySourceGenerator : IIncrementalGenerator
         {
             var (dbContextDeclaration, templates) = source;
             var dbContextName = dbContextDeclaration!.Identifier.Text;
-            var repositoryNamespace = dbContextDeclaration!.Parent!.GetNamespace();
+            var repositoryNamespace = dbContextDeclaration.Parent!.GetNamespace();
             var generatedCode = GenerateRepositoryCode(dbContextName, repositoryNamespace, templates);
             spc.AddSource($"{dbContextName}Repository.g.cs", SourceText.From(generatedCode, Encoding.UTF8));
         });
