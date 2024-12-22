@@ -7,12 +7,20 @@ using System.Text;
 namespace WeihanLi.EntityFramework.SourceGenerator;
 
 [Generator]
-public sealed class EFRepositorySourceGenerator : IIncrementalGenerator
+public sealed class EFExtensionsGenerator : IIncrementalGenerator
 {
+    private const string EFGenCode = """
+                                     namespace WeihanLi.EntityFramework
+                                     {
+                                         [AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+                                         public sealed class EFExtensionsAttribute;    
+                                     }
+                                     """;
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var additionalFiles = context.AdditionalTextsProvider
-            .Where(file => file.Path.EndsWith(".template"))
+            .Where(file => file.Path.EndsWith(".ef.template"))
             .Select((file, cancellationToken) => file.GetText(cancellationToken)?.ToString())
             .Where(content => !string.IsNullOrEmpty(content));
 
@@ -20,7 +28,8 @@ public sealed class EFRepositorySourceGenerator : IIncrementalGenerator
             .CreateSyntaxProvider(
                 predicate: static (s, _) => IsDbContextDeclaration(s),
                 transform: static (ctx, _) => GetDbContextDeclaration(ctx))
-            .Where(static m => m is not null);
+            .Where(FilterDbContextDeclarations)
+            ;
 
         var combined = dbContextDeclarations.Combine(additionalFiles.Collect());
 
@@ -36,17 +45,27 @@ public sealed class EFRepositorySourceGenerator : IIncrementalGenerator
 
     private static bool IsDbContextDeclaration(SyntaxNode node)
     {
-        return node is ClassDeclarationSyntax classDeclaration &&
-               classDeclaration.BaseList?.Types.Any(t => t.ToString().Contains("DbContext")) == true;
+        if (node is not ClassDeclarationSyntax classDeclaration
+            || classDeclaration.BaseList?.Types is null)
+            return false;
+
+        return classDeclaration.BaseList.Types.Any(t =>
+            t.ToString().Contains("DbContext"));
     }
 
-    private static ClassDeclarationSyntax? GetDbContextDeclaration(GeneratorSyntaxContext context)
+    private static bool FilterDbContextDeclarations(ClassDeclarationSyntax classDeclaration)
+    {
+        return true;
+    }
+
+    private static ClassDeclarationSyntax GetDbContextDeclaration(GeneratorSyntaxContext context)
     {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
         return classDeclaration;
     }
 
-    private static string GenerateRepositoryCode(string dbContextName, string repositoryNamespace, ImmutableArray<string> templates)
+    private static string GenerateRepositoryCode(string dbContextName, string repositoryNamespace,
+        ImmutableArray<string> templates)
     {
         var builder = new StringBuilder();
         builder.AppendLine("using WeihanLi.EntityFramework;");

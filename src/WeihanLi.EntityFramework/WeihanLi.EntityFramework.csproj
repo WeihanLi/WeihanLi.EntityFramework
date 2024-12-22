@@ -16,7 +16,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EFVersion)" />
     <PackageReference Include="WeihanLi.Common" Version="$(CommonVersion)" />  
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WeihanLi.EntityFramework.SourceGenerator\WeihanLi.EntityFramework.SourceGenerator.csproj" />
-  </ItemGroup>
 </Project>

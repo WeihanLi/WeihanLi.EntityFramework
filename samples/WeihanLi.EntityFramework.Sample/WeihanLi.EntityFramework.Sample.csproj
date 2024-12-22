@@ -11,5 +11,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EFVersion)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WeihanLi.EntityFramework.SourceGenerator\WeihanLi.EntityFramework.SourceGenerator.csproj" OutputItemType="analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
 
 </Project>

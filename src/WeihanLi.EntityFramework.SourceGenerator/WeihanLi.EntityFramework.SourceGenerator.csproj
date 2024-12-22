@@ -1,9 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--    <TargetFramework>net8.0</TargetFramework>  -->
     <LangVersion>latest</LangVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
     <Title>WeihanLi.EntityFramework.SourceGenerator</Title>
     <Description>Source generator for WeihanLi.EntityFramework</Description>
     <Authors>WeihanLi</Authors>
