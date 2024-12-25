@@ -1,5 +1,4 @@
 <Project>
-  <Import Project="./build/sign.props" />
   <Import Project="./build/version.props" />
   
   <PropertyGroup>
