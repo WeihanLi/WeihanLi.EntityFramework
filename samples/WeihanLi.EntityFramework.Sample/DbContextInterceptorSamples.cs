@@ -28,7 +28,7 @@ public static class DbContextInterceptorSamples
         dbContext.Entities.Add(new TestEntity { Id = 1, Name = "1" });
         await dbContext.SaveChangesAsync();
     }
-    
+
     private static async Task InterceptorTest2()
     {
         var services = new ServiceCollection();
