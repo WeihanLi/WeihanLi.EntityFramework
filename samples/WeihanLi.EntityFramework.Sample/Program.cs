@@ -18,11 +18,13 @@ namespace WeihanLi.EntityFramework.Sample;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         // SoftDeleteTest();
         // RepositoryTest();
-        AutoAuditTest();
+        // AutoAuditTest();
+
+        await DbContextInterceptorSamples.RunAsync();
 
         Console.WriteLine("completed");
         Console.ReadLine();
@@ -116,7 +118,7 @@ public static class Program
                     // .AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider))
                     ;
             });
-            services.AddDbContextInterceptor<TestDbContext, AuditInterceptor>();
+            services.AddDbContextInterceptor1<TestDbContext, AuditInterceptor>();
 
             services.AddEFAutoAudit(builder =>
             {
@@ -435,7 +437,7 @@ public static class Program
         context.Database.EnsureDeleted();
     }
 
-    private static IServiceCollection AddDbContextInterceptor<TContext, TInterceptor>(
+    private static IServiceCollection AddDbContextInterceptor1<TContext, TInterceptor>(
         this IServiceCollection services,
         ServiceLifetime optionsLifetime = ServiceLifetime.Scoped
         )
