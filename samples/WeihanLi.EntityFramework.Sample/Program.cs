@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
@@ -13,7 +16,7 @@ using WeihanLi.Extensions;
 
 namespace WeihanLi.EntityFramework.Sample;
 
-public class Program
+public static class Program
 {
     public static void Main(string[] args)
     {
@@ -27,78 +30,78 @@ public class Program
 
     private static void AutoAuditTest()
     {
-        {
-            var services = new ServiceCollection();
-            services.AddLogging(builder => builder.AddDefaultDelegateLogger());
-            services.AddDbContext<AutoAuditContext1>(options =>
-            {
-                options.UseSqlite("Data Source=AutoAuditTest1.db");
-            });
-            services.AddEFAutoAudit(builder =>
-            {
-                builder
-                    .WithUserIdProvider(new DelegateUserIdProvider(() => "AutoAuditTest1"))
-                    .EnrichWithProperty("MachineName", Environment.MachineName)
-                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
-                    // 保存到自定义的存储
-                    .WithStore<AuditFileStore>("logs0.log")
-                    // 忽略指定实体
-                    .IgnoreEntity<AuditRecord>();
-            });
-            using var serviceProvider = services.BuildServiceProvider();
-            using var scope = serviceProvider.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<AutoAuditContext1>();
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-            context.Jobs.Add(new TestJobEntity() { Name = "test1" });
-            context.SaveChanges();
-            var job = context.Jobs.Find(1);
-            if (job is not null)
-            {
-                context.Jobs.Remove(job);
-                context.SaveChanges();
-            }
-
-            var auditRecords = context.AuditRecords.AsNoTracking().ToArray();
-            Console.WriteLine(auditRecords.ToJson());
-        }
-        ConsoleHelper.ReadLineWithPrompt();
-        {
-            var services = new ServiceCollection();
-            services.AddLogging(builder => builder.AddDefaultDelegateLogger());
-            services.AddDbContext<AutoAuditContext2>((provider, options) =>
-            {
-                options.UseSqlite("Data Source=AutoAuditTest2.db");
-                options.AddInterceptors(provider.GetRequiredService<AuditInterceptor>());
-            });
-            services.AddEFAutoAudit(builder =>
-            {
-                builder.EnrichWithProperty("AutoAudit", "EntityFramework")
-                    .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
-                    .WithStore<AuditFileStore>()
-                    .WithAuditRecordsDbContextStore(options =>
-                    {
-                        options.UseSqlite("Data Source=AutoAuditAuditRecords.db");
-                    });
-            });
-            using var serviceProvider = services.BuildServiceProvider();
-            using var scope = serviceProvider.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<AutoAuditContext2>();
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-            context.Jobs.Add(new TestJobEntity() { Name = "test1" });
-            context.SaveChanges();
-            var job = context.Jobs.Find(1);
-            if (job is not null)
-            {
-                context.Jobs.Remove(job);
-                context.SaveChanges();
-            }
-
-            var auditRecordsContext = scope.ServiceProvider.GetRequiredService<AuditRecordsDbContext>();
-            var auditRecords = auditRecordsContext.AuditRecords.AsNoTracking().ToArray();
-            Console.WriteLine(auditRecords.ToJson());
-        }
+        // {
+        //     var services = new ServiceCollection();
+        //     services.AddLogging(builder => builder.AddDefaultDelegateLogger());
+        //     services.AddDbContext<AutoAuditContext1>(options =>
+        //     {
+        //         options.UseSqlite("Data Source=AutoAuditTest1.db");
+        //     });
+        //     services.AddEFAutoAudit(builder =>
+        //     {
+        //         builder
+        //             .WithUserIdProvider(new DelegateUserIdProvider(() => "AutoAuditTest1"))
+        //             .EnrichWithProperty("MachineName", Environment.MachineName)
+        //             .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+        //             // 保存到自定义的存储
+        //             .WithStore<AuditConsoleStore>("logs0.log")
+        //             // 忽略指定实体
+        //             .IgnoreEntity<AuditRecord>();
+        //     });
+        //     using var serviceProvider = services.BuildServiceProvider();
+        //     using var scope = serviceProvider.CreateScope();
+        //     var context = scope.ServiceProvider.GetRequiredService<AutoAuditContext1>();
+        //     context.Database.EnsureDeleted();
+        //     context.Database.EnsureCreated();
+        //     context.Jobs.Add(new TestJobEntity() { Name = "test1" });
+        //     context.SaveChanges();
+        //     var job = context.Jobs.Find(1);
+        //     if (job is not null)
+        //     {
+        //         context.Jobs.Remove(job);
+        //         context.SaveChanges();
+        //     }
+        //
+        //     var auditRecords = context.AuditRecords.AsNoTracking().ToArray();
+        //     Console.WriteLine(auditRecords.ToJson());
+        // }
+        // ConsoleHelper.ReadLineWithPrompt();
+        // {
+        //     var services = new ServiceCollection();
+        //     services.AddLogging(builder => builder.AddDefaultDelegateLogger());
+        //     services.AddDbContext<AutoAuditContext2>((provider, options) =>
+        //     {
+        //         options.UseSqlite("Data Source=AutoAuditTest2.db");
+        //         options.AddInterceptors(provider.GetRequiredService<AuditInterceptor>());
+        //     });
+        //     services.AddEFAutoAudit(builder =>
+        //     {
+        //         builder.EnrichWithProperty("AutoAudit", "EntityFramework")
+        //             .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
+        //             .WithStore<AuditConsoleStore>()
+        //             .WithAuditRecordsDbContextStore(options =>
+        //             {
+        //                 options.UseSqlite("Data Source=AutoAuditAuditRecords.db");
+        //             });
+        //     });
+        //     using var serviceProvider = services.BuildServiceProvider();
+        //     using var scope = serviceProvider.CreateScope();
+        //     var context = scope.ServiceProvider.GetRequiredService<AutoAuditContext2>();
+        //     context.Database.EnsureDeleted();
+        //     context.Database.EnsureCreated();
+        //     context.Jobs.Add(new TestJobEntity() { Name = "test1" });
+        //     context.SaveChanges();
+        //     var job = context.Jobs.Find(1);
+        //     if (job is not null)
+        //     {
+        //         context.Jobs.Remove(job);
+        //         context.SaveChanges();
+        //     }
+        //
+        //     var auditRecordsContext = scope.ServiceProvider.GetRequiredService<AuditRecordsDbContext>();
+        //     var auditRecords = auditRecordsContext.AuditRecords.AsNoTracking().ToArray();
+        //     Console.WriteLine(auditRecords.ToJson());
+        // }
 
         {
             var services = new ServiceCollection();
@@ -110,9 +113,11 @@ public class Program
             {
                 options
                     .UseSqlite("Data Source=Test.db")
-                    .AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider))
+                    // .AddInterceptors(ActivatorUtilities.GetServiceOrCreateInstance<AuditInterceptor>(provider))
                     ;
             });
+            services.AddDbContextInterceptor<TestDbContext, AuditInterceptor>();
+
             services.AddEFAutoAudit(builder =>
             {
                 builder
@@ -123,8 +128,7 @@ public class Program
                     .EnrichWithProperty("MachineName", Environment.MachineName)
                     .EnrichWithProperty(nameof(ApplicationHelper.ApplicationName), ApplicationHelper.ApplicationName)
                     // 保存到自定义的存储
-                    .WithStore<AuditFileStore>()
-                    .WithStore<AuditFileStore>("logs0.log")
+                    .WithStore<AuditConsoleStore>()
                     // 忽略指定实体
                     .IgnoreEntity<AuditRecord>()
                     // 忽略指定实体的某个属性
@@ -133,7 +137,7 @@ public class Program
                     .IgnoreProperty("CreatedAt")
                     ;
             });
-
+            DependencyResolver.SetDependencyResolver(services);
             DependencyResolver.TryInvoke<TestDbContext>(dbContext =>
             {
                 dbContext.Database.EnsureDeleted();
@@ -430,18 +434,58 @@ public class Program
 
         context.Database.EnsureDeleted();
     }
+    
+    private static IServiceCollection AddDbContextInterceptor<TContext, TInterceptor>(
+        this IServiceCollection services,
+        ServiceLifetime optionsLifetime = ServiceLifetime.Scoped
+        )
+        where TContext : DbContext
+        where TInterceptor : IInterceptor
+    {
+        Action<IServiceProvider, DbContextOptionsBuilder> optionsAction = (sp, builder) =>
+        {
+            builder.AddInterceptors(sp.GetRequiredService<TInterceptor>());
+        };
+        services.Add(ServiceDescriptor.Describe(typeof(TInterceptor), typeof(TInterceptor), optionsLifetime));
+        services.Add(ServiceDescriptor.Describe(typeof(IDbContextOptionsConfiguration<TContext>), _ => 
+            new DbContextOptionsConfiguration<TContext>(optionsAction), optionsLifetime));
+        return services;
+    }
 }
 
 
-file sealed class AuditFileStore : PeriodBatchingAuditStore
+public sealed class AuditConsoleStore : IAuditStore
 {
     private readonly string _fileName;
 
-    public AuditFileStore() : this(null)
+    public AuditConsoleStore():this("audit-logs.log")
+    {
+    }
+    public AuditConsoleStore(string fileName)
+    {
+        _fileName = fileName;
+    }
+    
+    public Task Save(ICollection<AuditEntry> auditEntries)
+    {
+        foreach (var auditEntry in auditEntries)
+        {
+            Console.WriteLine(auditEntry.ToJson());   
+        }
+        
+        return Task.CompletedTask;
+    }
+}
+
+file sealed class AuditFileBatchStore : PeriodBatchingAuditStore
+{
+    private readonly string _fileName;
+
+    public AuditFileBatchStore() : this(null)
     {
     }
 
-    public AuditFileStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
+    public AuditFileBatchStore(string? fileName) : base(100, TimeSpan.FromSeconds(10))
     {
         _fileName = fileName.GetValueOrDefault("audits.log");
     }
