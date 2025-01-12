@@ -434,7 +434,7 @@ public static class Program
 
         context.Database.EnsureDeleted();
     }
-    
+
     private static IServiceCollection AddDbContextInterceptor<TContext, TInterceptor>(
         this IServiceCollection services,
         ServiceLifetime optionsLifetime = ServiceLifetime.Scoped
@@ -447,7 +447,7 @@ public static class Program
             builder.AddInterceptors(sp.GetRequiredService<TInterceptor>());
         };
         services.Add(ServiceDescriptor.Describe(typeof(TInterceptor), typeof(TInterceptor), optionsLifetime));
-        services.Add(ServiceDescriptor.Describe(typeof(IDbContextOptionsConfiguration<TContext>), _ => 
+        services.Add(ServiceDescriptor.Describe(typeof(IDbContextOptionsConfiguration<TContext>), _ =>
             new DbContextOptionsConfiguration<TContext>(optionsAction), optionsLifetime));
         return services;
     }
@@ -458,21 +458,21 @@ public sealed class AuditConsoleStore : IAuditStore
 {
     private readonly string _fileName;
 
-    public AuditConsoleStore():this("audit-logs.log")
+    public AuditConsoleStore() : this("audit-logs.log")
     {
     }
     public AuditConsoleStore(string fileName)
     {
         _fileName = fileName;
     }
-    
+
     public Task Save(ICollection<AuditEntry> auditEntries)
     {
         foreach (var auditEntry in auditEntries)
         {
-            Console.WriteLine(auditEntry.ToJson());   
+            Console.WriteLine(auditEntry.ToJson());
         }
-        
+
         return Task.CompletedTask;
     }
 }

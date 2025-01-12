@@ -217,7 +217,7 @@ public static class EFExtensions
         ArgumentNullException.ThrowIfNull(entityTypeBuilder);
         return entityTypeBuilder.HasQueryFilter(x => x.IsDeleted == false);
     }
-    
+
     public static IServiceCollection AddDbContextInterceptor<TContext, TInterceptor>(
         this IServiceCollection services,
         ServiceLifetime optionsLifetime = ServiceLifetime.Scoped
@@ -231,7 +231,7 @@ public static class EFExtensions
             builder.AddInterceptors(sp.GetRequiredService<TInterceptor>());
         };
         services.TryAdd(ServiceDescriptor.Describe(typeof(TInterceptor), typeof(TInterceptor), optionsLifetime));
-        services.Add(ServiceDescriptor.Describe(typeof(IDbContextOptionsConfiguration<TContext>), 
+        services.Add(ServiceDescriptor.Describe(typeof(IDbContextOptionsConfiguration<TContext>),
             _ => new DbContextOptionsConfiguration<TContext>(optionsAction), optionsLifetime));
         return services;
     }
