@@ -1,5 +1,10 @@
 # Release Notes
 
+More changes: 
+
+- Releases: https://github.com/WeihanLi/WeihanLi.EntityFramework/releases
+- PRs: https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged+base%3Amaster
+
 ## WeihanLi.EntityFramework
 
 ### [WeihanLi.EntityFramework 1.8.0](https://www.nuget.org/packages/WeihanLi.EntityFramework/1.8.0)

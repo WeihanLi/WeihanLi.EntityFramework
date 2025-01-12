@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -214,6 +216,24 @@ public static class EFExtensions
     {
         ArgumentNullException.ThrowIfNull(entityTypeBuilder);
         return entityTypeBuilder.HasQueryFilter(x => x.IsDeleted == false);
+    }
+
+    public static IServiceCollection AddDbContextInterceptor<TContext, TInterceptor>(
+        this IServiceCollection services,
+        ServiceLifetime optionsLifetime = ServiceLifetime.Scoped
+    )
+        where TContext : DbContext
+        where TInterceptor : IInterceptor
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        Action<IServiceProvider, DbContextOptionsBuilder> optionsAction = (sp, builder) =>
+        {
+            builder.AddInterceptors(sp.GetRequiredService<TInterceptor>());
+        };
+        services.TryAdd(ServiceDescriptor.Describe(typeof(TInterceptor), typeof(TInterceptor), optionsLifetime));
+        services.Add(ServiceDescriptor.Describe(typeof(IDbContextOptionsConfiguration<TContext>),
+            _ => new DbContextOptionsConfiguration<TContext>(optionsAction), optionsLifetime));
+        return services;
     }
 
     private static EntityEntry<TEntity> GetEntityEntry<TEntity>(this DbContext dbContext, TEntity entity, out bool existBefore)

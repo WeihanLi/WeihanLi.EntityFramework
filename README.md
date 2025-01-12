@@ -10,25 +10,26 @@
 
 ## Intro
 
-EntityFramework extensions
+[EntityFrameworkCore](https://github.com/dotnet/efcore) extensions
 
 ## Package Release Notes
 
-See PRs for details
+See Releases/PRs for details
 
-https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged+base%3Amaster
+- Releases: https://github.com/WeihanLi/WeihanLi.EntityFramework/releases
+- PRs: https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged+base%3Amaster
 
 > Package Versions
 >
-> For EF Core 2.x , use 1.4.x and below
+> For EF 8 and above, use 8.x or above major-version matched versions
 >
-> For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
+> For EF 7, use 3.x
 >
 > For EF Core 5/6, use 2.x
 >
-> For EF 7, use 3.0.0 and above
+> For EF Core 3.x, use 1.5.0 above, and 2.0.0 below
 >
-> For EF 8 and above, use 8.x or above major-version matched versions
+> For EF Core 2.x , use 1.4.x and below
 
 ## Features
 
@@ -51,7 +52,7 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
  
 - AutoUpdate
 
-  - Soft delete for specific entity
+  - Soft delete for the specific entity
   - Auto update CreatedAt/UpdatedAt/CreatedBy/UpdatedBy
 
 - Extensions
@@ -59,6 +60,6 @@ https://github.com/WeihanLi/WeihanLi.EntityFramework/pulls?q=is%3Apr+is%3Aclosed
   - Update specific column(s) `Update`
   - Update without specific column(s) `UpdateWithout`
 
-## Contact
+## Support
 
-contact me <weihanli@outlook.com> if you need
+Feel free to try and [create issues](https://github.com/WeihanLi/WeihanLi.EntityFramework/issues/new) if you have any questions or integration issues
