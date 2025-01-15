@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--    <TargetFramework>net8.0</TargetFramework>  -->
+    <LangVersion>latest</LangVersion>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Title>WeihanLi.EntityFramework.SourceGenerator</Title>
+    <Description>Source generator for WeihanLi.EntityFramework</Description>
+    <Authors>WeihanLi</Authors>
+    <Company>WeihanLi</Company>
+    <Product>WeihanLi.EntityFramework</Product>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/WeihanLi/WeihanLi.EntityFramework</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright 2019-2024 (c) WeihanLi</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
