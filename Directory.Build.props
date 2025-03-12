@@ -6,8 +6,8 @@
     <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.74</CommonVersion>
-    <EFVersion>9.0.2</EFVersion>
+    <CommonVersion>1.0.75</CommonVersion>
+    <EFVersion>9.0.3</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
