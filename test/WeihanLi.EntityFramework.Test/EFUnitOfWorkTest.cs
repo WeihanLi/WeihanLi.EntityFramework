@@ -25,7 +25,7 @@ public class EFUnitOfWorkTest : EFTestBase
         IServiceScope scope1 = null;
         try
         {
-            _semaphore.Wait();
+            _semaphore.Wait(TestContext.Current.CancellationToken);
             scope1 = Services.CreateScope();
             var repository = scope1.ServiceProvider.GetRequiredService<IEFRepository<TestDbContext, TestEntity>>();
 
@@ -115,7 +115,7 @@ public class EFUnitOfWorkTest : EFTestBase
         IServiceScope scope1 = null;
         try
         {
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync(TestContext.Current.CancellationToken);
             scope1 = Services.CreateScope();
             var repository = scope1.ServiceProvider.GetRequiredService<IEFRepositoryFactory<TestDbContext>>()
                 .GetRepository<TestEntity>();
@@ -150,7 +150,7 @@ public class EFUnitOfWorkTest : EFTestBase
                         CreatedAt = DateTime.UtcNow,
                         Name = "xss3",
                     }
-                });
+                }, TestContext.Current.CancellationToken);
 
             using (var scope = Services.CreateScope())
             {
@@ -159,10 +159,10 @@ public class EFUnitOfWorkTest : EFTestBase
                 {
                     CreatedAt = DateTime.UtcNow,
                     Name = "xxxxxx"
-                });
+                }, TestContext.Current.CancellationToken);
             }
 
-            var beforeCount = await repository.CountAsync();
+            var beforeCount = await repository.CountAsync(cancellationToken: TestContext.Current.CancellationToken);
             using var uow = repository.GetUnitOfWork();
             uow.DbContext.Update(new TestEntity()
             {
@@ -187,15 +187,15 @@ public class EFUnitOfWorkTest : EFTestBase
                 Name = "xyy1",
             });
 
-            var beforeCommitCount = await repository.CountAsync();
+            var beforeCommitCount = await repository.CountAsync(cancellationToken: TestContext.Current.CancellationToken);
             Assert.Equal(beforeCount, beforeCommitCount);
 
-            await uow.CommitAsync();
+            await uow.CommitAsync(TestContext.Current.CancellationToken);
 
             var committedCount = await repository.CountAsync(cancellationToken: TestContext.Current.CancellationToken);
             Assert.Equal(committedCount, beforeCount + 1);
 
-            entity = await repository.DbContext.FindAsync<TestEntity>(3);
+            entity = await repository.DbContext.FindAsync<TestEntity>(new object[] { 3 }, TestContext.Current.CancellationToken);
             Assert.Equal(new string('3', 6), entity.Name);
 
             entity = await repository.DbContext.FindAsync<TestEntity>(new object[] { 4 }, cancellationToken: TestContext.Current.CancellationToken);
@@ -218,7 +218,7 @@ public class EFUnitOfWorkTest : EFTestBase
     {
         try
         {
-            _semaphore.Wait();
+            _semaphore.Wait(TestContext.Current.CancellationToken);
 
             using (var scope = Services.CreateScope())
             {
@@ -257,7 +257,7 @@ public class EFUnitOfWorkTest : EFTestBase
     {
         try
         {
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync(TestContext.Current.CancellationToken);
 
             using (var scope = Services.CreateScope())
             {
@@ -267,7 +267,7 @@ public class EFUnitOfWorkTest : EFTestBase
                     .Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "saa" });
                 unitOfWork.DbContext.TestEntities
                     .Add(new TestEntity() { CreatedAt = DateTime.UtcNow, Name = "saa" });
-                await unitOfWork.CommitAsync();
+                await unitOfWork.CommitAsync(TestContext.Current.CancellationToken);
             }
             using (var scope = Services.CreateScope())
             {
@@ -279,7 +279,7 @@ public class EFUnitOfWorkTest : EFTestBase
                 unitOfWork.DbContext.TestEntities.Add(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow });
                 unitOfWork.DbContext.TestEntities.Add(new TestEntity() { Name = "xxx", CreatedAt = DateTime.UtcNow });
 
-                await unitOfWork.RollbackAsync();
+                await unitOfWork.RollbackAsync(TestContext.Current.CancellationToken);
 
                 var count2 = unitOfWork.DbContext.TestEntities.Count();
                 Assert.Equal(count, count2);
@@ -301,7 +301,7 @@ public class EFUnitOfWorkTest : EFTestBase
         }
         try
         {
-            _semaphore.Wait();
+            _semaphore.Wait(TestContext.Current.CancellationToken);
 
             using (var scope = Services.CreateScope())
             {
