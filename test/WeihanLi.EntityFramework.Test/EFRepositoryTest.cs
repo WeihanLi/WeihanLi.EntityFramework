@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using WeihanLi.Common;
 using WeihanLi.Common.Helpers;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace WeihanLi.EntityFramework.Test;
 
@@ -40,7 +39,7 @@ public class EFRepositoryTest : EFTestBase
     [Fact]
     public async Task InsertAsyncTest()
     {
-        using (await _lock.LockAsync())
+        using (await _lock.LockAsync(cancellationToken: TestContext.Current.CancellationToken))
         {
             await DependencyResolver.TryInvokeAsync<IEFRepository<TestDbContext, TestEntity>>(async repo =>
             {

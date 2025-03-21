@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using WeihanLi.Common.Data;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace WeihanLi.EntityFramework.Test;
 
@@ -193,13 +192,13 @@ public class EFUnitOfWorkTest : EFTestBase
 
             await uow.CommitAsync();
 
-            var committedCount = await repository.CountAsync();
+            var committedCount = await repository.CountAsync(cancellationToken: TestContext.Current.CancellationToken);
             Assert.Equal(committedCount, beforeCount + 1);
 
             entity = await repository.DbContext.FindAsync<TestEntity>(3);
             Assert.Equal(new string('3', 6), entity.Name);
 
-            entity = await repository.DbContext.FindAsync<TestEntity>(new object[] { 4 }, CancellationToken.None);
+            entity = await repository.DbContext.FindAsync<TestEntity>(new object[] { 4 }, cancellationToken: TestContext.Current.CancellationToken);
             Assert.Equal(new string('4', 6), entity.Name);
 
             Assert.Equal(1, await Repository.DeleteAsync(1));
