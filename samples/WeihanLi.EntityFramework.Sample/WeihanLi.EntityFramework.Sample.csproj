@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WeihanLi.EntityFramework.SourceGenerator\WeihanLi.EntityFramework.SourceGenerator.csproj" OutputItemType="analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\WeihanLi.EntityFramework.SourceGenerator\WeihanLi.EntityFramework.SourceGenerator.csproj" OutputItemType="analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

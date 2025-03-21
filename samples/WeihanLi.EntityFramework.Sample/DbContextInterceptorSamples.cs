@@ -48,13 +48,13 @@ public static class DbContextInterceptorSamples
 
 file sealed class FileTestDbContext(DbContextOptions<FileTestDbContext> options) : DbContext(options)
 {
-    public DbSet<TestEntity> Entities { get; set; }
+    public DbSet<TestEntity> Entities { get; set; } = null!;
 }
 
 file sealed class TestEntity
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string? Name { get; set; }
 }
 
 file sealed class SavingInterceptor : SaveChangesInterceptor
