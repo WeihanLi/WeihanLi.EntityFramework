@@ -260,7 +260,7 @@ public class EFRepository<TDbContext, TEntity> :
         return DbContext.SaveChanges();
     }
 
-    public int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
+    public int Update(Action<UpdateSettersBuilder<TEntity>> setExpression,
         Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null)
     {
         var queryBuilder = new EFRepositoryQueryBuilder<TEntity>(DbContext.Set<TEntity>());
@@ -268,7 +268,7 @@ public class EFRepository<TDbContext, TEntity> :
         return queryBuilder.Build().ExecuteUpdate(setExpression);
     }
 
-    public Task<int> UpdateAsync(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
+    public Task<int> UpdateAsync(Action<UpdateSettersBuilder<TEntity>> setExpression,
         Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
         CancellationToken cancellationToken = default)
     {

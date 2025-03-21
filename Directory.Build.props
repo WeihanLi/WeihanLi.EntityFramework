@@ -2,12 +2,12 @@
   <Import Project="./build/version.props" />
   
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.75</CommonVersion>
-    <EFVersion>9.0.3</EFVersion>
+    <CommonVersion>1.0.76</CommonVersion>
+    <EFVersion>10.0.0-preview.2.25163.8</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

@@ -32,10 +32,10 @@ public interface IEFRepository<out TDbContext, TEntity> : IRepository<TEntity>
     /// <returns>the entity founded, if not found, null returned</returns>
     ValueTask<TEntity?> FindAsync(object[] keyValues, CancellationToken cancellationToken);
 
-    int Update(Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null);
+    int Update(Action<UpdateSettersBuilder<TEntity>> setExpression, Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null);
 
     Task<int> UpdateAsync(
-        Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setExpression,
+        Action<UpdateSettersBuilder<TEntity>> setExpression,
         Action<EFRepositoryQueryBuilder<TEntity>>? queryBuilderAction = null,
         CancellationToken cancellationToken = default);
 
