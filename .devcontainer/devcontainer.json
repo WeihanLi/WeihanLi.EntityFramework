@@ -1,6 +1,6 @@
 {
     "name": "CodeSpace",
-    "image": "mcr.microsoft.com/dotnet/sdk:8.0",
+    "image": "mcr.microsoft.com/dotnet/sdk:10.0-preview",
     // Install needed extensions
     "extensions": [
         "ms-dotnettools.csharp",
