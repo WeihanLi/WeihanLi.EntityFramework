@@ -13,7 +13,7 @@ public sealed class EFExtensionsGenerator : IIncrementalGenerator
                                      namespace WeihanLi.EntityFramework
                                      {
                                          [AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-                                         public sealed class EFExtensionsAttribute;    
+                                         public sealed class EFExtensionsAttribute;
                                      }
                                      """;
 
@@ -39,7 +39,7 @@ public sealed class EFExtensionsGenerator : IIncrementalGenerator
             var dbContextName = dbContextDeclaration!.Identifier.Text;
             var repositoryNamespace = dbContextDeclaration.Parent!.GetNamespace();
             var generatedCode = GenerateRepositoryCode(dbContextName, repositoryNamespace, templates);
-            spc.AddSource($"{dbContextName}Repository.g.cs", SourceText.From(generatedCode, Encoding.UTF8));
+            // spc.AddSource($"{dbContextName}Repository.g.cs", SourceText.From(generatedCode, Encoding.UTF8));
         });
     }
 
