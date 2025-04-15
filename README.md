@@ -63,3 +63,7 @@ See Releases/PRs for details
 ## Support
 
 Feel free to try and [create issues](https://github.com/WeihanLi/WeihanLi.EntityFramework/issues/new) if you have any questions or integration issues
+
+## Usage
+
+For detailed usage instructions, please refer to the [Usage Documentation](docs/Usage.md).
