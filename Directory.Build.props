@@ -6,7 +6,7 @@
     <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <CommonVersion>1.0.76</CommonVersion>
+    <CommonVersion>1.0.77</CommonVersion>
     <EFVersion>10.0.0-preview.3.25171.6</EFVersion>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
