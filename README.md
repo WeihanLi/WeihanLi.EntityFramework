@@ -161,6 +161,8 @@ See Releases/PRs for details
 
 📖 **[Complete Usage Guide](docs/Usage.md)** - Comprehensive documentation with examples for all features
 
+⚡ **[Advanced Features Guide](docs/AdvancedFeatures.md)** - Custom interceptors, performance optimization, and integration patterns
+
 📋 **[Release Notes](docs/ReleaseNotes.md)** - Version history and breaking changes
 
 🔧 **[Sample Project](samples/WeihanLi.EntityFramework.Sample/)** - Working examples and demonstrations

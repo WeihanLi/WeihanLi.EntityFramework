@@ -827,3 +827,9 @@ public class ProductQueryService
 ```
 
 These advanced patterns help you build robust, scalable applications while leveraging the full power of WeihanLi.EntityFramework.
+
+## Related Documentation
+
+- 🚀 [Getting Started Guide](GettingStarted.md) - New to WeihanLi.EntityFramework? Start here
+- 📖 [Complete Usage Guide](Usage.md) - Comprehensive documentation with examples for all features  
+- 📋 [Release Notes](ReleaseNotes.md) - Version history and breaking changes

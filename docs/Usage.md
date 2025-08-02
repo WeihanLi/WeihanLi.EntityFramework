@@ -1458,3 +1458,9 @@ services.AddEFAutoAudit(builder =>
 ### Migration Notes
 
 When upgrading between major versions, review the [Release Notes](ReleaseNotes.md) for breaking changes and migration guidance.
+
+## Related Documentation
+
+- 🚀 [Getting Started Guide](GettingStarted.md) - New to WeihanLi.EntityFramework? Start here
+- ⚡ [Advanced Features Guide](AdvancedFeatures.md) - Custom interceptors, performance optimization, and integration patterns
+- 📋 [Release Notes](ReleaseNotes.md) - Version history and breaking changes

@@ -375,6 +375,7 @@ When you run this setup, WeihanLi.EntityFramework will automatically:
 ## Next Steps
 
 - 📖 Read the [Complete Usage Guide](Usage.md) for advanced features
+- ⚡ Explore [Advanced Features Guide](AdvancedFeatures.md) for custom interceptors and optimization
 - 🔍 Explore the [sample project](../samples/WeihanLi.EntityFramework.Sample/) for more examples
 - 🛠️ Check out bulk operations, advanced querying, and custom audit stores
 - 📋 Review [Release Notes](ReleaseNotes.md) for version-specific information
