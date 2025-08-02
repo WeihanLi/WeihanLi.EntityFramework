@@ -52,9 +52,9 @@ public class EFRepositoryQueryBuilder<TEntity> where TEntity : class
         _ignoreQueryFilters = ignoreQueryFilters;
         return this;
     }
-    
+
     private readonly HashSet<string> _queryFiltersToIgnore = new();
-    
+
     public EFRepositoryQueryBuilder<TEntity> IgnoreQueryFilters(IReadOnlyCollection<string> queryFilters, bool ignoreQueryFilters = true)
     {
         ArgumentNullException.ThrowIfNull(queryFilters);
