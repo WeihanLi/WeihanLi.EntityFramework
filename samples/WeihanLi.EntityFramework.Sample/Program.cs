@@ -21,10 +21,10 @@ public static class Program
     public static async Task Main(string[] args)
     {
         // SoftDeleteTest();
-        // RepositoryTest();
+        RepositoryTest();
         // AutoAuditTest();
 
-        await DbContextInterceptorSamples.RunAsync();
+        // await DbContextInterceptorSamples.RunAsync();
 
         Console.WriteLine("completed");
         Console.ReadLine();
@@ -212,7 +212,7 @@ public static class Program
                 var conn = db.Database.GetDbConnection();
                 try
                 {
-                    conn.Execute($@"TRUNCATE TABLE {tableName}");
+                    conn.Execute($"TRUNCATE TABLE {tableName}");
                 }
                 catch
                 {
@@ -240,6 +240,14 @@ public static class Program
 
             var abc = db.TestEntities.AsNoTracking().ToArray();
             Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
+
+            var entities = repo.Query(q => q.IgnoreQueryFilters(["not-null"]))
+                .ToArray();
+            Console.WriteLine(entities.Length);
+
+            entities = repo.Query(q => q.IgnoreQueryFilters())
+                .ToArray();
+            Console.WriteLine(entities.Length);
 
             var data = repo.Query(q => q.WithPredictIf(f => f.Id > 0, false)).ToArray();
             Console.WriteLine(JsonSerializer.Serialize(data));
