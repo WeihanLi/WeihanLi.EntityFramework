@@ -528,10 +528,7 @@ services.AddEFAutoAudit(builder =>
         .IgnoreProperty("CreatedAt")
         
         // Include unmodified properties (default is false)
-        .WithUnModifiedProperty()
-        
-        // Configure property value formatting
-        .WithPropertyValueFormatter<CustomPropertyValueFormatter>();
+        .WithUnModifiedProperty();
 });
 ```
 
