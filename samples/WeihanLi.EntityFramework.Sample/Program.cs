@@ -236,15 +236,19 @@ public static class Program
                 { "Extra", "12345"}
             });
 
-            var list = repo.Query(q => q.IgnoreQueryFilters(["not-null"]))
-                .ToArray();
-            Console.WriteLine(list.Length);
-
             repo.Update(x => x.SetProperty(_ => _.Extra, _ => "{}"), q => q.IgnoreQueryFilters());
 
             var abc = db.TestEntities.AsNoTracking().ToArray();
             Console.WriteLine($"{string.Join(Environment.NewLine, abc.Select(_ => _.ToJson()))}");
-
+            
+            var entities = repo.Query(q => q.IgnoreQueryFilters(["not-null"]))
+                .ToArray();
+            Console.WriteLine(entities.Length);
+            
+            entities = repo.Query(q => q.IgnoreQueryFilters())
+                .ToArray();
+            Console.WriteLine(entities.Length);
+            
             var data = repo.Query(q => q.WithPredictIf(f => f.Id > 0, false)).ToArray();
             Console.WriteLine(JsonSerializer.Serialize(data));
 
