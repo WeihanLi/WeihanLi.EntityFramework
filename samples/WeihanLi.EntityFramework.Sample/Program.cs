@@ -21,10 +21,10 @@ public static class Program
     public static async Task Main(string[] args)
     {
         // SoftDeleteTest();
-        // RepositoryTest();
+        RepositoryTest();
         // AutoAuditTest();
 
-        await DbContextInterceptorSamples.RunAsync();
+        // await DbContextInterceptorSamples.RunAsync();
 
         Console.WriteLine("completed");
         Console.ReadLine();
@@ -212,7 +212,7 @@ public static class Program
                 var conn = db.Database.GetDbConnection();
                 try
                 {
-                    conn.Execute($@"TRUNCATE TABLE {tableName}");
+                    conn.Execute($"TRUNCATE TABLE {tableName}");
                 }
                 catch
                 {
@@ -235,6 +235,10 @@ public static class Program
             {
                 { "Extra", "12345"}
             });
+
+            var list = repo.Query(q => q.IgnoreQueryFilters(["not-null"]))
+                .ToArray();
+            Console.WriteLine(list.Length);
 
             repo.Update(x => x.SetProperty(_ => _.Extra, _ => "{}"), q => q.IgnoreQueryFilters());
 

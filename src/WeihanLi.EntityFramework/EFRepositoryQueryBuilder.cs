@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using WeihanLi.Common;
 
@@ -55,6 +52,28 @@ public class EFRepositoryQueryBuilder<TEntity> where TEntity : class
         _ignoreQueryFilters = ignoreQueryFilters;
         return this;
     }
+    
+    private readonly HashSet<string> _queryFiltersToIgnore = new();
+    
+    public EFRepositoryQueryBuilder<TEntity> IgnoreQueryFilters(IReadOnlyCollection<string> queryFilters, bool ignoreQueryFilters = true)
+    {
+        ArgumentNullException.ThrowIfNull(queryFilters);
+        if (ignoreQueryFilters)
+        {
+            foreach (var queryFilter in queryFilters)
+            {
+                _queryFiltersToIgnore.Add(queryFilter);
+            }
+        }
+        else
+        {
+            foreach (var queryFilter in queryFilters)
+            {
+                _queryFiltersToIgnore.Remove(queryFilter);
+            }
+        }
+        return this;
+    }
 
     private int _count;
 
@@ -82,6 +101,10 @@ public class EFRepositoryQueryBuilder<TEntity> where TEntity : class
         if (_ignoreQueryFilters)
         {
             query = query.IgnoreQueryFilters();
+        }
+        else if (_queryFiltersToIgnore.Count > 0)
+        {
+            query = query.IgnoreQueryFilters(_queryFiltersToIgnore);
         }
         if (_whereExpression.Count > 0)
         {
