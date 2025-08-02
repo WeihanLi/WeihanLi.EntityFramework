@@ -171,9 +171,7 @@ See Releases/PRs for details
 
 💡 **Questions?** Check out the [Usage Guide](docs/Usage.md) for detailed examples
 
-🐛 **Found a bug?** [Create an issue](https://github.com/WeihanLi/WeihanLi.EntityFramework/issues/new) with reproduction steps
-
-💬 **Need help?** Feel free to [start a discussion](https://github.com/WeihanLi/WeihanLi.EntityFramework/discussions) or create an issue
+🐛 **Found a bug or need help?** Feel free to [create an issue](https://github.com/WeihanLi/WeihanLi.EntityFramework/issues/new) with reproduction steps
 
 ## Usage
 
