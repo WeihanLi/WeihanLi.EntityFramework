@@ -1,7 +1,7 @@
 [string]$SCRIPT = '.\build\build.cs'
  
 # Install dotnet tool
-dotnet tool update --global dotnet-execute
+dotnet tool install --global dotnet-execute --prerelease
 
 Write-Host "dotnet-exec $SCRIPT --args $ARGS" -ForegroundColor GREEN
  
