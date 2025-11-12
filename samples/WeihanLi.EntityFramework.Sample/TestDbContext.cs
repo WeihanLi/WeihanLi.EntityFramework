@@ -11,6 +11,16 @@ public class TestDbContext : DbContext
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<TestEntity>()
+            // .HasQueryFilter("one-month-ago", t => t.CreatedAt > DateTime.Now.AddMonths(-1))
+            .HasQueryFilter("valid-id", t => t.Id > 0)
+            .HasQueryFilter("not-null", t => t.Extra != null)
+            ;
+    }
+
     public DbSet<TestEntity> TestEntities { get; set; } = null!;
 }
 
