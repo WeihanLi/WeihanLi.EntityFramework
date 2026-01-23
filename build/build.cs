@@ -1,4 +1,5 @@
-var solutionPath = "./WeihanLi.EntityFramework.slnx";
+﻿var solutionPath = "./WeihanLi.EntityFramework.slnx";
+
 string[] srcProjects = [ 
     "./src/WeihanLi.EntityFramework/WeihanLi.EntityFramework.csproj"
 ];
